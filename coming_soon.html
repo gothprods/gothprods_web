@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goth Prods | Coming Soon</title>
+    <!-- Favicon -->
+    <link rel="icon" href="assets/logo.png" type="image/png">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .logo-container {
+            margin-bottom: 40px;
+            animation: pulseLogo 3s infinite alternate ease-in-out;
+        }
+
+        .logo-container img {
+            width: 280px;
+            max-width: 80vw;
+            background: transparent;
+            filter: drop-shadow(0 0 15px rgba(165, 155, 93, 0.4));
+        }
+
+        @keyframes pulseLogo {
+            0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(165, 155, 93, 0.2)); }
+            100% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(165, 155, 93, 0.8)); }
+        }
+
+        .coming-text-container {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #coming-text {
+            font-family: 'Oswald', sans-serif;
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            color: #A59B5D; /* Color de acento oficial de Goth Prods */
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out, letter-spacing 0.5s ease;
+            text-shadow: 0px 4px 15px rgba(165, 155, 93, 0.5);
+        }
+
+        .social-icons {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            display: flex;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .social-icons a {
+            color: #ffffff;
+            font-size: 1.5rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-icons a:hover {
+            color: #A59B5D;
+            transform: translateY(-3px) scale(1.1);
+            filter: drop-shadow(0 0 8px rgba(165, 155, 93, 0.6));
+        }
+
+        /* Responsive por si se ve en móviles */
+        @media (max-width: 768px) {
+            .social-icons {
+                top: 20px;
+                right: 50%;
+                transform: translateX(50%);
+                gap: 15px;
+            }
+            .social-icons a {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Efecto de ruido de fondo (opcional, le da toque under) */
+        .noise {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.15;
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+
+    <div class="social-icons">
+        <a href="https://www.tiktok.com/@goth_prods" target="_blank" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://www.facebook.com/Goth-Prods-104237088306624/" target="_blank" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="https://www.instagram.com/goth_prods/" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.youtube.com/@gothprods44" target="_blank" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        <a href="https://podcasts.apple.com/mx/podcast/goth-prods/id1606324255?l=en" target="_blank" title="Apple Podcasts"><i class="fa-solid fa-podcast"></i></a>
+        <a href="https://open.spotify.com/show/2hnlgkcGNl9GOAPa0WT9HW?si=7e9b95f203464fe6" target="_blank" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
+    </div>
+
+    <div class="logo-container">
+        <img src="assets/logo_transparent.png" alt="Goth Prods Logo">
+    </div>
+
+    <div class="coming-text-container">
+        <h1 id="coming-text">Pronto ...</h1>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const textElement = document.getElementById('coming-text');
+            let isPronto = true;
+            
+            setInterval(() => {
+                textElement.style.opacity = 0;
+                
+                setTimeout(() => {
+                    if (isPronto) {
+                        textElement.innerText = "Soon ...";
+                        textElement.style.letterSpacing = "15px";
+                    } else {
+                        textElement.innerText = "Pronto ...";
+                        textElement.style.letterSpacing = "8px";
+                    }
+                    textElement.style.opacity = 1;
+                    isPronto = !isPronto;
+                }, 500); 
+                
+            }, 3000); 
+        });
+    </script>
+</body>
+</html>

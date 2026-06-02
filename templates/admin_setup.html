@@ -1,0 +1,10 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<h1>¡Bienvenido al Abismo!</h1>
+<p style="text-align: center; color: var(--text-muted); margin-bottom: 20px;">Por favor, crea la contraseña maestra de Goth Prods.</p>
+<form method="POST">
+    <label>Nueva Contraseña Maestra</label>
+    <input type="password" name="password" placeholder="Mínimo 8 caracteres" required>
+    <button type="submit"><i class="fa-solid fa-key"></i> Guardar Contraseña</button>
+</form>
+{% endblock %}

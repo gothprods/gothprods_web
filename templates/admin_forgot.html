@@ -1,0 +1,11 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<h1>Recuperar Contraseña</h1>
+<p style="text-align: center; color: var(--text-muted); margin-bottom: 20px;">Ingresa tu correo para enviarte un código de recuperación.</p>
+<form method="POST">
+    <label>Correo Electrónico</label>
+    <input type="email" name="email" placeholder="root@gothprods.com" required>
+    <button type="submit"><i class="fa-solid fa-paper-plane"></i> Enviar Código</button>
+</form>
+<a href="/admin/login" class="link">Volver al Login</a>
+{% endblock %}

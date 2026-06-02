@@ -1,0 +1,14 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<h1>Crear Nueva Contraseña</h1>
+<p style="text-align: center; color: var(--text-muted); margin-bottom: 20px;">Ingresa el código de 6 dígitos enviado a {{ session.reset_email }} y tu nueva contraseña.</p>
+<form method="POST">
+    <label>Código de Verificación</label>
+    <input type="text" name="code" placeholder="123456" maxlength="6" required>
+    
+    <label>Nueva Contraseña</label>
+    <input type="password" name="new_password" placeholder="Mínimo 8 caracteres" required>
+    
+    <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Guardar Nueva Contraseña</button>
+</form>
+{% endblock %}

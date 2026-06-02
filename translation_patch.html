@@ -1,0 +1,109 @@
+<script>
+const dict = {
+    'Crear/Editar Registro': 'Create/Edit Record',
+    'Sincronización Automática': 'Auto Sync',
+    'Gestión Noticiero': 'News Mgmt',
+    'Gestión Reseñas': 'Reviews Mgmt',
+    'Metal Pulse': 'Metal Pulse',
+    'Crear Nuevo Registro': 'Create New Record',
+    'Llena este formulario para actualizar la web y generar automáticamente tus copys e imágenes para redes sociales.': 'Fill out this form to update the web and automatically generate your copy and images for social media.',
+    'Sección de la Página': 'Page Section',
+    'Fecha de Publicación': 'Publish Date',
+    'Título del Registro': 'Record Title',
+    'Descripción Corta (Para tarjetas y listados)': 'Short Description (Cards & Lists)',
+    'Descripción Completa (Para modal/cuerpo de la noticia)': 'Full Description (Modal/Body)',
+    'Imagen de Portada': 'Cover Image',
+    'Link YouTube (Opcional)': 'YouTube Link (Optional)',
+    'Link Spotify (Opcional)': 'Spotify Link (Optional)',
+    'Link Apple Podcast (Opcional)': 'Apple Podcast Link (Optional)',
+    'Autor / Crew': 'Author / Crew',
+    'Actualizar Web y Generar Redes Sociales': 'Update Web & Generate Socials',
+    'Cancelar': 'Cancel',
+    'Importa automáticamente desde Apple, Spotify, YouTube o Google Sheets.': 'Import automatically from Apple, Spotify, YouTube or Google Sheets.',
+    'La Galería Nocturna': 'La Galería Nocturna',
+    'Busca nuevos episodios en YouTube para La Galería': 'Search for new episodes on YouTube for La Galería',
+    'Actualizar Galería': 'Update Galería',
+    'Busca nuevos episodios en Apple Podcast y Spotify': 'Search for new episodes on Apple Podcast and Spotify',
+    'Actualizar Metal Pulse': 'Update Metal Pulse',
+    'Busca nuevas entrevistas en tu lista de YouTube': 'Search for new interviews in your YouTube playlist',
+    'Actualizar Entrevistas': 'Update Interviews',
+    'Agenda Metalera': 'Metal Agenda',
+    'Lee los nuevos eventos confirmados desde tu Google Sheet': 'Read newly confirmed events from your Google Sheet',
+    'Actualizar Agenda': 'Update Agenda',
+    'El Noticiero Nocturno': 'El Noticiero Nocturno',
+    'Registros manuales de esta sección.': 'Manual records for this section.',
+    'Reseñas de Conciertos': 'Concert Reviews',
+    'Gestión Metal Pulse': 'Metal Pulse Mgmt',
+    'Agrega recomendaciones de canciones y álbumes para la sección Metal Pulse (Top 10).': 'Add song and album recommendations for the Metal Pulse section (Top 10).',
+    'Nombre de la Banda': 'Band Name',
+    'Nombre de la Canción / Álbum': 'Song / Album Name',
+    'Link de Spotify': 'Spotify Link',
+    'Agregar Track': 'Add Track',
+    'Tracks Actuales': 'Current Tracks',
+    'Acciones': 'Actions',
+    'Banda': 'Band',
+    'Canción / Álbum': 'Song / Album',
+    'Editar': 'Edit',
+    'Eliminar': 'Delete',
+    'Título': 'Title',
+    'Fecha': 'Date',
+    'Ej. ¡Nuevo Box Set de Metallica!': 'Ex. New Metallica Box Set!',
+    'Resumen de 1-2 líneas...': '1-2 line summary...',
+    'Toda la información del evento, noticia o episodio...': 'All info for the event, news or episode...',
+    'Ej. Nekrogoblikon': 'Ex. Nekrogoblikon',
+    'Ej. The Boiling Sea': 'Ex. The Boiling Sea',
+    'Salir': 'Logout',
+    'Reseñas de Conciertos': 'Concert Reviews',
+    'El Noticiero Nocturno': 'El Noticiero Nocturno',
+    'Metal Pulse Tracks': 'Metal Pulse Tracks'
+};
+
+const reverseDict = {};
+for (const [es, en] of Object.entries(dict)) {
+    reverseDict[en] = es;
+}
+
+let currentLang = 'es';
+
+function setLanguage(lang) {
+    if (lang === currentLang) return;
+    const targetDict = lang === 'en' ? dict : reverseDict;
+    
+    // Update text nodes
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+    let node;
+    while (node = walker.nextNode()) {
+        let trimmed = node.nodeValue.trim();
+        if (targetDict[trimmed]) {
+            node.nodeValue = node.nodeValue.replace(trimmed, targetDict[trimmed]);
+        }
+    }
+
+    // Update placeholders
+    const inputs = document.querySelectorAll('input[placeholder], textarea[placeholder]');
+    inputs.forEach(input => {
+        let trimmed = input.placeholder.trim();
+        if (targetDict[trimmed]) {
+            input.placeholder = targetDict[trimmed];
+        }
+    });
+    
+    // Update select options
+    const options = document.querySelectorAll('option');
+    options.forEach(opt => {
+        let trimmed = opt.textContent.trim();
+        if (targetDict[trimmed]) {
+            opt.textContent = targetDict[trimmed];
+            opt.value = lang === 'en' ? reverseDict[targetDict[trimmed]] : targetDict[trimmed]; // ensure value stays ES so DB works! Wait! 
+            // Actually, keep value identical so backend doesn't break, only change textContent!
+            opt.value = opt.value; // Keep original DB value
+        }
+    });
+
+    currentLang = lang;
+    
+    // Update button styles
+    document.getElementById('btn-es').style.borderColor = lang === 'es' ? 'var(--accent-color)' : '#555';
+    document.getElementById('btn-en').style.borderColor = lang === 'en' ? 'var(--accent-color)' : '#555';
+}
+</script>
