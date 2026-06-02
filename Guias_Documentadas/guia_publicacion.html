@@ -1,0 +1,100 @@
+<html><head><meta charset="utf-8"><title>guia_publicacion.md</title><style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #333; max-width: 800px; margin: 40px auto; padding: 20px; }
+h1, h2, h3 { color: #111; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+code { background-color: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #d63384; }
+pre { background-color: #f6f8fa; padding: 16px; border-radius: 8px; overflow-x: auto; }
+pre code { background-color: transparent; color: #333; }
+blockquote { border-left: 4px solid #007bff; margin-left: 0; padding-left: 16px; color: #555; background: #f8f9fa; padding: 10px; border-radius: 0 8px 8px 0; }
+a { color: #007bff; text-decoration: none; }
+table { border-collapse: collapse; width: 100%; margin-bottom: 1em; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #f2f2f2; }
+</style></head><body><h1>Guía Paso a Paso para Publicar tu Sitio Web Goth Prods</h1>
+<p>¡Hola! Has creado una página web increíble con un panel de control propio. Como tu página web está construida con <strong>Python (Flask)</strong> y tiene bases de datos, no es una página web "normal" o sencilla (como las de HTML básico o WordPress). Es una <strong>aplicación web real</strong>. </p>
+<p>Aquí tienes la guía definitiva, explicada con manzanas, para llevar tu página desde tu computadora hasta el internet usando Google Drive y tu dominio en Hostinger.</p>
+<blockquote>
+<p>[!WARNING]
+<strong>Aclaración CRÍTICA sobre Hostinger y Python</strong>
+Hostinger vende dos tipos principales de alojamiento (Hosting):
+1. <strong>Hosting Compartido (Premium/Business):</strong> Es el más común y barato. <strong>NO SOPORTA aplicaciones Python/Flask</strong>. Está hecho para WordPress y PHP.
+2. <strong>Servidores VPS:</strong> Es una computadora virtual completa. <strong>SÍ SOPORTA Python</strong>, pero normalmente requiere saber programar comandos.</p>
+<p><em>Para que esta guía sea "para dummies", te explicaré cómo hacerlo si tienes un VPS de Hostinger usando un panel visual, o la alternativa más fácil del mundo (PythonAnywhere).</em></p>
+</blockquote>
+<hr />
+<h2>FASE 1: Preparar tu proyecto y usar Google Drive como "Repositorio"</h2>
+<p>Un "repositorio" es simplemente el lugar donde guardas tu código de forma segura en la nube. Como no usaremos herramientas complejas para programadores (como GitHub), usaremos Google Drive.</p>
+<h3>Paso 1: Comprimir tu proyecto en tu computadora (Mac)</h3>
+<ol>
+<li>Ve a la carpeta donde está tu proyecto <code>Antigravity</code> (donde está tu archivo <code>app.py</code>, <code>gothprods.db</code>, etc.).</li>
+<li>Selecciona <strong>todos</strong> los archivos y carpetas dentro de ese directorio.</li>
+<li>Haz clic derecho y selecciona <strong>"Comprimir"</strong>.</li>
+<li>Se creará un archivo llamado <code>Archivo.zip</code>. Cámbiale el nombre a <code>gothprods_web.zip</code>.</li>
+</ol>
+<h3>Paso 2: Subir a Google Drive</h3>
+<ol>
+<li>Abre tu navegador y entra a <a href="https://drive.google.com">Google Drive</a>.</li>
+<li>Crea una carpeta nueva llamada "Mi Pagina Web".</li>
+<li>Arrastra y suelta el archivo <code>gothprods_web.zip</code> dentro de esa carpeta.</li>
+<li>¡Listo! Ya tienes tu código respaldado en la nube. Cada vez que hagas un cambio grande en tu computadora, repite este proceso.</li>
+</ol>
+<hr />
+<h2>FASE 2: Subir la página al Servidor (Hosting)</h2>
+<p>Dado que es una app de Python, la forma <strong>más fácil del mundo</strong> para alguien sin conocimientos técnicos es usar una plataforma especializada en Python llamada <strong>PythonAnywhere</strong>, y luego conectarla a tu dominio de Hostinger.</p>
+<blockquote>
+<p>[!TIP]
+<strong>Opción recomendada para Dummies: PythonAnywhere</strong>
+PythonAnywhere te permite subir tu <code>.zip</code> y hacer que funcione con clics, sin necesidad de comandos negros y letras verdes como en Matrix. (Nota: Para usar tu dominio personalizado <code>gothprods.com</code> cobran $5 dólares al mes).</p>
+</blockquote>
+<h3>Paso 1: Crear la App en PythonAnywhere</h3>
+<ol>
+<li>Ve a <a href="https://www.pythonanywhere.com/">PythonAnywhere.com</a> y crea una cuenta (puedes empezar gratis).</li>
+<li>Ve a la pestaña <strong>"Files"</strong> (Archivos).</li>
+<li>Haz clic en el botón naranja <strong>"Upload a file"</strong> y sube el archivo <code>gothprods_web.zip</code> que descargaste de tu Google Drive.</li>
+<li>Abre una consola ahí mismo (botón <strong>Bash</strong>) y escribe este único comando para descomprimir:
+   <code>unzip gothprods_web.zip -d misitio</code></li>
+<li>Ve a la pestaña <strong>"Web"</strong> y haz clic en <strong>"Add a new web app"</strong>.</li>
+<li>Selecciona <strong>Flask</strong> y luego la versión de Python (la más reciente que aparezca, ej. 3.10).</li>
+<li>Te pedirá la ruta del archivo. Escribe: <code>/home/tu_usuario/misitio/app.py</code></li>
+</ol>
+<h3>Paso 2: Instalar las librerías necesarias</h3>
+<ol>
+<li>Tu página necesita librerías (como <code>Flask</code>, <code>Werkzeug</code>). En PythonAnywhere, ve a la consola de "Bash" y escribe:
+   <code>pip install Flask Werkzeug python-dotenv</code></li>
+<li>Ve a la pestaña <strong>"Web"</strong> y presiona el botón verde gigante que dice <strong>"Reload"</strong> (Recargar).</li>
+<li>¡Tu página ya está viva en internet! (Te darán un link temporal como <code>tu_usuario.pythonanywhere.com</code>).</li>
+</ol>
+<hr />
+<h2>FASE 3: Conectar tu Dominio de Hostinger (gothprods.com)</h2>
+<p>Ahora queremos que cuando la gente escriba <code>gothprods.com</code> en su navegador, vean tu página.</p>
+<h3>Paso 1: Configurar en PythonAnywhere (Requiere cuenta Hacker de $5/mes)</h3>
+<ol>
+<li>En la pestaña <strong>Web</strong> de PythonAnywhere, cambia el nombre de tu app de <code>tu_usuario.pythonanywhere.com</code> a <code>www.gothprods.com</code>.</li>
+<li>El sistema te dará un código extraño llamado <strong>CNAME</strong> (ejemplo: <code>webapp-123456.pythonanywhere.com</code>). Cópialo.</li>
+</ol>
+<h3>Paso 2: Configurar en Hostinger</h3>
+<ol>
+<li>Entra a tu cuenta de <strong>Hostinger</strong>.</li>
+<li>En el panel principal (hPanel), busca la sección <strong>"Dominios"</strong> y haz clic en <code>gothprods.com</code>.</li>
+<li>En el menú izquierdo, busca <strong>"DNS / Nameservers"</strong> o <strong>"Editor de Zona DNS"</strong>.</li>
+<li>Verás una lista de muchos registros. Busca uno que diga <strong>Tipo: CNAME</strong> y <strong>Nombre: www</strong>.</li>
+<li>Haz clic en <strong>Editar</strong> en ese registro.</li>
+<li>En la casilla que dice <strong>Objetivo</strong> (o Target / Apunta a), pega el código que copiaste de PythonAnywhere (<code>webapp-123456.pythonanywhere.com</code>).</li>
+<li>Haz clic en <strong>Guardar</strong>.</li>
+</ol>
+<blockquote>
+<p>[!NOTE]
+<strong>Paciencia:</strong> Los cambios en los dominios (DNS) pueden tardar desde 10 minutos hasta 24 horas en actualizarse en todo el mundo.</p>
+</blockquote>
+<hr />
+<h2>FASE ALTERNATIVA: Si ya compraste un VPS en Hostinger</h2>
+<p>Si te obligaron a comprar un VPS en Hostinger y no quieres usar PythonAnywhere, este es el resumen rápido (pero advertencia: no es para "dummies"):</p>
+<ol>
+<li><strong>Instalar aaPanel en Hostinger:</strong> En el panel de Hostinger VPS, ve a "Sistema Operativo" e instala <strong>aaPanel</strong> (es un panel de control visual).</li>
+<li><strong>Entrar a aaPanel:</strong> Hostinger te dará un link y contraseña. Entra.</li>
+<li><strong>Subir archivos:</strong> Ve a "Files" en aaPanel, crea una carpeta y sube tu <code>gothprods_web.zip</code> desde Google Drive, y extráelo.</li>
+<li><strong>App Store:</strong> En aaPanel, ve a "App Store" e instala "Python Manager".</li>
+<li><strong>Crear la App:</strong> Abre Python Manager, añade un nuevo proyecto, selecciona tu archivo <code>app.py</code> y tu dominio <code>gothprods.com</code>.</li>
+<li><strong>Apuntar el DNS:</strong> En el Editor de Zona DNS de Hostinger, crea un registro "A" que apunte hacia la Dirección IP de tu VPS.</li>
+</ol>
+<h3>¡Felicidades!</h3>
+<p>Siguiendo estos pasos, tu panel de control y tu página web gótica estarán listos para recibir al mundo entero.</p></body></html>

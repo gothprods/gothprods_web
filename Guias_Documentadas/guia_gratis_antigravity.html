@@ -1,0 +1,70 @@
+<html><head><meta charset="utf-8"><title>guia_gratis_antigravity.md</title><style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #333; max-width: 800px; margin: 40px auto; padding: 20px; }
+h1, h2, h3 { color: #111; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+code { background-color: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #d63384; }
+pre { background-color: #f6f8fa; padding: 16px; border-radius: 8px; overflow-x: auto; }
+pre code { background-color: transparent; color: #333; }
+blockquote { border-left: 4px solid #007bff; margin-left: 0; padding-left: 16px; color: #555; background: #f8f9fa; padding: 10px; border-radius: 0 8px 8px 0; }
+a { color: #007bff; text-decoration: none; }
+table { border-collapse: collapse; width: 100%; margin-bottom: 1em; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #f2f2f2; }
+</style></head><body><h1>Guía Definitiva 100% Gratuita (Desde Antigravity)</h1>
+<p>Entendido. Quieres que sea <strong>completamente gratis</strong>, usar tu dominio de <strong>Hostinger</strong>, y hacer todo tu trabajo directamente aquí en <strong>Antigravity</strong>.</p>
+<p>Para lograr esto sin pagar un solo centavo extra, dejaremos de lado Google Drive. En su lugar, usaremos <strong>GitHub</strong> (que es gratis y está integrado en Antigravity) y <strong>Render.com</strong> (un servidor gratuito que permite dominios personalizados). </p>
+<p>La lógica será esta: 
+1. Haces los cambios aquí en Antigravity.
+2. Escribes un comando sencillo para "Empujar" los cambios a GitHub.
+3. Render.com detecta el cambio automáticamente y actualiza tu página en internet.</p>
+<hr />
+<h2>FASE 1: Crear tu cuenta en GitHub (El "Google Drive" de los programadores)</h2>
+<p>Como Google Drive no se puede conectar directamente a un servidor para que se actualice solo, usaremos GitHub.
+1. Ve a <a href="https://github.com/">GitHub.com</a> y créate una cuenta gratuita.
+2. Una vez creada, avísame aquí en el chat de Antigravity diciéndome: <em>"Ya tengo mi cuenta de GitHub"</em>. 
+3. <strong>Yo me encargaré de todo el trabajo técnico</strong> (vincularé Antigravity con tu GitHub y subiré el código por ti). Tú no tendrás que tocar nada complejo.</p>
+<hr />
+<h2>FASE 2: Alojar la página web gratis en Render.com</h2>
+<p>Render es una plataforma moderna que te regala un servidor y permite conectar tu dominio de Hostinger gratis.</p>
+<ol>
+<li>Ve a <a href="https://render.com/">Render.com</a> y haz clic en <strong>"Get Started"</strong> (Empezar).</li>
+<li>Regístrate eligiendo la opción <strong>"GitHub"</strong> (así se vinculará con la cuenta que acabas de crear).</li>
+<li>En el panel principal de Render, haz clic en <strong>"New"</strong> (Nuevo) y elige <strong>"Web Service"</strong> (Servicio Web).</li>
+<li>Elige la opción <strong>"Build and deploy from a Git repository"</strong> y haz clic en Next.</li>
+<li>Verás una lista con tu proyecto (que previamente yo habré subido por ti). Selecciónalo.</li>
+<li>En la configuración que aparece, llena esto:</li>
+<li><strong>Name:</strong> gothprods</li>
+<li><strong>Environment:</strong> Python 3</li>
+<li><strong>Build Command:</strong> <code>pip install Flask Werkzeug python-dotenv</code></li>
+<li><strong>Start Command:</strong> <code>gunicorn app:app</code></li>
+<li><strong>Instance Type:</strong> Free (Gratis)</li>
+<li>Haz clic en <strong>"Create Web Service"</strong>. Render empezará a cargar tu página y te dará un link temporal (ej. <code>gothprods.onrender.com</code>).</li>
+</ol>
+<hr />
+<h2>FASE 3: Conectar tu Dominio (gothprods.com) en Hostinger</h2>
+<p>Ahora conectaremos tu dominio de Hostinger a Render.</p>
+<ol>
+<li>En el panel de tu proyecto en <strong>Render</strong>, ve a la pestaña <strong>"Settings"</strong> (Ajustes) y baja hasta la sección <strong>"Custom Domains"</strong>.</li>
+<li>Haz clic en <strong>"Add Custom Domain"</strong> y escribe: <code>gothprods.com</code>. Te dará unas instrucciones con unos códigos.</li>
+<li>Ahora, abre tu panel de <strong>Hostinger</strong>.</li>
+<li>Ve a <strong>Dominios</strong> -&gt; haz clic en <code>gothprods.com</code> -&gt; busca <strong>"DNS / Nameservers"</strong> o "Editor de Zona DNS".</li>
+<li>Tienes que crear o editar dos registros (basado en lo que te dijo Render):</li>
+<li><strong>Registro 1 (Para que funcione con www):</strong> <ul>
+<li>Tipo: <code>CNAME</code></li>
+<li>Nombre: <code>www</code></li>
+<li>Objetivo/Apunta a: <code>gothprods.onrender.com</code> (o lo que te haya dado Render).</li>
+</ul>
+</li>
+<li><strong>Registro 2 (Para que funcione sin www):</strong><ul>
+<li>Tipo: <code>A</code> o <code>ALIAS</code></li>
+<li>Nombre: <code>@</code></li>
+<li>Objetivo/Apunta a: <code>La dirección IP (números) que te da Render</code>.</li>
+</ul>
+</li>
+<li>Guarda los cambios. ¡Listo! Solo toca esperar a que el internet se actualice (puede tardar un par de horas).</li>
+</ol>
+<hr />
+<h3>¿Cómo actualizarás tu página en el futuro? (El flujo de trabajo mágico)</h3>
+<p>Cuando quieras agregar una nueva banda, cambiar texto o modificar fotos:
+1. Lo haces todo aquí en tu panel local usando Antigravity.
+2. Cuando estés contento con el resultado, me dices a mí (la IA de Antigravity): <em>"Sube los últimos cambios a internet"</em>.
+3. Yo ejecutaré los comandos necesarios, Render lo detectará en 2 segundos, y tu sitio <code>gothprods.com</code> se actualizará solo. ¡Así de fácil!</p></body></html>
