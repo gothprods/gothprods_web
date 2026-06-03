@@ -442,6 +442,14 @@ def update_caos_sonoro():
     flash('Configuración de Caos Sonoro actualizada. Es necesario validar en vista previa antes de liberar.', 'success')
     return redirect(url_for('admin_dashboard'))
 
+def parse_embed_url(url, plataforma):
+    if not url: return ''
+    if plataforma == 'Spotify' and 'open.spotify.com/embed' not in url:
+        return url.replace('open.spotify.com/', 'open.spotify.com/embed/')
+    elif plataforma == 'Apple Music' and 'embed.music.apple.com' not in url:
+        return url.replace('music.apple.com', 'embed.music.apple.com')
+    return url
+
 @app.route('/admin/banda', methods=['POST'])
 def add_banda():
     if 'user_id' not in session: return redirect(url_for('admin_login'))
@@ -458,6 +466,18 @@ def add_banda():
     sp_link = request.form.get('sp_link', '')
     ap_link = request.form.get('ap_link', '')
     yt_link = request.form.get('yt_link', '')
+    titulo_resena = request.form.get('titulo_resena', '')
+    texto_resena = request.form.get('texto_resena', '')
+    
+    discografia = request.form.get('discografia', '')
+    ultimo_lanzamiento_titulo = request.form.get('ultimo_lanzamiento_titulo', '')
+    ultimo_lanzamiento_tipo = request.form.get('ultimo_lanzamiento_tipo', 'Album')
+    
+    raw_sp = request.form.get('ultimo_lanzamiento_sp_link', '')
+    raw_ap = request.form.get('ultimo_lanzamiento_ap_link', '')
+    
+    ultimo_lanzamiento_sp_link = parse_embed_url(raw_sp, 'Spotify')
+    ultimo_lanzamiento_ap_link = parse_embed_url(raw_ap, 'Apple Music')
 
     file = request.files.get('img_video_path')
     filename = ''
@@ -468,9 +488,9 @@ def add_banda():
         
     conn = get_db_connection()
     conn.execute('''
-        INSERT INTO banda_semana (nombre, pais, ciudad, bio_corta, img_video_path, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (nombre, pais, ciudad, bio_corta, filename, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up))
+        INSERT INTO banda_semana (nombre, pais, ciudad, bio_corta, img_video_path, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (nombre, pais, ciudad, bio_corta, filename, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link))
     conn.commit()
     conn.close()
     
@@ -493,6 +513,18 @@ def edit_banda(id):
     sp_link = request.form.get('sp_link', '')
     ap_link = request.form.get('ap_link', '')
     yt_link = request.form.get('yt_link', '')
+    titulo_resena = request.form.get('titulo_resena', '')
+    texto_resena = request.form.get('texto_resena', '')
+    
+    discografia = request.form.get('discografia', '')
+    ultimo_lanzamiento_titulo = request.form.get('ultimo_lanzamiento_titulo', '')
+    ultimo_lanzamiento_tipo = request.form.get('ultimo_lanzamiento_tipo', 'Album')
+    
+    raw_sp = request.form.get('ultimo_lanzamiento_sp_link', '')
+    raw_ap = request.form.get('ultimo_lanzamiento_ap_link', '')
+    
+    ultimo_lanzamiento_sp_link = parse_embed_url(raw_sp, 'Spotify')
+    ultimo_lanzamiento_ap_link = parse_embed_url(raw_ap, 'Apple Music')
 
     conn = get_db_connection()
     
@@ -502,14 +534,14 @@ def edit_banda(id):
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         filename = f"updates/{filename}"
         conn.execute('''
-            UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, img_video_path=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?
+            UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, img_video_path=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?, titulo_resena=?, texto_resena=?, discografia=?, ultimo_lanzamiento_titulo=?, ultimo_lanzamiento_tipo=?, ultimo_lanzamiento_sp_link=?, ultimo_lanzamiento_ap_link=?
             WHERE id=?
-        ''', (nombre, pais, ciudad, bio_corta, filename, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, id))
+        ''', (nombre, pais, ciudad, bio_corta, filename, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link, id))
     else:
         conn.execute('''
-            UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?
+            UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?, titulo_resena=?, texto_resena=?, discografia=?, ultimo_lanzamiento_titulo=?, ultimo_lanzamiento_tipo=?, ultimo_lanzamiento_sp_link=?, ultimo_lanzamiento_ap_link=?
             WHERE id=?
-        ''', (nombre, pais, ciudad, bio_corta, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, id))
+        ''', (nombre, pais, ciudad, bio_corta, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link, id))
         
     conn.commit()
     conn.close()

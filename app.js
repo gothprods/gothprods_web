@@ -84,6 +84,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (modal) {
                 modal.classList.remove('show');
                 document.body.style.overflow = '';
+                // Remove hash if closing modal
+                if (window.location.hash.startsWith('#article-')) {
+                    history.replaceState(null, null, ' ');
+                }
             }
         });
     });
