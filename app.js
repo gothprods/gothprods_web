@@ -88,6 +88,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Check URL for direct link to an item
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemId = urlParams.get('item');
+    if (itemId) {
+        const directModal = document.getElementById('dynNewsModal' + itemId);
+        if (directModal) {
+            directModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
     // Close modal if clicked outside of content
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal')) {
@@ -113,3 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+window.copyShareLink = function(itemId) {
+    const link = window.location.origin + window.location.pathname + '?item=' + itemId;
+    navigator.clipboard.writeText(link).then(() => {
+        alert('¡Enlace copiado al portapapeles!\n' + link);
+    }).catch(err => {
+        prompt('Copia este enlace para compartir:', link);
+    });
+};

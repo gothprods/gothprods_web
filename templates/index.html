@@ -511,6 +511,7 @@
                 {% if item.author %}<p style="margin-top: 20px; font-size: 0.95rem; color: #aaa; text-align: right; font-style: italic; font-weight: bold; margin-right: 25px;">— Escrito por: {{ item.author }}</p>{% endif %}
                 
                 <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 30px;">
+                    <button onclick="copyShareLink('{{ item.id }}')" class="platform-btn" style="background-color: #444; border: none; cursor: pointer; color: white;"><i class="fa-solid fa-share-nodes"></i> Compartir Link</button>
                     {% if item.yt_link %}<a href="{{ item.yt_link }}" target="_blank" class="platform-btn"><i class="fa-brands fa-youtube"></i> YouTube</a>{% endif %}
                     {% if item.sp_link %}<a href="{{ item.sp_link }}" target="_blank" class="platform-btn spotify-btn"><i class="fa-brands fa-spotify"></i> Spotify</a>{% endif %}
                     {% if item.ap_link %}<a href="{{ item.ap_link }}" target="_blank" class="platform-btn apple-btn"><i class="fa-solid fa-podcast"></i> Apple</a>{% endif %}
