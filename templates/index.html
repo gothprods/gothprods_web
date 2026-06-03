@@ -426,8 +426,12 @@
             </div>
             
             {% for month_name, items in agenda_grouped.items() %}
-            <h3 style="color: var(--accent-color); margin-bottom: 10px; margin-top: 20px; text-transform: uppercase;">{{ month_name }}</h3>
-            <div class="news-rail">
+            {% set is_past_month = items[-1].author < current_date %}
+            <h3 onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'flex' : 'none'; this.querySelector('i').classList.toggle('fa-chevron-down'); this.querySelector('i').classList.toggle('fa-chevron-up');" style="color: var(--accent-color); margin-bottom: 10px; margin-top: 20px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 5px; transition: color 0.3s;">
+                {{ month_name }}
+                <i class="fa-solid {% if is_past_month %}fa-chevron-down{% else %}fa-chevron-up{% endif %}" style="font-size: 1rem;"></i>
+            </h3>
+            <div class="news-rail" style="{% if is_past_month %}display: none;{% endif %}">
                 {% for item in items %}
                 <div class="agenda-card {% if item.author < current_date %}past-event{% endif %}">
                     <img src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" onerror="this.src='assets/logo.png';" alt="Logo" class="agenda-logo">
