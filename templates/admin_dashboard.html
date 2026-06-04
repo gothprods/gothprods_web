@@ -153,7 +153,20 @@
                             <td style="padding: 10px; color: #fff;">{{ item.title[:50] }}...</td>
                             <td style="padding: 10px; color: #888;">{{ item.created_at[:10] if item.created_at else '' }}</td>
                             <td style="padding: 10px; text-align: right; white-space: nowrap;">
-                                <button type="button" onclick="editRecord({{ item.id }}, '{{ item.section }}', '{{ item.created_at[:16] if item.created_at else '' }}', `{{ item.title | replace('`', '\\`') }}`, `{{ item.short_desc | replace('`', '\\`') }}`, `{{ item.full_desc | replace('`', '\\`') }}`, '{{ item.yt_link }}', '{{ item.sp_link }}', '{{ item.ap_link }}')" style="display: inline-block; padding: 5px 10px; background: #333; color: white; border: none; border-radius: 4px; margin-right: 5px; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto;"><i class="fa-solid fa-pen"></i> Editar</button>
+                                <button type="button" class="edit-record-btn"
+                                    data-id="{{ item.id }}"
+                                    data-section="{{ item.section }}"
+                                    data-pub="{{ item.created_at[:16] if item.created_at else '' }}"
+                                    data-title="{{ item.title }}"
+                                    data-short="{{ item.short_desc }}"
+                                    data-full="{{ item.full_desc | default('', true) }}"
+                                    data-yt="{{ item.yt_link | default('', true) }}"
+                                    data-sp="{{ item.sp_link | default('', true) }}"
+                                    data-ap="{{ item.ap_link | default('', true) }}"
+                                    onclick="editRecord(this)"
+                                    style="display: inline-block; padding: 5px 10px; background: #333; color: white; border: none; border-radius: 4px; margin-right: 5px; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto;">
+                                    <i class="fa-solid fa-pen"></i> Editar
+                                </button>
                                 <form action="/admin/delete/{{ item.id }}" method="POST" style="display: inline-block; margin: 0; padding: 0; box-shadow: none; background: transparent;" onsubmit="return confirm('¿Estás seguro de eliminar este registro permanentemente?');">
                                     <button type="submit" style="padding: 5px 10px; background: #ff3b3b; margin: 0; width: auto; border: none; font-size: 0.8rem; text-transform: none; border-radius: 4px;"><i class="fa-solid fa-trash"></i> Eliminar</button>
                                 </form>
@@ -190,7 +203,20 @@
                             <td style="padding: 10px; color: #fff;">{{ item.title[:50] }}...</td>
                             <td style="padding: 10px; color: #888;">{{ item.created_at[:10] if item.created_at else '' }}</td>
                             <td style="padding: 10px; text-align: right; white-space: nowrap;">
-                                <button type="button" onclick="editRecord({{ item.id }}, '{{ item.section }}', '{{ item.created_at[:16] if item.created_at else '' }}', `{{ item.title | replace('`', '\\`') }}`, `{{ item.short_desc | replace('`', '\\`') }}`, `{{ item.full_desc | replace('`', '\\`') }}`, '{{ item.yt_link }}', '{{ item.sp_link }}', '{{ item.ap_link }}')" style="display: inline-block; padding: 5px 10px; background: #333; color: white; border: none; border-radius: 4px; margin-right: 5px; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto;"><i class="fa-solid fa-pen"></i> Editar</button>
+                                <button type="button" class="edit-record-btn"
+                                    data-id="{{ item.id }}"
+                                    data-section="{{ item.section }}"
+                                    data-pub="{{ item.created_at[:16] if item.created_at else '' }}"
+                                    data-title="{{ item.title }}"
+                                    data-short="{{ item.short_desc }}"
+                                    data-full="{{ item.full_desc | default('', true) }}"
+                                    data-yt="{{ item.yt_link | default('', true) }}"
+                                    data-sp="{{ item.sp_link | default('', true) }}"
+                                    data-ap="{{ item.ap_link | default('', true) }}"
+                                    onclick="editRecord(this)"
+                                    style="display: inline-block; padding: 5px 10px; background: #333; color: white; border: none; border-radius: 4px; margin-right: 5px; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto;">
+                                    <i class="fa-solid fa-pen"></i> Editar
+                                </button>
                                 <form action="/admin/delete/{{ item.id }}" method="POST" style="display: inline-block; margin: 0; padding: 0; box-shadow: none; background: transparent;" onsubmit="return confirm('¿Estás seguro de eliminar este registro permanentemente?');">
                                     <button type="submit" style="padding: 5px 10px; background: #ff3b3b; margin: 0; width: auto; border: none; font-size: 0.8rem; text-transform: none; border-radius: 4px;"><i class="fa-solid fa-trash"></i> Eliminar</button>
                                 </form>
@@ -245,7 +271,20 @@
                             <td style="padding: 10px; color: #fff;"><strong>{{ item.title }}</strong></td>
                             <td style="padding: 10px; color: #aaa;">{{ item.short_desc }}</td>
                             <td style="padding: 10px; text-align: right; white-space: nowrap;">
-                                <button type="button" onclick="editRecord({{ item.id }}, '{{ item.section }}', '', `{{ item.title | replace('`', '\\`') }}`, `{{ item.short_desc | replace('`', '\\`') }}`, '', '', '{{ item.sp_link }}', '')" style="display: inline-block; padding: 5px 10px; background: #333; color: white; border: none; border-radius: 4px; margin-right: 5px; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto;"><i class="fa-solid fa-pen"></i> Editar</button>
+                                <button type="button" class="edit-record-btn"
+                                    data-id="{{ item.id }}"
+                                    data-section="{{ item.section }}"
+                                    data-pub=""
+                                    data-title="{{ item.title }}"
+                                    data-short="{{ item.short_desc }}"
+                                    data-full=""
+                                    data-yt=""
+                                    data-sp="{{ item.sp_link | default('', true) }}"
+                                    data-ap=""
+                                    onclick="editRecord(this)"
+                                    style="display: inline-block; padding: 5px 10px; background: #333; color: white; border: none; border-radius: 4px; margin-right: 5px; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto;">
+                                    <i class="fa-solid fa-pen"></i> Editar
+                                </button>
                                 <form action="/admin/delete/{{ item.id }}" method="POST" style="display: inline-block; margin: 0; padding: 0; box-shadow: none; background: transparent;" onsubmit="return confirm('¿Estás seguro de eliminar este track permanentemente?');">
                                     <button type="submit" style="padding: 5px 10px; background: #ff3b3b; margin: 0; width: auto; border: none; font-size: 0.8rem; text-transform: none; border-radius: 4px;"><i class="fa-solid fa-trash"></i> Eliminar</button>
                                 </form>
@@ -403,7 +442,31 @@
                         <td style="padding: 10px; color: #aaa;">{{ b.ciudad }}, {{ b.pais }}</td>
                         <td style="padding: 10px; color: #888;">{{ b.created_at.split()[0] if b.created_at else '' }}</td>
                         <td style="padding: 10px; text-align: right; white-space: nowrap;">
-                            <button type="button" onclick="editBandaRecord({{ b.id }}, `{{ b.nombre | replace('`', '\\`') }}`, `{{ b.pais | replace('`', '\\`') }}`, `{{ b.ciudad | replace('`', '\\`') }}`, `{{ b.bio_corta | replace('`', '\\`') }}`, `{{ b.ano_formacion | default('', true) | replace('`', '\\`') }}`, `{{ b.line_up | default('', true) | replace('`', '\\`') }}`, '{{ b.ig_link | default('', true) }}', '{{ b.fb_link | default('', true) }}', '{{ b.tk_link | default('', true) }}', '{{ b.sp_link | default('', true) }}', '{{ b.ap_link | default('', true) }}', '{{ b.yt_link | default('', true) }}', `{{ b.titulo_resena | default('', true) | replace('`', '\\`') }}`, `{{ b.texto_resena | default('', true) | replace('`', '\\`') }}`, `{{ b.discografia | default('', true) | replace('`', '\\`') }}`, `{{ b.ultimo_lanzamiento_titulo | default('', true) | replace('`', '\\`') }}`, `{{ b.ultimo_lanzamiento_tipo | default('', true) | replace('`', '\\`') }}`, `{{ b.ultimo_lanzamiento_sp_link | default('', true) | replace('`', '\\`') }}`, `{{ b.ultimo_lanzamiento_ap_link | default('', true) | replace('`', '\\`') }}`)" style="display: inline-block; padding: 5px 10px; background: #333; color: white; border: none; border-radius: 4px; margin-right: 5px; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto;"><i class="fa-solid fa-pen"></i> Editar</button>
+                            <button type="button" class="edit-banda-btn"
+                                data-id="{{ b.id }}"
+                                data-nombre="{{ b.nombre | default('', true) }}"
+                                data-pais="{{ b.pais | default('', true) }}"
+                                data-ciudad="{{ b.ciudad | default('', true) }}"
+                                data-biocorta="{{ b.bio_corta | default('', true) }}"
+                                data-ano="{{ b.ano_formacion | default('', true) }}"
+                                data-lineup="{{ b.line_up | default('', true) }}"
+                                data-ig="{{ b.ig_link | default('', true) }}"
+                                data-fb="{{ b.fb_link | default('', true) }}"
+                                data-tk="{{ b.tk_link | default('', true) }}"
+                                data-sp="{{ b.sp_link | default('', true) }}"
+                                data-ap="{{ b.ap_link | default('', true) }}"
+                                data-yt="{{ b.yt_link | default('', true) }}"
+                                data-titulores="{{ b.titulo_resena | default('', true) }}"
+                                data-textores="{{ b.texto_resena | default('', true) }}"
+                                data-disco="{{ b.discografia | default('', true) }}"
+                                data-ulttit="{{ b.ultimo_lanzamiento_titulo | default('', true) }}"
+                                data-ulttipo="{{ b.ultimo_lanzamiento_tipo | default('', true) }}"
+                                data-ultsp="{{ b.ultimo_lanzamiento_sp_link | default('', true) }}"
+                                data-ultap="{{ b.ultimo_lanzamiento_ap_link | default('', true) }}"
+                                onclick="editBandaRecord(this)"
+                                style="display: inline-block; padding: 5px 10px; background: #333; color: white; border: none; border-radius: 4px; margin-right: 5px; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto;">
+                                <i class="fa-solid fa-pen"></i> Editar
+                            </button>
                             <form method="POST" action="/admin/banda/delete/{{ b.id }}" onsubmit="return confirm('¿Seguro que deseas eliminar esta banda?');" style="display: inline-block; margin: 0; padding: 0; box-shadow: none; background: transparent;">
                                 <button type="submit" style="padding: 5px 10px; background: #ff3b3b; margin: 0; width: auto; border: none; font-size: 0.8rem; text-transform: none; border-radius: 4px;"><i class="fa-solid fa-trash"></i> Eliminar</button>
                             </form>
@@ -507,7 +570,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function editRecord(id, section, pub_date, title, short_desc, full_desc, yt_link, sp_link, ap_link) {
+function editRecord(btn) {
+    var id = btn.getAttribute('data-id');
+    
     // Switch to "Crear" tab automatically when editing
     var firstBtn = document.getElementsByClassName("tab-btn")[0];
     openTab({currentTarget: firstBtn}, 'tab-crear');
@@ -517,16 +582,16 @@ function editRecord(id, section, pub_date, title, short_desc, full_desc, yt_link
     document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-save"></i> Guardar Cambios';
     document.getElementById('cancel-btn').style.display = 'block';
     
-    document.querySelector('select[name="section"]').value = section;
-    document.querySelector('input[name="pub_date"]').value = pub_date;
-    document.querySelector('input[name="title"]').value = title;
-    document.querySelector('input[name="short_desc"]').value = short_desc;
-    document.querySelector('textarea[name="full_desc"]').value = full_desc;
-    document.querySelector('input[name="yt_link"]').value = yt_link;
-    document.querySelector('input[name="sp_link"]').value = sp_link;
-    document.querySelector('input[name="ap_link"]').value = ap_link;
+    document.querySelector('#main-form select[name="section"]').value = btn.getAttribute('data-section') || '';
+    document.querySelector('#main-form input[name="pub_date"]').value = btn.getAttribute('data-pub') || '';
+    document.querySelector('#main-form input[name="title"]').value = btn.getAttribute('data-title') || '';
+    document.querySelector('#main-form input[name="short_desc"]').value = btn.getAttribute('data-short') || '';
+    document.querySelector('#main-form textarea[name="full_desc"]').value = btn.getAttribute('data-full') || '';
+    document.querySelector('#main-form input[name="yt_link"]').value = btn.getAttribute('data-yt') || '';
+    document.querySelector('#main-form input[name="sp_link"]').value = btn.getAttribute('data-sp') || '';
+    document.querySelector('#main-form input[name="ap_link"]').value = btn.getAttribute('data-ap') || '';
     
-    document.querySelector('input[name="image"]').required = false;
+    document.querySelector('#main-form input[name="image"]').required = false;
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -541,7 +606,9 @@ function cancelEdit() {
     document.querySelector('input[name="image"]').required = true;
 }
 
-function editBandaRecord(id, nombre, pais, ciudad, bio_corta, ano_formacion, line_up, ig, fb, tk, sp, ap, yt, titulo_resena, texto_resena, discografia, ult_titulo, ult_tipo, ult_sp_link, ult_ap_link) {
+function editBandaRecord(btn) {
+    var id = btn.getAttribute('data-id');
+    
     // Switch to "Banda" tab automatically when editing
     var bandBtn = document.getElementsByClassName("tab-btn")[4]; // Index 4 is usually the Banda tab
     if(bandBtn) openTab({currentTarget: bandBtn}, 'tab-banda');
@@ -551,29 +618,32 @@ function editBandaRecord(id, nombre, pais, ciudad, bio_corta, ano_formacion, lin
     document.getElementById('banda-submit-btn').innerHTML = '<i class="fa-solid fa-save"></i> Guardar Cambios';
     document.getElementById('banda-cancel-btn').style.display = 'block';
     
-    document.querySelector('input[name="nombre"]').value = nombre;
-    document.querySelector('input[name="pais"]').value = pais;
-    document.querySelector('input[name="ciudad"]').value = ciudad;
-    document.querySelector('textarea[name="bio_corta"]').value = bio_corta;
-    document.querySelector('input[name="ano_formacion"]').value = ano_formacion;
-    document.querySelector('input[name="line_up"]').value = line_up;
-    document.querySelector('input[name="ig_link"]').value = ig;
-    document.querySelector('input[name="fb_link"]').value = fb;
-    document.querySelector('input[name="tk_link"]').value = tk;
-    document.querySelector('input[name="sp_link"]').value = sp;
-    document.querySelector('input[name="ap_link"]').value = ap;
-    document.querySelector('input[name="yt_link"]').value = yt;
+    document.querySelector('#banda-form input[name="nombre"]').value = btn.getAttribute('data-nombre') || '';
+    document.querySelector('#banda-form input[name="pais"]').value = btn.getAttribute('data-pais') || '';
+    document.querySelector('#banda-form input[name="ciudad"]').value = btn.getAttribute('data-ciudad') || '';
+    document.querySelector('#banda-form textarea[name="bio_corta"]').value = btn.getAttribute('data-biocorta') || '';
+    document.querySelector('#banda-form input[name="ano_formacion"]').value = btn.getAttribute('data-ano') || '';
+    document.querySelector('#banda-form input[name="line_up"]').value = btn.getAttribute('data-lineup') || '';
+    document.querySelector('#banda-form input[name="ig_link"]').value = btn.getAttribute('data-ig') || '';
+    document.querySelector('#banda-form input[name="fb_link"]').value = btn.getAttribute('data-fb') || '';
+    document.querySelector('#banda-form input[name="tk_link"]').value = btn.getAttribute('data-tk') || '';
+    document.querySelector('#banda-form input[name="sp_link"]').value = btn.getAttribute('data-sp') || '';
+    document.querySelector('#banda-form input[name="ap_link"]').value = btn.getAttribute('data-ap') || '';
+    document.querySelector('#banda-form input[name="yt_link"]').value = btn.getAttribute('data-yt') || '';
     
-    document.querySelector('input[name="titulo_resena"]').value = titulo_resena || '';
-    document.querySelector('textarea[name="texto_resena"]').value = texto_resena || '';
+    document.querySelector('#banda-form input[name="titulo_resena"]').value = btn.getAttribute('data-titulores') || '';
+    document.querySelector('#banda-form textarea[name="texto_resena"]').value = btn.getAttribute('data-textores') || '';
     
-    document.querySelector('textarea[name="discografia"]').value = discografia || '';
-    document.querySelector('input[name="ultimo_lanzamiento_titulo"]').value = ult_titulo || '';
-    if (ult_tipo) document.querySelector('select[name="ultimo_lanzamiento_tipo"]').value = ult_tipo;
-    document.querySelector('input[name="ultimo_lanzamiento_sp_link"]').value = ult_sp_link || '';
-    document.querySelector('input[name="ultimo_lanzamiento_ap_link"]').value = ult_ap_link || '';
+    document.querySelector('#banda-form textarea[name="discografia"]').value = btn.getAttribute('data-disco') || '';
+    document.querySelector('#banda-form input[name="ultimo_lanzamiento_titulo"]').value = btn.getAttribute('data-ulttit') || '';
     
-    document.querySelector('input[name="img_video_path"]').required = false;
+    var ultTipo = btn.getAttribute('data-ulttipo');
+    if (ultTipo) document.querySelector('#banda-form select[name="ultimo_lanzamiento_tipo"]').value = ultTipo;
+    
+    document.querySelector('#banda-form input[name="ultimo_lanzamiento_sp_link"]').value = btn.getAttribute('data-ultsp') || '';
+    document.querySelector('#banda-form input[name="ultimo_lanzamiento_ap_link"]').value = btn.getAttribute('data-ultap') || '';
+    
+    document.querySelector('#banda-form input[name="img_video_path"]').required = false;
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }

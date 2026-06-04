@@ -348,7 +348,7 @@ def admin_dashboard():
         return redirect(url_for('admin_dashboard'))
 
     conn = get_db_connection()
-    all_items = conn.execute("SELECT id, section, title, short_desc, created_at FROM content_items WHERE section IN ('El Noticiero Nocturno', 'Reseñas de Conciertos', 'Metal Pulse Tracks') ORDER BY id DESC LIMIT 100").fetchall()
+    all_items = conn.execute("SELECT id, section, title, short_desc, full_desc, yt_link, sp_link, ap_link, created_at FROM content_items WHERE section IN ('El Noticiero Nocturno', 'Reseñas de Conciertos', 'Metal Pulse Tracks') ORDER BY id DESC LIMIT 100").fetchall()
     todas_bandas = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC").fetchall()
     conn.close()
 
