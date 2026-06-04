@@ -228,10 +228,12 @@
                 <!-- Agenda del mes -->
                 {% if settings.get('show_agenda', '1') == '1' %}
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-                    <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.8);">
-                        <img src="assets/banner_new.jpg" style="width: 100%; height: 100px; object-fit: cover; object-position: center; display: block;">
+                    <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
+                        <img src="assets/banner_new.jpg" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
+                        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
+                            <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-color); margin-right: 8px;"></i>Agenda Reciente</h3>
+                        </div>
                     </div>
-                    <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: #716d4a;"><i class="fa-solid fa-calendar-days"></i> Agenda Reciente</h3>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
                         {% for item in upcoming_agenda[:8] %}
                         <li style="margin-bottom: 8px; line-height: 1.3;"><strong>{{ item.title }}</strong> <span style="color: var(--accent-color);">({{ item.author[8:10] }}/{{ item.author[5:7] }})</span> - <span style="color: #ccc;">{{ item.short_desc }}</span></li>
@@ -244,11 +246,13 @@
                 <!-- Últimas Noticias / Noticiero Nocturno -->
                 {% if settings.get('show_news', '1') == '1' %}
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-                    <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.8);">
+                    <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
                         {% set img = noticiero_items[0].image_filename if noticiero_items else 'assets/reload_2.jpg' %}
-                        <img src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100px; object-fit: cover; object-position: center; display: block;">
+                        <img src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
+                        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
+                            <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-newspaper" style="color: var(--accent-color); margin-right: 8px;"></i>El Noticiero Nocturno</h3>
+                        </div>
                     </div>
-                    <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: #716d4a;"><i class="fa-solid fa-newspaper"></i> El Noticiero Nocturno</h3>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
                         {% for item in noticiero_items[:5] %}
                         <li style="margin-bottom: 8px; line-height: 1.3;"><a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" class="open-review-modal" style="color: #716d4a;"><strong style="color: inherit;">{{ item.title }}:</strong></a> <span style="color: #ccc;">{{ item.short_desc[:40] }}...</span></li>
@@ -261,13 +265,15 @@
                 <!-- Reviews Recientes -->
                 {% if settings.get('show_reviews', '1') == '1' %}
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-                    <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.8);">
+                    <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
                         {% set img = reseñas_items[0].image_filename if reseñas_items else 'assets/dream_theater_horizontal.jpg' %}
-                        <a href="javascript:void(0);" data-target="dynNewsModal{{ reseñas_items[0].id if reseñas_items else '' }}" class="open-review-modal" style="display: block;">
-                            <img src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100px; object-fit: cover; object-position: center; display: block; cursor: pointer;">
+                        <a href="javascript:void(0);" data-target="dynNewsModal{{ reseñas_items[0].id if reseñas_items else '' }}" class="open-review-modal" style="display: block; height: 100%;">
+                            <img src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; cursor: pointer; filter: brightness(0.6) contrast(1.2);">
+                            <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px; pointer-events: none;">
+                                <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-pen-to-square" style="color: var(--accent-color); margin-right: 8px;"></i>Reseñas Recientes</h3>
+                            </div>
                         </a>
                     </div>
-                    <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: #716d4a;"><i class="fa-solid fa-pen-to-square"></i> Reseñas Recientes</h3>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
                         {% for item in reseñas_items[:5] %}
                         <li style="margin-bottom: 8px; line-height: 1.3;"><a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" class="open-review-modal" style="color: #716d4a;"><strong style="color: inherit;">{{ item.title }}</strong></a> - <span style="color: #ccc;">{{ item.short_desc[:60] if item.short_desc else '' }}...</span></li>
@@ -280,11 +286,13 @@
                 <!-- Entrevistas Under -->
                 {% if settings.get('show_interviews', '1') == '1' %}
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-                    <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.8);">
+                    <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
                         {% set img = entrevistas_items[0].image_filename if entrevistas_items else 'https://img.youtube.com/vi/2GDTVHHIRI8/maxresdefault.jpg' %}
-                        <img src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else 'assets/logo.png' }}" style="width: 100%; height: 100px; object-fit: cover; object-position: center; display: block;">
+                        <img src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else 'assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
+                        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
+                            <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-microphone" style="color: var(--accent-color); margin-right: 8px;"></i>Entrevistas Under</h3>
+                        </div>
                     </div>
-                    <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: #716d4a;"><i class="fa-solid fa-microphone"></i> Entrevistas Under</h3>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
                         {% for item in entrevistas_items[:5] %}
                         <li style="margin-bottom: 8px; line-height: 1.3;"><a href="{{ item.yt_link if item.yt_link else item.sp_link if item.sp_link else item.ap_link if item.ap_link else '#' }}" target="_blank" style="color: #716d4a; text-decoration: underline;"><strong style="color: inherit;">{{ item.title }}</strong></a> - <span style="color: #ccc;">{{ item.short_desc[:60] if item.short_desc else '' }}...</span></li>
