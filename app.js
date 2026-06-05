@@ -137,3 +137,47 @@ window.copyShareLink = function(itemId) {
         prompt('Copia este enlace para compartir:', link);
     });
 };
+
+// Agenda Metalera Tabs Logic
+function openAgendaTab(monthName) {
+    // Hide all panels
+    const panels = document.querySelectorAll('.agenda-month-panel');
+    panels.forEach(panel => panel.classList.remove('active'));
+
+    // Remove active class from all buttons
+    const buttons = document.querySelectorAll('.agenda-tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+
+    // Show the selected panel
+    const targetPanel = document.getElementById('tab-' + monthName.replace(/ /g, '-'));
+    if (targetPanel) {
+        targetPanel.classList.add('active');
+    }
+
+    // Add active class to clicked button
+    const targetBtn = Array.from(buttons).find(btn => btn.getAttribute('data-month') === monthName);
+    if (targetBtn) {
+        targetBtn.classList.add('active');
+    }
+}
+
+// Initialize the first valid tab on load
+document.addEventListener('DOMContentLoaded', () => {
+    // Try to find the first month that is NOT past
+    let targetTabBtn = document.querySelector('.agenda-tab-btn:not(.past-month)');
+    
+    // If all are past, pick the last past month
+    if (!targetTabBtn) {
+        const allBtns = document.querySelectorAll('.agenda-tab-btn');
+        if (allBtns.length > 0) {
+            targetTabBtn = allBtns[allBtns.length - 1];
+        }
+    }
+    
+    if (targetTabBtn) {
+        const monthName = targetTabBtn.getAttribute('data-month');
+        if (monthName) {
+            openAgendaTab(monthName);
+        }
+    }
+});
