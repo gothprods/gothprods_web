@@ -1488,6 +1488,26 @@ footer {
     color: #000;
     border-color: var(--accent-color);
 }
+
+/* Hide Google Translate UI */
+iframe.skiptranslate,
+.goog-te-banner-frame.skiptranslate, 
+.goog-te-banner-frame {
+    display: none !important;
+    visibility: hidden !important;
+}
+html, body {
+    top: 0px !important; 
+    position: static !important;
+    min-height: 100vh;
+}
+#goog-gt-tt, .goog-te-balloon-frame {
+    display: none !important;
+}
+.goog-text-highlight {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
 .agenda-month-panel {
     display: none;
     animation: fadeIn 0.4s ease;
