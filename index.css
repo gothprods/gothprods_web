@@ -1490,6 +1490,7 @@ footer {
 }
 
 /* Hide Google Translate UI */
+div.skiptranslate,
 iframe.skiptranslate,
 .goog-te-banner-frame.skiptranslate, 
 .goog-te-banner-frame {
