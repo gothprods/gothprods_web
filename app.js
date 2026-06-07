@@ -109,6 +109,13 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.classList.remove('show');
             document.body.style.overflow = '';
         }
+        
+        // Close sidebar if clicking outside of it and not on the hamburger menu
+        if (sidebarMenu && sidebarMenu.classList.contains('active')) {
+            if (!sidebarMenu.contains(e.target) && (!menuToggle || !menuToggle.contains(e.target))) {
+                sidebarMenu.classList.remove('active');
+            }
+        }
     });
 
     // Close modals and sidebar on Escape key press
