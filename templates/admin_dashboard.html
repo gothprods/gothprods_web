@@ -568,6 +568,14 @@ document.addEventListener('DOMContentLoaded', function() {
             openTab({currentTarget: firstBtn}, 'tab-crear');
         }
     }
+
+    // Auto-fill pub_date with current OS date/time
+    const pubDateInput = document.querySelector('input[name="pub_date"]');
+    if (pubDateInput && !pubDateInput.value) {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        pubDateInput.value = now.toISOString().slice(0, 16);
+    }
 });
 
 function editRecord(btn) {
