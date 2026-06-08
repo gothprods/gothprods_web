@@ -611,6 +611,37 @@ def edit_record(id):
     if not item:
         flash('Registro no encontrado.', 'error')
     return render_template('admin_edit.html', item=item)
+
+@app.route('/api/fetch_meta', methods=['POST'])
+def fetch_meta():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    data = request.get_json()
+    url = data.get('url')
+    if not url:
+        return jsonify({'error': 'No URL provided'}), 400
+    
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            html = response.read().decode('utf-8')
+            
+        title_match = re.search(r'<meta property="og:title" content="([^"]+)"', html)
+        if title_match:
+            og_title = title_match.group(1)
+            # Spotify format: "Track Name - song and lyrics by Band Name | Spotify"
+            if ' by ' in og_title:
+                parts = og_title.split(' by ')
+                song = parts[0].replace(' - song and lyrics', '').replace(' - song', '').strip()
+                band = parts[1].split('|')[0].replace('on Apple Music', '').strip()
+                return jsonify({'title': song, 'band': band})
+            return jsonify({'title': og_title, 'band': ''})
+            
+        return jsonify({'title': '', 'band': ''})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/admin/update_single_setting', methods=['POST'])
 def update_single_setting():
     if 'user_id' not in session:
