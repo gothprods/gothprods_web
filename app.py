@@ -603,15 +603,29 @@ def edit_record(id):
         
         conn.commit()
         conn.close()
-        flash('Registro editado exitosamente.', 'success')
+        flash('Configuración actualizada exitosamente.', 'success')
         return redirect(url_for('admin_dashboard'))
     
     item = conn.execute("SELECT * FROM content_items WHERE id = ?", (id,)).fetchone()
     conn.close()
     if not item:
         flash('Registro no encontrado.', 'error')
-        return redirect(url_for('admin_dashboard'))
     return render_template('admin_edit.html', item=item)
+@app.route('/admin/update_single_setting', methods=['POST'])
+def update_single_setting():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    key = request.form.get('key')
+    value = request.form.get('value', '0')
+    conn = get_db_connection()
+    cur = conn.execute("SELECT * FROM settings WHERE key = ?", (key,))
+    if not cur.fetchone():
+        conn.execute("INSERT INTO settings (key, value) VALUES (?, ?)", (key, value))
+    else:
+        conn.execute("UPDATE settings SET value = ? WHERE key = ?", (value, key))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
 
 @app.route('/admin/sync_galeria', methods=['POST'])
 def sync_galeria():

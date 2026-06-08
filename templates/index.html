@@ -461,6 +461,10 @@
                 {% set _ = pulse_by_month[month].append(item) %}
             {% endfor %}
 
+            {% if settings.get('hide_past_metalpulse', '0') == '1' and ordered_months|length > 0 %}
+                {% set ordered_months = [ordered_months[0]] %}
+            {% endif %}
+
             {% for month in ordered_months %}
             <div class="pulse-month-collapsible" style="background: #111; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--accent-color);">
                 <button class="pulse-collapsible-btn" style="width: 100%; text-align: left; padding: 15px; background: none; border: none; color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="const content = this.nextElementSibling; if(content.style.display === 'none'){content.style.display='block'; this.querySelector('i').classList.replace('fa-chevron-down', 'fa-chevron-up');}else{content.style.display='none'; this.querySelector('i').classList.replace('fa-chevron-up', 'fa-chevron-down');}">

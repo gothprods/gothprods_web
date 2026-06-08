@@ -295,7 +295,27 @@
                 });
             </script>
 
+            <script>
+                function updateSingleSetting(key, value) {
+                    const formData = new FormData();
+                    formData.append('key', key);
+                    formData.append('value', value);
+                    fetch('/admin/update_single_setting', {
+                        method: 'POST',
+                        body: formData
+                    }).then(res => res.json()).then(data => {
+                        if(data.success) {
+                            console.log('Setting updated');
+                        }
+                    });
+                }
+            </script>
+
             <h3 style="margin-bottom: 15px;">Tracks Actuales</h3>
+            <label style="display: flex; align-items: center; gap: 10px; color: #fff; margin-bottom: 15px; font-size: 0.9rem; background: #222; padding: 10px; border-radius: 8px; border: 1px solid #444;">
+                <input type="checkbox" id="hide_past_metalpulse" value="1" {% if settings.get('hide_past_metalpulse', '0') == '1' %}checked{% endif %} onchange="updateSingleSetting('hide_past_metalpulse', this.checked ? '1' : '0')" style="width: auto; margin: 0;">
+                Ocultar tracks de meses anteriores en la página principal (Mostrar solo el mes más reciente)
+            </label>
             <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
                     <thead>
