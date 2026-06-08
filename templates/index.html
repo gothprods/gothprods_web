@@ -471,17 +471,17 @@
                     {{ month }} <i class="fa-solid {% if loop.index == 1 %}fa-chevron-up{% else %}fa-chevron-down{% endif %}"></i>
                 </button>
                 <div class="pulse-collapsible-content" style="padding: 15px; display: {% if loop.index == 1 %}block{% else %}none{% endif %}; border-top: 1px solid #333;">
-                    <div style="display: flex; flex-direction: column; gap: 15px;">
-                        {% for item in pulse_by_month[month]|reverse %}
-                        <div class="news-card" style="display: flex; align-items: center; gap: 15px; padding: 10px;">
-                            <img src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover; margin-bottom: 0;">
-                            <div class="card-content" style="flex: 1; padding: 0;">
-                                <h3 style="font-size: 1.1rem; line-height: 1.2; margin-bottom: 5px;">{{ item.title|replace(' - ', ' | ')|replace('-', '|') }}</h3>
-                                <p style="font-size: 0.9rem; margin-bottom: 0; color: #aaa;">{{ item.short_desc[:120]|replace(' - ', ' | ')|replace('-', '|') if item.short_desc else '' }}</p>
-                            </div>
-                            <div class="episode-actions" style="margin-top: 0; display: flex; gap: 10px;">
-                                <a href="{{ item.sp_link if item.sp_link else 'https://open.spotify.com/show/2hnlgkcGNl9GOAPa0WT9HW?si=7e9b95f203464fe6' }}" target="_blank" class="platform-btn spotify-btn" style="padding: 10px;"><i class="fa-brands fa-spotify"></i></a>
-                                <a href="{{ item.ap_link if item.ap_link else 'https://podcasts.apple.com/mx/podcast/goth-prods/id1606324255?l=en' }}" target="_blank" class="platform-btn apple-btn" style="padding: 10px;"><i class="fa-solid fa-podcast"></i></a>
+                    <div class="news-rail">
+                        {% for item in pulse_by_month[month] %}
+                        <div class="news-card">
+                            <img src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
+                            <div class="card-content">
+                                <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
+                                <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
+                                <div class="episode-actions" style="margin-top: 15px;">
+                                    <a href="{{ item.sp_link if item.sp_link else 'https://open.spotify.com/show/2hnlgkcGNl9GOAPa0WT9HW?si=7e9b95f203464fe6' }}" target="_blank" class="platform-btn spotify-btn"><i class="fa-brands fa-spotify"></i> Spotify</a>
+                                    <a href="{{ item.ap_link if item.ap_link else 'https://podcasts.apple.com/mx/podcast/goth-prods/id1606324255?l=en' }}" target="_blank" class="platform-btn apple-btn"><i class="fa-solid fa-podcast"></i> Apple</a>
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
