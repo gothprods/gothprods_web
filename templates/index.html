@@ -338,13 +338,13 @@
                         </div>
                     </div>
                     
-                    <ul class="highlight-list" style="padding-left: 0; list-style: none; font-size: 0.8rem; column-count: 2; column-gap: 15px; margin-bottom: 0;">
-                        {% for track in metalpulse_tracks[:10] %}
+                    <ul class="highlight-list" style="padding-left: 0; list-style: none; font-size: 0.8rem; margin-bottom: 0;">
+                        {% for track in metalpulse_tracks[:10]|reverse %}
                         <li style="margin-bottom: 8px; break-inside: avoid; line-height: 1.2; display: flex; align-items: center; gap: 8px;">
                             <img class="sp-thumb" data-splink="{{ track.sp_link }}" src="assets/logo.png" style="width: 30px; height: 30px; border-radius: 4px; object-fit: cover; flex-shrink: 0; background: #222; border: 1px solid #333;">
                             <div style="flex-grow: 1;">
                                 <a href="{{ track.sp_link }}" target="_blank" style="color: #716d4a; font-weight: bold; text-decoration: underline;">{{ track.title }}</a> 
-                                <span style="color: #ccc;">- {{ track.short_desc }}</span>
+                                <span style="color: #ccc;">| {{ track.short_desc }}</span>
                             </div>
                         </li>
                         {% endfor %}
