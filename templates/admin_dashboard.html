@@ -321,6 +321,7 @@
                     <thead>
                         <tr style="border-bottom: 1px solid #444;">
                             <th style="padding: 10px;">ID</th>
+                            <th style="padding: 10px;">Mes</th>
                             <th style="padding: 10px;">Banda</th>
                             <th style="padding: 10px;">Canción / Álbum</th>
                             <th style="padding: 10px; text-align: right;">Acciones</th>
@@ -331,6 +332,7 @@
                         {% if item.section == 'Metal Pulse Tracks' %}
                         <tr style="border-bottom: 1px solid #333;">
                             <td style="padding: 10px; color: #888;">#{{ item.id }}</td>
+                            <td style="padding: 10px; color: var(--accent-color);">{{ item.full_desc }}</td>
                             <td style="padding: 10px; color: #fff;"><strong>{{ item.title }}</strong></td>
                             <td style="padding: 10px; color: #aaa;">{{ item.short_desc }}</td>
                             <td style="padding: 10px; text-align: right; white-space: nowrap;">
