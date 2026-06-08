@@ -253,20 +253,32 @@
                 <input type="text" name="short_desc" id="pulse_short_desc" placeholder="Ej. The Boiling Sea" required>
                 
                 <label><i class="fa-solid fa-calendar-days"></i> Mes Correspondiente</label>
-                <input type="text" name="full_desc" id="pulse_full_desc" placeholder="Ej. Mayo 2026" required>
+                <select name="full_desc" id="pulse_full_desc" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+                    <option value="Abril 2026">Abril 2026</option>
+                    <option value="Mayo 2026" selected>Mayo 2026</option>
+                    <option value="Junio 2026">Junio 2026</option>
+                    <option value="Julio 2026">Julio 2026</option>
+                    <option value="Agosto 2026">Agosto 2026</option>
+                    <option value="Septiembre 2026">Septiembre 2026</option>
+                    <option value="Octubre 2026">Octubre 2026</option>
+                    <option value="Noviembre 2026">Noviembre 2026</option>
+                    <option value="Diciembre 2026">Diciembre 2026</option>
+                </select>
                 
                 <button type="submit" class="btn-primary" style="margin-top: 10px;"><i class="fa-solid fa-plus"></i> Agregar Track</button>
             </form>
             
             <script>
-                document.getElementById('pulse_sp_link').addEventListener('change', async function() {
+                document.getElementById('pulse_sp_link').addEventListener('input', async function() {
                     const url = this.value;
                     if (!url.includes('spotify.com') && !url.includes('apple.com')) return;
+                    if (url.length < 20) return; // Prevent triggering on partial pastes
                     
                     document.getElementById('pulse_loading').style.display = 'block';
                     try {
                         const response = await fetch('/api/fetch_meta', {
                             method: 'POST',
+                            credentials: 'same-origin',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
