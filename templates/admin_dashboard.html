@@ -238,19 +238,50 @@
             
             <form method="POST" action="/admin/dashboard" style="background: var(--bg-primary); padding: 20px; border-radius: 8px; margin-bottom: 30px;">
                 <input type="hidden" name="section" value="Metal Pulse Tracks">
-                <input type="hidden" name="full_desc" value="">
+                
+                <label><i class="fa-brands fa-spotify" style="color: #1DB954;"></i> Link de Spotify / Apple</label>
+                <input type="url" name="sp_link" id="pulse_sp_link" placeholder="https://open.spotify.com/..." required>
+
+                <div id="pulse_loading" style="display:none; color: var(--accent-color); font-size: 0.8rem; margin-top: -10px; margin-bottom: 10px;">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Extrayendo información del link...
+                </div>
                 
                 <label><i class="fa-solid fa-user"></i> Nombre de la Banda</label>
-                <input type="text" name="title" placeholder="Ej. Nekrogoblikon" required>
+                <input type="text" name="title" id="pulse_title" placeholder="Ej. Nekrogoblikon" required>
                 
                 <label><i class="fa-solid fa-compact-disc"></i> Nombre de la Canción / Álbum</label>
-                <input type="text" name="short_desc" placeholder="Ej. The Boiling Sea" required>
+                <input type="text" name="short_desc" id="pulse_short_desc" placeholder="Ej. The Boiling Sea" required>
                 
-                <label><i class="fa-brands fa-spotify" style="color: #1DB954;"></i> Link de Spotify</label>
-                <input type="url" name="sp_link" placeholder="https://open.spotify.com/..." required>
+                <label><i class="fa-solid fa-calendar-days"></i> Mes Correspondiente</label>
+                <input type="text" name="full_desc" id="pulse_full_desc" placeholder="Ej. Mayo 2026" required>
                 
                 <button type="submit" class="btn-primary" style="margin-top: 10px;"><i class="fa-solid fa-plus"></i> Agregar Track</button>
             </form>
+            
+            <script>
+                document.getElementById('pulse_sp_link').addEventListener('change', async function() {
+                    const url = this.value;
+                    if (!url.includes('spotify.com') && !url.includes('apple.com')) return;
+                    
+                    document.getElementById('pulse_loading').style.display = 'block';
+                    try {
+                        const response = await fetch('/api/fetch_meta', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ url: url })
+                        });
+                        const data = await response.json();
+                        if (data.title) document.getElementById('pulse_short_desc').value = data.title;
+                        if (data.band) document.getElementById('pulse_title').value = data.band;
+                    } catch (e) {
+                        console.error('Error:', e);
+                    } finally {
+                        document.getElementById('pulse_loading').style.display = 'none';
+                    }
+                });
+            </script>
 
             <h3 style="margin-bottom: 15px;">Tracks Actuales</h3>
             <div style="overflow-x: auto;">
@@ -277,7 +308,7 @@
                                     data-pub=""
                                     data-title="{{ item.title }}"
                                     data-short="{{ item.short_desc }}"
-                                    data-full=""
+                                    data-full="{{ item.full_desc | default('', true) }}"
                                     data-yt=""
                                     data-sp="{{ item.sp_link | default('', true) }}"
                                     data-ap=""
