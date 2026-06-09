@@ -73,7 +73,7 @@ def index():
     conn = get_db_connection(live=not is_preview)
     
     # Query for the latest Banda de la Semana
-    banda_semana = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC LIMIT 1").fetchone()
+    bandas_semana = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC LIMIT 5").fetchall()
     
     # Existing content queries
     noticiero_items = conn.execute("SELECT * FROM content_items WHERE section = 'El Noticiero Nocturno' ORDER BY created_at DESC").fetchall()
@@ -123,7 +123,7 @@ def index():
                            upcoming_agenda=upcoming_agenda,
                            current_date=current_date,
                            settings=get_settings(live=not is_preview),
-                           banda_semana=banda_semana)
+                           bandas_semana=bandas_semana)
 
 @app.route('/<path:path>')
 def serve_static(path):
