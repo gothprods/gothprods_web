@@ -73,7 +73,15 @@ def index():
     conn = get_db_connection(live=not is_preview)
     
     # Query for the latest Banda de la Semana
-    bandas_semana = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC LIMIT 5").fetchall()
+    raw_bandas = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC").fetchall()
+    bandas_semana = []
+    seen_bands = set()
+    for b in raw_bandas:
+        if b['nombre'] not in seen_bands:
+            seen_bands.add(b['nombre'])
+            bandas_semana.append(b)
+            if len(bandas_semana) == 5:
+                break
     
     # Existing content queries
     noticiero_items = conn.execute("SELECT * FROM content_items WHERE section = 'El Noticiero Nocturno' ORDER BY created_at DESC").fetchall()
