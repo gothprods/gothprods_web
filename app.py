@@ -23,9 +23,32 @@ app.permanent_session_lifetime = timedelta(minutes=30)
 DB_FILE = 'gothprods.db'
 DB_LIVE_FILE = 'gothprods_live.db'
 
-def get_db_connection(live=False):
-    conn = sqlite3.connect(DB_LIVE_FILE if live else DB_FILE)
+def get_db_connection(live=True):
+    db_path = DB_LIVE_FILE if live else DB_FILE
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
+    
+    # Auto-migrate schema for banda_semana
+    try:
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(banda_semana)")
+        columns = [col[1] for col in cursor.fetchall()]
+        
+        required_columns = [
+            'ano_formacion', 'line_up', 'titulo_resena', 'texto_resena', 
+            'discografia', 'ultimo_lanzamiento_titulo', 'ultimo_lanzamiento_tipo', 
+            'ultimo_lanzamiento_url', 'ultimo_lanzamiento_plataforma', 
+            'ultimo_lanzamiento_sp_link', 'ultimo_lanzamiento_ap_link',
+            'bio_larga'
+        ]
+        
+        for col in required_columns:
+            if col not in columns:
+                cursor.execute(f"ALTER TABLE banda_semana ADD COLUMN {col} TEXT")
+        conn.commit()
+    except Exception as e:
+        print("Schema migration error:", e)
+
     return conn
 
 def get_settings(live=False):
