@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, request, session, redirect, url_for, render_template, flash
+from flask import Flask, send_from_directory, request, session, redirect, url_for, render_template, flash, jsonify
 import sqlite3
 import os
 import random
@@ -23,7 +23,7 @@ app.permanent_session_lifetime = timedelta(minutes=30)
 DB_FILE = 'gothprods.db'
 DB_LIVE_FILE = 'gothprods_live.db'
 
-def get_db_connection(live=True):
+def get_db_connection(live=False):
     db_path = DB_LIVE_FILE if live else DB_FILE
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row

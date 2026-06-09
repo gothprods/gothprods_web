@@ -541,7 +541,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                 data-textores="{{ b.texto_resena | default('', true) }}"
                                 data-disco="{{ b.discografia | default('', true) }}"
                                 data-ulttit="{{ b.ultimo_lanzamiento_titulo | default('', true) }}"
-                                data-ulttipo="{{ b.ultimo_lanzamiento_tipo | default('', true) }}"
+                                data-ulttipo="{{ b.ultimo_lanzamiento_tipo | default('Album', true) }}"
                                 data-ultsp="{{ b.ultimo_lanzamiento_sp_link | default('', true) }}"
                                 data-ultap="{{ b.ultimo_lanzamiento_ap_link | default('', true) }}"
                                 onclick="editBandaRecord(this)"
