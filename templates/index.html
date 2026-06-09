@@ -104,12 +104,21 @@
             </div>
         </section>
 
-        {% if settings.get('show_banda_semana', '1') == '1' and banda_semana %}
+        {% if settings.get('show_banda_semana', '1') == '1' and bandas_semana %}
         <section id="banda-semana" class="section highlights-section" style="background: linear-gradient(to right, #111, #000); border-bottom: 2px solid var(--accent-color); padding: 3.5rem 5%;">
             <div class="section-header" style="margin-bottom: 20px;">
                 <h2>Banda de la <span>Semana</span></h2>
             </div>
-            <div class="grid-container" style="display: flex; flex-wrap: wrap; align-items: center; gap: 20px;">
+            <style>
+                @keyframes fadeEffect {
+                    from {opacity: 0.2;}
+                    to {opacity: 1;}
+                }
+            </style>
+            <div class="banda-slider-container" style="position: relative; overflow: hidden;">
+                {% for banda_semana in bandas_semana %}
+                <div class="banda-slide fade" style="animation: fadeEffect 1s; {% if loop.index != 1 %}display: none;{% endif %}">
+                    <div class="grid-container" style="display: flex; flex-wrap: wrap; align-items: center; gap: 20px;">
                 <div style="flex: 1; min-width: 300px; max-width: 400px; margin: 0 auto;">
                     <img src="{{ banda_semana.img_video_path }}" alt="{{ banda_semana.nombre }}" style="width: 100%; height: auto; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.8);">
                 </div>
@@ -122,7 +131,7 @@
                         <div>
                             <h4 style="color: var(--accent-color); font-family: 'Oswald', sans-serif; font-size: 1.1rem; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;"><i class="fa-solid fa-align-left"></i> Biografía</h4>
                             <p style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px;">{{ banda_semana.bio_corta }}</p>
-                            <button onclick="openBandaModal()" style="background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 5px 12px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-family: 'Oswald', sans-serif; letter-spacing: 1px; transition: all 0.3s;"><i class="fa-solid fa-book-open"></i> Leer historia completa</button>
+                            <button onclick="openBandaModal({{ banda_semana.id }})" style="background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 5px 12px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-family: 'Oswald', sans-serif; letter-spacing: 1px; transition: all 0.3s;"><i class="fa-solid fa-book-open"></i> Leer historia completa</button>
                         </div>
 
                         <!-- Columna 2: Alineación y Discografía -->
@@ -182,14 +191,24 @@
                     </div>
                 </div>
             </div>
+            </div>
+            {% endfor %}
+            </div>
 
+            <!-- Slider Dots -->
+            <div style="text-align: center; margin-top: 30px;">
+                {% for banda_semana in bandas_semana %}
+                <span class="banda-dot {% if loop.index == 1 %}active{% endif %}" onclick="currentBandaSlide({{ loop.index }})" style="height: 12px; width: 12px; margin: 0 5px; background-color: {% if loop.index == 1 %}var(--accent-color){% else %}#555{% endif %}; border-radius: 50%; display: inline-block; cursor: pointer; transition: background-color 0.3s ease;"></span>
+                {% endfor %}
+            </div>
 
         </section>
 
-        <!-- BANDA MODAL -->
-        <div id="banda-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
-            <div id="banda-modal-content" style="background: #111; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--accent-color); border-radius: 8px; position: relative;">
-                <button onclick="closeBandaModal()" style="position: absolute; right: 20px; top: 20px; background: transparent; border: none; color: #fff; font-size: 2rem; cursor: pointer; z-index: 10;"><i class="fa-solid fa-times"></i></button>
+        <!-- BANDA MODALS (One for each band) -->
+        {% for banda_semana in bandas_semana %}
+        <div id="banda-modal-{{ banda_semana.id }}" class="banda-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
+            <div id="banda-modal-content-{{ banda_semana.id }}" style="background: #111; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--accent-color); border-radius: 8px; position: relative;">
+                <button onclick="closeBandaModal({{ banda_semana.id }})" style="position: absolute; right: 20px; top: 20px; background: transparent; border: none; color: #fff; font-size: 2rem; cursor: pointer; z-index: 10;"><i class="fa-solid fa-times"></i></button>
                 <div style="padding: 40px 30px;">
                     <h2 class="notranslate" style="color: var(--accent-color); font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ banda_semana.nombre }}</h2>
                     <p style="text-align: center; color: #888; font-size: 1.1rem; margin-bottom: 30px;">
@@ -206,7 +225,7 @@
                     </div>
                     {% endif %}
 
-                    <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ banda_semana.bio_corta }}</p>
+                    <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ banda_semana.bio_larga if banda_semana.bio_larga else banda_semana.bio_corta }}</p>
 
                     {% if banda_semana.titulo_resena and banda_semana.texto_resena %}
                     <div style="background: rgba(113, 109, 74, 0.1); padding: 25px; border-radius: 8px; margin-top: 30px; border-left: 4px solid var(--accent-color);">
@@ -217,28 +236,76 @@
                 </div>
             </div>
         </div>
+        {% endfor %}
+
         <script>
-            function openBandaModal() { 
-                document.getElementById('banda-modal').style.display = 'flex'; 
-                document.body.style.overflow = 'hidden'; // Evitar scroll del sitio
+            let bandaSlideIndex = 1;
+            let bandaSlideInterval;
+
+            function showBandaSlides(n) {
+                let slides = document.getElementsByClassName("banda-slide");
+                let dots = document.getElementsByClassName("banda-dot");
+                if (slides.length === 0) return;
+                if (n > slides.length) {bandaSlideIndex = 1}    
+                if (n < 1) {bandaSlideIndex = slides.length}
+                for (let i = 0; i < slides.length; i++) {
+                    slides[i].style.display = "none";  
+                }
+                for (let i = 0; i < dots.length; i++) {
+                    dots[i].style.backgroundColor = "#555";
+                }
+                slides[bandaSlideIndex-1].style.display = "block";  
+                dots[bandaSlideIndex-1].style.backgroundColor = "var(--accent-color)";
             }
-            function closeBandaModal() { 
-                document.getElementById('banda-modal').style.display = 'none'; 
-                document.body.style.overflow = 'auto'; // Restaurar scroll
+
+            function currentBandaSlide(n) {
+                clearInterval(bandaSlideInterval);
+                showBandaSlides(bandaSlideIndex = n);
+                startBandaSlideTimer();
+            }
+
+            function startBandaSlideTimer() {
+                bandaSlideInterval = setInterval(function() {
+                    bandaSlideIndex++;
+                    showBandaSlides(bandaSlideIndex);
+                }, 30000);
+            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                if(document.getElementsByClassName("banda-slide").length > 0) {
+                    showBandaSlides(bandaSlideIndex);
+                    startBandaSlideTimer();
+                }
+            });
+
+            function openBandaModal(id) { 
+                document.getElementById('banda-modal-' + id).style.display = 'flex'; 
+                document.body.style.overflow = 'hidden'; 
+            }
+            function closeBandaModal(id) { 
+                document.getElementById('banda-modal-' + id).style.display = 'none'; 
+                document.body.style.overflow = 'auto'; 
             }
 
             // Cerrar con Escape
             document.addEventListener('keydown', function(event) {
                 if (event.key === "Escape" || event.keyCode === 27) {
-                    closeBandaModal();
+                    let modals = document.getElementsByClassName('banda-modal');
+                    for (let i = 0; i < modals.length; i++) {
+                        modals[i].style.display = 'none';
+                    }
+                    document.body.style.overflow = 'auto';
                 }
             });
 
             // Cerrar al hacer clic fuera del modal content
-            document.getElementById('banda-modal').addEventListener('click', function(event) {
-                const modalContent = document.getElementById('banda-modal-content');
-                if (!modalContent.contains(event.target)) {
-                    closeBandaModal();
+            document.addEventListener('click', function(event) {
+                let modals = document.getElementsByClassName('banda-modal');
+                for (let i = 0; i < modals.length; i++) {
+                    if (event.target === modals[i]) {
+                        modals[i].style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
                 }
             });
         </script>
