@@ -39,12 +39,15 @@ def get_db_connection(live=True):
             'discografia', 'ultimo_lanzamiento_titulo', 'ultimo_lanzamiento_tipo', 
             'ultimo_lanzamiento_url', 'ultimo_lanzamiento_plataforma', 
             'ultimo_lanzamiento_sp_link', 'ultimo_lanzamiento_ap_link',
-            'bio_larga'
+            'bio_larga', 'is_active'
         ]
         
         for col in required_columns:
             if col not in columns:
-                cursor.execute(f"ALTER TABLE banda_semana ADD COLUMN {col} TEXT")
+                if col == 'is_active':
+                    cursor.execute(f"ALTER TABLE banda_semana ADD COLUMN {col} INTEGER DEFAULT 1")
+                else:
+                    cursor.execute(f"ALTER TABLE banda_semana ADD COLUMN {col} TEXT")
         conn.commit()
     except Exception as e:
         print("Schema migration error:", e)
@@ -100,7 +103,9 @@ def index():
     bandas_semana = []
     seen_bands = set()
     for b in raw_bandas:
-        if b['nombre'] not in seen_bands:
+        # Check if the band is active (default 1 if column just added, but could be 0)
+        is_active = b['is_active'] if 'is_active' in b.keys() else 1
+        if is_active == 1 and b['nombre'] not in seen_bands:
             seen_bands.add(b['nombre'])
             bandas_semana.append(b)
             if len(bandas_semana) == 5:
@@ -579,6 +584,18 @@ def edit_banda(id):
     
     flash('Banda editada temporalmente. Es necesario validar en vista previa antes de liberar.', 'success')
     return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/toggle_banda/<int:id>', methods=['POST'])
+def toggle_banda(id):
+    if 'user_id' not in session: return redirect(url_for('admin_login'))
+    conn = get_db_connection()
+    b = conn.execute("SELECT is_active FROM banda_semana WHERE id = ?", (id,)).fetchone()
+    if b:
+        new_status = 0 if b['is_active'] == 1 else 1
+        conn.execute("UPDATE banda_semana SET is_active = ? WHERE id = ?", (new_status, id))
+        conn.commit()
+    conn.close()
+    return jsonify({"success": True})
 
 @app.route('/admin/banda/delete/<int:id>', methods=['POST'])
 def delete_banda(id):

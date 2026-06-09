@@ -19,6 +19,14 @@
 .tab-content { display: none; }
 .tab-content.active { display: block; animation: fadeIn 0.3s; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Toggle Switch CSS */
+.switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .4s; border-radius: 20px; }
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--accent-color); }
+input:checked + .slider:before { transform: translateX(20px); }
 </style>
 
 <div class="tab-container">
@@ -497,6 +505,7 @@
                         <th style="padding: 10px;">Banda</th>
                         <th style="padding: 10px;">Origen</th>
                         <th style="padding: 10px;">Fecha Agregada</th>
+                        <th style="padding: 10px; text-align: center;">Activo (Inicio)</th>
                         <th style="padding: 10px; text-align: right;">Acciones</th>
                     </tr>
                 </thead>
@@ -506,6 +515,13 @@
                         <td style="padding: 10px; color: #fff;">{{ b.nombre }}</td>
                         <td style="padding: 10px; color: #aaa;">{{ b.ciudad }}, {{ b.pais }}</td>
                         <td style="padding: 10px; color: #888;">{{ b.created_at.split()[0] if b.created_at else '' }}</td>
+                        <td style="padding: 10px; text-align: center;">
+                            <label class="switch">
+                                {% set active = b.is_active if 'is_active' in b.keys() else 1 %}
+                                <input type="checkbox" onchange="toggleBandaStatus({{ b.id }})" {% if active == 1 %}checked{% endif %}>
+                                <span class="slider"></span>
+                            </label>
+                        </td>
                         <td style="padding: 10px; text-align: right; white-space: nowrap;">
                             <button type="button" class="edit-banda-btn"
                                 data-id="{{ b.id }}"
@@ -761,6 +777,25 @@ function confirmGoLive() {
 
 
 <script>
+function toggleBandaStatus(id) {
+    fetch(`/admin/toggle_banda/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(!data.success) {
+            alert('Error al actualizar el estado de la banda');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Hubo un error de conexión');
+    });
+}
+
 const dict = {
     'Crear/Editar Registro': 'Create/Edit Record',
     'Sincronización Automática': 'Auto Sync',
