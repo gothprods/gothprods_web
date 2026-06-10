@@ -161,6 +161,19 @@ def index():
                            settings=get_settings(live=not is_preview),
                            bandas_semana=bandas_semana)
 
+@app.route('/banda/<int:id>')
+def view_banda(id):
+    is_preview = request.args.get('preview') == '1'
+    conn = get_db_connection(live=not is_preview)
+    banda = conn.execute("SELECT * FROM banda_semana WHERE id = ?", (id,)).fetchone()
+    conn.close()
+    
+    if not banda:
+        return "Banda no encontrada", 404
+        
+    settings = get_settings(live=not is_preview)
+    return render_template('banda.html', banda=banda, settings=settings)
+
 @app.route('/<path:path>')
 def serve_static(path):
     if os.path.exists(path):
