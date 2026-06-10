@@ -174,6 +174,19 @@ def view_banda(id):
     settings = get_settings(live=not is_preview)
     return render_template('banda.html', banda=banda, settings=settings)
 
+@app.route('/articulo/<int:id>')
+def view_articulo(id):
+    is_preview = request.args.get('preview') == '1'
+    conn = get_db_connection(live=not is_preview)
+    item = conn.execute("SELECT * FROM content_items WHERE id = ?", (id,)).fetchone()
+    conn.close()
+    
+    if not item:
+        return "Artículo no encontrado", 404
+        
+    settings = get_settings(live=not is_preview)
+    return render_template('articulo.html', item=item, settings=settings)
+
 @app.route('/<path:path>')
 def serve_static(path):
     if os.path.exists(path):

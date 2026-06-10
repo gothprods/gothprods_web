@@ -4,25 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ banda.nombre }} | Banda de la Semana | Goth Prods</title>
-    <meta name="description" content="Conoce a {{ banda.nombre }}, nuestra Banda de la Semana en Goth Prods. {{ banda.bio_corta }}">
-    <meta name="keywords" content="{{ banda.nombre }}, banda de la semana, metal, goth prods, heavy metal">
-    <meta name="author" content="Goth Prods">
+    <title>{{ item.title }} | Goth Prods</title>
+    <meta name="description" content="{{ item.short_desc }}">
+    <meta name="keywords" content="{{ item.section }}, goth prods, metal, heavy metal">
+    <meta name="author" content="{{ item.author if item.author else 'Goth Prods' }}">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph / Redes Sociales (Facebook, LinkedIn, etc.) -->
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://gothprods.com/banda/{{ banda.id }}">
-    <meta property="og:title" content="{{ banda.nombre }} | Banda de la Semana en Goth Prods">
-    <meta property="og:description" content="{{ banda.bio_corta }}">
-    <meta property="og:image" content="https://gothprods.com/{{ banda.img_video_path }}">
+    <meta property="og:url" content="https://gothprods.com/articulo/{{ item.id }}">
+    <meta property="og:title" content="{{ item.title }} | Goth Prods">
+    <meta property="og:description" content="{{ item.short_desc }}">
+    <meta property="og:image" content="https://gothprods.com/{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/viking.jpg' }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://gothprods.com/banda/{{ banda.id }}">
-    <meta property="twitter:title" content="{{ banda.nombre }} | Banda de la Semana en Goth Prods">
-    <meta property="twitter:description" content="{{ banda.bio_corta }}">
-    <meta property="twitter:image" content="https://gothprods.com/{{ banda.img_video_path }}">
+    <meta property="twitter:url" content="https://gothprods.com/articulo/{{ item.id }}">
+    <meta property="twitter:title" content="{{ item.title }} | Goth Prods">
+    <meta property="twitter:description" content="{{ item.short_desc }}">
+    <meta property="twitter:image" content="https://gothprods.com/{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/viking.jpg' }}">
 
     <!-- Favicons -->
     <link rel="icon" href="/assets/viking.jpg" type="image/jpeg">
@@ -89,74 +89,41 @@
             
             <a href="/" style="color: var(--accent-color); text-decoration: none; font-size: 0.9rem; margin-bottom: 20px; display: inline-block; font-weight: bold;"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
             
-            <h2 class="notranslate" style="color: var(--accent-color); font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ banda.nombre }}</h2>
+            <h2 style="color: var(--accent-color); font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ item.title }}</h2>
+            
+            {% if item.author %}
             <p style="text-align: center; color: #888; font-size: 1.1rem; margin-bottom: 30px;">
-                <i class="fa-solid fa-location-dot"></i> Origen: {{ banda.ciudad }}, {{ banda.pais }}
-                {% if banda.ano_formacion %} | <i class="fa-solid fa-calendar-days"></i> Formación: {{ banda.ano_formacion }}{% endif %}
+                <i class="fa-solid fa-pen-nib"></i> Escrito por: {{ item.author }}
             </p>
+            {% else %}
+            <div style="margin-bottom: 30px;"></div>
+            {% endif %}
 
+            {% if item.image_filename %}
             <div style="text-align: center; margin-bottom: 30px;">
-                <img src="/{{ banda.img_video_path }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
-            </div>
-
-            {% if banda.line_up %}
-            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <p style="margin: 0; color: #ccc; font-size: 1rem;"><strong><i class="fa-solid fa-users"></i> Line Up:</strong> {{ banda.line_up }}</p>
+                <img src="/{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
             </div>
             {% endif %}
 
-            <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ banda.bio_corta }}</p>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ item.full_desc }}</p>
 
-            {% if banda.titulo_resena and banda.texto_resena %}
-            <div style="background: rgba(113, 109, 74, 0.1); padding: 25px; border-radius: 8px; margin-top: 30px; border-left: 4px solid var(--accent-color);">
-                <h3 style="color: var(--accent-color); font-size: 1.8rem; margin-bottom: 15px; font-family: 'Oswald', sans-serif; text-transform: uppercase;"><i class="fa-solid fa-pen-nib"></i> {{ banda.titulo_resena }}</h3>
-                <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin: 0; text-align: justify; white-space: pre-line;">{{ banda.texto_resena }}</p>
+            {% if item.yt_link or item.sp_link or item.ap_link %}
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 30px;">
+                {% if item.yt_link %}<a href="{{ item.yt_link }}" target="_blank" class="platform-btn"><i class="fa-brands fa-youtube"></i> YouTube</a>{% endif %}
+                {% if item.sp_link %}<a href="{{ item.sp_link }}" target="_blank" class="platform-btn spotify-btn"><i class="fa-brands fa-spotify"></i> Spotify</a>{% endif %}
+                {% if item.ap_link %}<a href="{{ item.ap_link }}" target="_blank" class="platform-btn apple-btn"><i class="fa-solid fa-podcast"></i> Apple</a>{% endif %}
             </div>
             {% endif %}
-
-            <!-- Redes de la banda y lanzamientos -->
-            <div style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
-                {% if banda.discografia %}
-                <h4 style="color: var(--accent-color); margin-bottom: 10px;">Discografía Destacada</h4>
-                <p style="color: #aaa; white-space: pre-line; margin-bottom: 20px;">{{ banda.discografia }}</p>
-                {% endif %}
-
-                {% if banda.ultimo_lanzamiento_sp_link or banda.ultimo_lanzamiento_ap_link %}
-                <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <h4 style="color: #fff; margin-bottom: 15px;"><i class="fa-solid fa-compact-disc"></i> Último Lanzamiento</h4>
-                    {% if banda.ultimo_lanzamiento_titulo %}
-                    <p style="font-weight: bold; margin-bottom: 15px;">{{ banda.ultimo_lanzamiento_titulo }} <span style="color: #888; font-weight: normal;">({{ banda.ultimo_lanzamiento_tipo }})</span></p>
-                    {% endif %}
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        {% if banda.ultimo_lanzamiento_sp_link %}
-                        <a href="{{ banda.ultimo_lanzamiento_sp_link | replace('open.spotify.com/embed/', 'open.spotify.com/') }}" target="_blank" class="platform-btn spotify-btn" style="display: flex; align-items: center; gap: 5px; padding: 8px 15px; border-radius: 6px;"><i class="fa-brands fa-spotify"></i> Escuchar en Spotify</a>
-                        {% endif %}
-                        {% if banda.ultimo_lanzamiento_ap_link %}
-                        <a href="{{ banda.ultimo_lanzamiento_ap_link | replace('embed.', '') }}" target="_blank" class="platform-btn apple-btn" style="display: flex; align-items: center; gap: 5px; padding: 8px 15px; border-radius: 6px;"><i class="fa-brands fa-apple"></i> Escuchar en Apple Music</a>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endif %}
-                
-                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                    {% if banda.ig_link %}<a href="{{ banda.ig_link }}" target="_blank" class="platform-btn" style="background: #E1306C; padding: 8px 15px; font-size: 1rem;"><i class="fa-brands fa-instagram"></i></a>{% endif %}
-                    {% if banda.fb_link %}<a href="{{ banda.fb_link }}" target="_blank" class="platform-btn" style="background: #4267B2; padding: 8px 15px; font-size: 1rem;"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
-                    {% if banda.tk_link %}<a href="{{ banda.tk_link }}" target="_blank" class="platform-btn" style="background: #000; border: 1px solid #333; padding: 8px 15px; font-size: 1rem;"><i class="fa-brands fa-tiktok"></i></a>{% endif %}
-                    {% if banda.sp_link %}<a href="{{ banda.sp_link }}" target="_blank" class="platform-btn spotify-btn" style="padding: 8px 15px; font-size: 1rem;"><i class="fa-brands fa-spotify"></i></a>{% endif %}
-                    {% if banda.ap_link %}<a href="{{ banda.ap_link }}" target="_blank" class="platform-btn apple-btn" style="padding: 8px 15px; font-size: 1rem;"><i class="fa-solid fa-podcast"></i></a>{% endif %}
-                    {% if banda.yt_link %}<a href="{{ banda.yt_link }}" target="_blank" class="platform-btn" style="background: #FF0000; padding: 8px 15px; font-size: 1rem;"><i class="fa-brands fa-youtube"></i></a>{% endif %}
-                </div>
-            </div>
 
             <!-- Botones Compartir en Redes -->
-            <div style="margin-top: 40px; border-top: 1px solid #333; padding-top: 25px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center;">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 40px; border-top: 1px solid #333; padding-top: 25px;">
                 <span style="color: #fff; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-right: 10px;"><i class="fa-solid fa-share-nodes"></i> Compartir:</span>
                 
-                <a href="https://www.facebook.com/sharer/sharer.php?u=https://gothprods.com/banda/{{ banda.id }}" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-facebook-f"></i> Facebook</a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=https://gothprods.com/articulo/{{ item.id }}" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-facebook-f"></i> Facebook</a>
                 
                 <a href="https://www.instagram.com/goth_prods/" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-instagram"></i> Instagram</a>
                 
-                <button onclick="navigator.clipboard.writeText('https://gothprods.com/banda/{{ banda.id }}'); alert('Enlace copiado al portapapeles');" class="platform-btn" style="background: transparent; border: 1px solid var(--accent-color); padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); cursor: pointer; text-decoration: none; min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-link"></i> Copiar Link</button>
+                <button onclick="navigator.clipboard.writeText('https://gothprods.com/articulo/{{ item.id }}'); alert('Enlace copiado al portapapeles');" class="platform-btn" style="background: transparent; border: 1px solid var(--accent-color); padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); cursor: pointer; text-decoration: none; min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-link"></i> Copiar Link</button>
             </div>
             
         </div>
