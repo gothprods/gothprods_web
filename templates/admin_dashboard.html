@@ -420,7 +420,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     <!-- TAB: BANDA DE LA SEMANA -->
     <div id="tab-banda" class="tab-content">
-        <h3><i class="fa-solid fa-star"></i> Gestión Banda de la Semana</h3>
+        <h3 id="form-banda-title"><i class="fa-solid fa-star"></i> Gestión Banda de la Semana</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Agrega la banda destacada que aparecerá en el sitio.</p>
         
         <form id="banda-form" method="POST" action="/admin/banda" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;">
@@ -744,7 +744,7 @@ function cancelBandaEdit() {
     document.getElementById('banda-cancel-btn').style.display = 'none';
     
     document.getElementById('banda-form').reset();
-    document.querySelector('input[name="img_video_path"]').required = true;
+    document.querySelector('#banda-form input[name="img_video_path"]').required = true;
 }
 
 function setPreviewMode(mode) {
