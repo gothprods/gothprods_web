@@ -12,13 +12,51 @@ from email import encoders
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+import uuid
+from PIL import Image
 
 load_dotenv('config.env')
 
 app = Flask(__name__, static_folder='.', static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY', 'super_secret_goth_key')
 app.config['UPLOAD_FOLDER'] = 'updates'
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 2592000
 app.permanent_session_lifetime = timedelta(minutes=30)
+
+def optimize_and_save_image(file_obj, save_dir, prefix=""):
+    """
+    Saves an uploaded image file, converting it to WebP format and resizing it if it's too large.
+    Returns the final filename relative to the base directory (or just the filename if stored in updates).
+    """
+    # Generate a unique secure filename with .webp extension
+    original_filename = secure_filename(file_obj.filename)
+    base_name = os.path.splitext(original_filename)[0]
+    final_filename = f"{prefix}{uuid.uuid4().hex[:8]}_{base_name}.webp"
+    final_path = os.path.join(save_dir, final_filename)
+    
+    try:
+        img = Image.open(file_obj)
+        # Convert to RGB if necessary (e.g. RGBA for PNGs) to save as WebP
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+            
+        # Resize if width is larger than 1200px
+        max_width = 1200
+        if img.width > max_width:
+            ratio = max_width / float(img.width)
+            new_height = int((float(img.height) * float(ratio)))
+            img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
+            
+        img.save(final_path, "WEBP", quality=80, optimize=True)
+        return final_filename
+    except Exception as e:
+        print(f"Error optimizing image: {e}")
+        # Fallback to normal save if not a valid image
+        fallback_name = secure_filename(file_obj.filename)
+        fallback_path = os.path.join(save_dir, fallback_name)
+        file_obj.seek(0)
+        file_obj.save(fallback_path)
+        return fallback_name
 
 DB_FILE = 'gothprods.db'
 DB_LIVE_FILE = 'gothprods_live.db'
@@ -370,10 +408,7 @@ def admin_dashboard():
         
         image_filename = ""
         if image and image.filename:
-            ext = image.filename.rsplit('.', 1)[1].lower() if '.' in image.filename else 'jpg'
-            image_filename = f"{safe_title}.{ext}"
-            image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
-            image.save(image_path)
+            image_filename = optimize_and_save_image(image, app.config['UPLOAD_FOLDER'], prefix="content_")
             
         copy_text = f"🔥 ¡NUEVO CONTENIDO EN GOTH PRODS! 🔥\n\n"
         copy_text += f"SECCIÓN: {section}\n"
@@ -446,9 +481,12 @@ def update_settings():
     
     file = request.files.get('hero_bg')
     if file and file.filename != '':
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
+        if file.filename.lower().endswith(('.mp4', '.webm', '.gif')):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+        else:
+            filename = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="hero_")
         queries.append(("UPDATE settings SET value = ? WHERE key = 'hero_bg'", (f"updates/{filename}",)))
 
     for q, params in queries:
@@ -544,9 +582,8 @@ def add_banda():
     file = request.files.get('img_video_path')
     filename = ''
     if file and file.filename != '':
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        filename = f"updates/{filename}"
+        optimized_name = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="banda_")
+        filename = f"updates/{optimized_name}"
         
     conn = get_db_connection()
     conn.execute('''
@@ -592,9 +629,8 @@ def edit_banda(id):
     
     file = request.files.get('img_video_path')
     if file and file.filename != '':
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        filename = f"updates/{filename}"
+        optimized_name = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="banda_")
+        filename = f"updates/{optimized_name}"
         conn.execute('''
             UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, img_video_path=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?, titulo_resena=?, texto_resena=?, discografia=?, ultimo_lanzamiento_titulo=?, ultimo_lanzamiento_tipo=?, ultimo_lanzamiento_sp_link=?, ultimo_lanzamiento_ap_link=?
             WHERE id=?
@@ -662,11 +698,7 @@ def edit_record(id):
         # Opcional imagen nueva
         image = request.files.get('image')
         if image and image.filename:
-            safe_title = "".join([c for c in title if c.isalpha() or c.isdigit() or c==' ']).rstrip().replace(" ", "_")
-            ext = image.filename.rsplit('.', 1)[1].lower() if '.' in image.filename else 'jpg'
-            image_filename = f"{safe_title}.{ext}"
-            image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
-            image.save(image_path)
+            image_filename = optimize_and_save_image(image, app.config['UPLOAD_FOLDER'], prefix="content_")
             conn.execute('''
                 UPDATE content_items SET title=?, short_desc=?, full_desc=?, image_filename=?, yt_link=?, sp_link=?, ap_link=?, created_at=? WHERE id=?
             ''', (title, short_desc, full_desc, image_filename, yt_link, sp_link, ap_link, pub_date, id))

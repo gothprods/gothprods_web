@@ -25,8 +25,8 @@
     <meta property="twitter:image" content="https://gothprods.com/assets/viking.jpg">
 
     <!-- Favicons -->
-    <link rel="icon" href="assets/viking.jpg" type="image/jpeg">
-    <link rel="apple-touch-icon" href="assets/viking.jpg">
+    <link rel="icon" href="assets/viking.webp" type="image/jpeg">
+    <link rel="apple-touch-icon" href="assets/viking.webp">
     <link rel="stylesheet" href="index.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,7 +39,7 @@
 <body>
     <header class="navbar">
         <div class="left-controls">
-            <img src="assets/viking.jpg" alt="Viking Icon" class="viking-icon">
+            <img src="assets/viking.webp" alt="Viking Icon" class="viking-icon">
             {% if settings.get('hamburger_active', '1') == '1' %}
             <div class="menu-toggle" id="mobile-menu">
                 <span class="bar"></span>
@@ -49,7 +49,7 @@
             {% endif %}
         </div>
         <div class="logo">
-            <a href="#home"><img src="assets/logo-new.png" alt="Goth Prods Logo" class="logo-img"></a>
+            <a href="#home"><img src="assets/logo-new.webp" alt="Goth Prods Logo" class="logo-img"></a>
         </div>
         <nav class="header-socials">
             <a href="https://www.tiktok.com/@goth_prods" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
@@ -71,7 +71,7 @@
 
     <div id="sidebar-menu" class="sidebar">
         <div class="sidebar-header">
-            <img src="assets/logo.png" alt="Goth Prods Logo" class="sidebar-logo">
+            <img src="assets/logo.webp" alt="Goth Prods Logo" class="sidebar-logo">
             <div class="close-btn" id="close-menu">&times;</div>
         </div>
         <ul class="sidebar-links">
@@ -121,7 +121,7 @@
                 <div class="banda-slide fade" style="animation: fadeEffect 1s; {% if loop.index != 1 %}display: none;{% endif %}">
                     <div class="grid-container" style="display: flex; flex-wrap: wrap; align-items: center; gap: 20px;">
                 <div style="flex: 1; min-width: 300px; max-width: 400px; margin: 0 auto;">
-                    <img src="{{ banda_semana.img_video_path }}" alt="{{ banda_semana.nombre }}" style="width: 100%; height: auto; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.8);">
+                    <img loading="lazy" src="{{ banda_semana.img_video_path }}" alt="{{ banda_semana.nombre }}" style="width: 100%; height: auto; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.8);">
                 </div>
                 <div style="flex: 1; min-width: 300px; color: #ddd;">
                     <h3 class="notranslate" style="font-size: 2rem; color: var(--accent-color); margin-bottom: 0px; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ banda_semana.nombre }}</h3>
@@ -172,7 +172,7 @@
                                 {% if banda_semana.ultimo_lanzamiento_ap_link %}
                                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                                     <div style="flex: 1; min-width: 140px;">
-                                        <iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="152" style="width:100%;max-width:660px;overflow:hidden;background:#000;border-radius:12px; border: none;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation" src="{{ banda_semana.ultimo_lanzamiento_ap_link }}{{ '&theme=dark' if '?' in banda_semana.ultimo_lanzamiento_ap_link else '?theme=dark' }}"></iframe>
+                                        <iframe loading="lazy" allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="152" style="width:100%;max-width:660px;overflow:hidden;background:#000;border-radius:12px; border: none;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation" src="{{ banda_semana.ultimo_lanzamiento_ap_link }}{{ '&theme=dark' if '?' in banda_semana.ultimo_lanzamiento_ap_link else '?theme=dark' }}"></iframe>
                                     </div>
                                     <a href="{{ banda_semana.ultimo_lanzamiento_ap_link | replace('embed.', '') }}" target="_blank" class="platform-btn apple-btn" style="display: flex; align-items: center; justify-content: center; padding: 6px 10px; font-size: 0.8rem; border-radius: 6px; gap: 5px; min-width: 80px;"><i class="fa-brands fa-apple"></i> Apple</a>
                                 </div>
@@ -217,7 +217,7 @@
                         {% if banda_semana.ano_formacion %} | <i class="fa-solid fa-calendar-days"></i> Formación: {{ banda_semana.ano_formacion }}{% endif %}
                     </p>
                     <div style="text-align: center; margin-bottom: 30px;">
-                        <img src="{{ banda_semana.img_video_path }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
+                        <img loading="lazy" src="{{ banda_semana.img_video_path }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
                     </div>
 
                     {% if banda_semana.line_up %}
@@ -332,7 +332,7 @@
                 {% if settings.get('show_agenda', '1') == '1' %}
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                     <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
-                        <img src="assets/banner_new.jpg" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
+                        <img loading="lazy" src="assets/banner_new.webp" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
                             <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-color); margin-right: 8px;"></i>Agenda Metalera</h3>
                         </div>
@@ -351,7 +351,7 @@
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                     <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
                         {% set img = noticiero_items[0].image_filename if noticiero_items else 'assets/reload_2.jpg' %}
-                        <img src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
+                        <img loading="lazy" src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
                             <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-newspaper" style="color: var(--accent-color); margin-right: 8px;"></i>El Noticiero Nocturno</h3>
                         </div>
@@ -371,7 +371,7 @@
                     <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
                         {% set img = reseñas_items[0].image_filename if reseñas_items else 'assets/dream_theater_horizontal.jpg' %}
                         <a href="javascript:void(0);" data-target="dynNewsModal{{ reseñas_items[0].id if reseñas_items else '' }}" class="open-review-modal" style="display: block; height: 100%;">
-                            <img src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; cursor: pointer; filter: brightness(0.6) contrast(1.2);">
+                            <img loading="lazy" src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; cursor: pointer; filter: brightness(0.6) contrast(1.2);">
                             <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px; pointer-events: none;">
                                 <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-pen-to-square" style="color: var(--accent-color); margin-right: 8px;"></i>Reseñas Recientes</h3>
                             </div>
@@ -391,7 +391,7 @@
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                     <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
                         {% set img = entrevistas_items[0].image_filename if entrevistas_items else 'https://img.youtube.com/vi/2GDTVHHIRI8/maxresdefault.jpg' %}
-                        <img src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else 'assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
+                        <img loading="lazy" src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else 'assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
                             <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-microphone" style="color: var(--accent-color); margin-right: 8px;"></i>Entrevistas Under</h3>
                         </div>
@@ -410,7 +410,7 @@
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                     <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
                         {% set img = metalpulse_items[0].image_filename if metalpulse_items else 'assets/metal_pulse_cover.jpg' %}
-                        <img src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else 'assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
+                        <img loading="lazy" src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else 'assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
                             <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-bolt" style="color: var(--accent-color); margin-right: 8px;"></i>Los 10 Favoritos del mes</h3>
                         </div>
@@ -419,7 +419,7 @@
                     <ul class="highlight-list" style="padding-left: 0; list-style: none; font-size: 0.8rem; margin-bottom: 0;">
                         {% for track in metalpulse_tracks[:10]|reverse %}
                         <li style="margin-bottom: 8px; break-inside: avoid; line-height: 1.2; display: flex; align-items: center; gap: 8px;">
-                            <img class="sp-thumb" data-splink="{{ track.sp_link }}" src="assets/logo.png" style="width: 30px; height: 30px; border-radius: 4px; object-fit: cover; flex-shrink: 0; background: #222; border: 1px solid #333;">
+                            <img loading="lazy" class="sp-thumb" data-splink="{{ track.sp_link }}" src="assets/logo.webp" style="width: 30px; height: 30px; border-radius: 4px; object-fit: cover; flex-shrink: 0; background: #222; border: 1px solid #333;">
                             <div style="flex-grow: 1;">
                                 <a href="{{ track.sp_link }}" target="_blank" style="color: #716d4a; font-weight: bold; text-decoration: underline;">{{ track.title }}</a> 
                                 <span style="color: #ccc;">| {{ track.short_desc }}</span>
@@ -457,7 +457,7 @@
             <div class="section-header">
                 <div class="header-titles" style="display: flex; flex-direction: column; align-items: flex-start; width: 100%; gap: 2rem; text-align: left;">
                     <div style="display: flex; align-items: center; gap: 1rem; justify-content: flex-start;">
-                        <img src="assets/galeria-logo-new.jpg" alt="La Galería Nocturna Logo" class="section-logo">
+                        <img loading="lazy" src="assets/galeria-logo-new.webp" alt="La Galería Nocturna Logo" class="section-logo">
                         <div class="header-text-group" style="text-align: left;">
                             <h2>La Galería Nocturna <span>Podcast</span></h2>
                             <p class="section-slogan">El podcast en donde hablamos de metal en serio.</p>
@@ -493,7 +493,7 @@
                                     <div class="news-rail">
                 {% for item in galeria_items %}
                 <div class="news-card">
-                    <img src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
+                    <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
                     <div class="card-content">
                         <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
                         <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
@@ -515,7 +515,7 @@
 
             <div class="section-header">
                 <div class="header-titles">
-                    <img src="assets/metal-pulse-logo.jpg" alt="Metal Pulse Logo" class="section-logo">
+                    <img loading="lazy" src="assets/metal-pulse-logo.webp" alt="Metal Pulse Logo" class="section-logo">
                     <div class="header-text-group">
                         <h2>Metal <span class="metal-pulse-text">Pulse</span></h2>
                         <p class="section-slogan">Lo Último en el Metal Mundial</p>
@@ -552,7 +552,7 @@
                     <div class="news-rail">
                         {% for item in pulse_by_month[month] %}
                         <div class="news-card">
-                            <img src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
+                            <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
                             <div class="card-content">
                                 <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
                                 <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
@@ -578,7 +578,7 @@
             <div class="news-rail">
                 {% for item in reseñas_items %}
                 <div class="news-card">
-                    <img src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
+                    <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
                     <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
                     <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc }}</p>
                     <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" class="open-review-modal" style="color: var(--accent-color); font-weight: bold; font-size: 0.85rem;">Leer reseña completa &rarr;</a>
@@ -598,7 +598,7 @@
                 {% for item in noticiero_items %}
                 <div class="news-card">
                     <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" class="open-review-modal" style="display: block;">
-                        <img src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center; cursor: pointer;">
+                        <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center; cursor: pointer;">
                     </a>
                     <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
                     <p style="font-size: 0.85rem; margin-bottom: 5px; margin-top: 5px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
@@ -627,7 +627,7 @@
             <div class="news-rail">
                 {% for item in entrevistas_items[:20] %}
                 <div class="news-card">
-                    <img src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
+                    <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
                     <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
                     <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
                     <div class="episode-actions" style="margin-top: 15px;">
@@ -658,7 +658,7 @@
             <div id="tab-{{ month_name|replace(' ', '-') }}" class="agenda-month-panel news-rail">
                 {% for item in items %}
                 <div class="agenda-card {% if item.author < current_date %}past-event{% endif %}">
-                    <img src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" onerror="this.src='assets/logo.png';" alt="Logo" class="agenda-logo">
+                    <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" onerror="this.src='assets/logo.png';" alt="Logo" class="agenda-logo">
                     {% if item.author < current_date %}
                     <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #888; padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #555; font-weight: bold; letter-spacing: 1px;">FINALIZADO</div>
                     {% endif %}
@@ -667,7 +667,7 @@
                     <p>{{ item.short_desc }}</p>
                     <p style="margin-top: 5px; font-weight: bold;">{{ item.full_desc }}</p>
                     {% if item.yt_link == 'Y' %}
-                    <img src="assets/viking.jpg" class="agenda-viking-small" title="Goth Prods Crew">
+                    <img loading="lazy" src="assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
                     {% endif %}
                 </div>
                 {% endfor %}
@@ -697,7 +697,7 @@
 
     <footer>
         <div class="footer-content">
-            <img src="assets/logo.png" alt="Goth Prods Logo" class="footer-logo">
+            <img loading="lazy" src="assets/logo.webp" alt="Goth Prods Logo" class="footer-logo">
             <p>Goth Productions es una productora y creadora de contenidos enfocados al género más feroz del planeta.</p>
             <div class="footer-socials">
                 <a href="https://www.tiktok.com/@goth_prods" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
@@ -734,7 +734,7 @@
                 {% endif %}
                 
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <img src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
+                    <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
                 </div>
 
                 <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ item.full_desc }}</p>
