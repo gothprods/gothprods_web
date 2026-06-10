@@ -663,8 +663,8 @@ function editRecord(btn) {
     var id = btn.getAttribute('data-id');
     
     // Switch to "Crear" tab automatically when editing
-    var firstBtn = document.getElementsByClassName("tab-btn")[0];
-    openTab({currentTarget: firstBtn}, 'tab-crear');
+    var firstBtn = document.querySelector(".tab-btn[onclick*='tab-crear']");
+    if(firstBtn) openTab({currentTarget: firstBtn}, 'tab-crear');
     
     document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-pen-nib"></i> Editar Registro #' + id;
     document.getElementById('main-form').action = '/admin/edit/' + id;
@@ -699,7 +699,7 @@ function editBandaRecord(btn) {
     var id = btn.getAttribute('data-id');
     
     // Switch to "Banda" tab automatically when editing
-    var bandBtn = document.getElementsByClassName("tab-btn")[4]; // Index 4 is usually the Banda tab
+    var bandBtn = document.querySelector(".tab-btn[onclick*='tab-banda']");
     if(bandBtn) openTab({currentTarget: bandBtn}, 'tab-banda');
     
     document.getElementById('form-banda-title').innerHTML = '<i class="fa-solid fa-pen-nib"></i> Editar Banda #' + id;
