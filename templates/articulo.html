@@ -11,18 +11,19 @@
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph / Redes Sociales (Facebook, LinkedIn, etc.) -->
+    {% set image_url = item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/viking.jpg' %}
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://gothprods.com/articulo/{{ item.id }}">
     <meta property="og:title" content="{{ item.title }} | Goth Prods">
     <meta property="og:description" content="{{ item.short_desc }}">
-    <meta property="og:image" content="https://gothprods.com/{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/viking.jpg' }}">
+    <meta property="og:image" content="https://gothprods.com/{{ image_url | replace(' ', '%20') }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://gothprods.com/articulo/{{ item.id }}">
     <meta property="twitter:title" content="{{ item.title }} | Goth Prods">
     <meta property="twitter:description" content="{{ item.short_desc }}">
-    <meta property="twitter:image" content="https://gothprods.com/{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/viking.jpg' }}">
+    <meta property="twitter:image" content="https://gothprods.com/{{ image_url | replace(' ', '%20') }}">
 
     <!-- Favicons -->
     <link rel="icon" href="/assets/viking.jpg" type="image/jpeg">

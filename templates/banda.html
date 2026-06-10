@@ -15,14 +15,14 @@
     <meta property="og:url" content="https://gothprods.com/banda/{{ banda.id }}">
     <meta property="og:title" content="{{ banda.nombre }} | Banda de la Semana en Goth Prods">
     <meta property="og:description" content="{{ banda.bio_corta }}">
-    <meta property="og:image" content="https://gothprods.com/{{ banda.img_video_path }}">
+    <meta property="og:image" content="https://gothprods.com/{{ banda.img_video_path | replace(' ', '%20') }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://gothprods.com/banda/{{ banda.id }}">
     <meta property="twitter:title" content="{{ banda.nombre }} | Banda de la Semana en Goth Prods">
     <meta property="twitter:description" content="{{ banda.bio_corta }}">
-    <meta property="twitter:image" content="https://gothprods.com/{{ banda.img_video_path }}">
+    <meta property="twitter:image" content="https://gothprods.com/{{ banda.img_video_path | replace(' ', '%20') }}">
 
     <!-- Favicons -->
     <link rel="icon" href="/assets/viking.jpg" type="image/jpeg">
