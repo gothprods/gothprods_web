@@ -36,9 +36,12 @@ def optimize_and_save_image(file_obj, save_dir, prefix=""):
     
     try:
         img = Image.open(file_obj)
-        # Convert to RGB if necessary (e.g. RGBA for PNGs) to save as WebP
-        if img.mode in ("RGBA", "P"):
-            img = img.convert("RGB")
+        # WebP supports RGBA natively. Only convert P to RGBA or RGB depending on transparency.
+        if img.mode == "P":
+            if 'transparency' in img.info:
+                img = img.convert("RGBA")
+            else:
+                img = img.convert("RGB")
             
         # Resize if width is larger than 1200px
         max_width = 1200

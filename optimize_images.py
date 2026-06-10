@@ -23,8 +23,11 @@ def convert_to_webp(folder):
                     new_filename = f"{base}.webp"
                     new_path = os.path.join(root, new_filename)
                     
-                    if img.mode in ("RGBA", "P"):
-                        img = img.convert("RGB")
+                    if img.mode == "P":
+                        if 'transparency' in img.info:
+                            img = img.convert("RGBA")
+                        else:
+                            img = img.convert("RGB")
                     
                     max_width = 1200
                     if img.width > max_width:
