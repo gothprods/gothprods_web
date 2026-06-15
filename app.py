@@ -471,26 +471,28 @@ def update_settings():
     
     conn = get_db_connection()
     queries = [
-        ("UPDATE settings SET value = ? WHERE key = 'hero_title'", (hero_title,)),
-        ("UPDATE settings SET value = ? WHERE key = 'hero_subtitle'", (hero_subtitle,)),
-        ("UPDATE settings SET value = ? WHERE key = 'show_reviews'", (show_reviews,)),
-        ("UPDATE settings SET value = ? WHERE key = 'show_news'", (show_news,)),
-        ("UPDATE settings SET value = ? WHERE key = 'show_interviews'", (show_interviews,)),
-        ("UPDATE settings SET value = ? WHERE key = 'show_metalpulse'", (show_metalpulse,)),
-        ("UPDATE settings SET value = ? WHERE key = 'show_agenda'", (show_agenda,)),
-        ("UPDATE settings SET value = ? WHERE key = 'show_banda_semana'", (show_banda_semana,)),
-        ("UPDATE settings SET value = ? WHERE key = 'hamburger_active'", (hamburger_active,))
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('hero_title', ?)", (hero_title,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('hero_subtitle', ?)", (hero_subtitle,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_reviews', ?)", (show_reviews,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_news', ?)", (show_news,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_interviews', ?)", (show_interviews,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_metalpulse', ?)", (show_metalpulse,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_agenda', ?)", (show_agenda,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_banda_semana', ?)", (show_banda_semana,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('hamburger_active', ?)", (hamburger_active,))
     ]
     
-    file = request.files.get('hero_bg')
-    if file and file.filename != '':
-        if file.filename.lower().endswith(('.mp4', '.webm', '.gif')):
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
-        else:
-            filename = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="hero_")
-        queries.append(("UPDATE settings SET value = ? WHERE key = 'hero_bg'", (f"updates/{filename}",)))
+    file_keys = ['hero_bg', 'header_logo', 'hamburger_icon', 'galeria_bg', 'metalpulse_bg']
+    for fk in file_keys:
+        file = request.files.get(fk)
+        if file and file.filename != '':
+            if file.filename.lower().endswith(('.mp4', '.webm', '.gif')):
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)
+            else:
+                filename = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix=f"{fk}_")
+            queries.append(("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (fk, f"updates/{filename}")))
 
     for q, params in queries:
         conn.execute(q, params)

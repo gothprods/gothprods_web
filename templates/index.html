@@ -39,7 +39,7 @@
 <body>
     <header class="navbar">
         <div class="left-controls">
-            <img src="assets/viking.webp" alt="Viking Icon" class="viking-icon">
+            <img src="{{ settings.get('hamburger_icon', 'assets/viking.webp') }}" alt="Viking Icon" class="viking-icon">
             {% if settings.get('hamburger_active', '1') == '1' %}
             <div class="menu-toggle" id="mobile-menu">
                 <span class="bar"></span>
@@ -49,7 +49,7 @@
             {% endif %}
         </div>
         <div class="logo">
-            <a href="#home"><img src="assets/logo-new.webp?v=2" alt="Goth Prods Logo" class="logo-img"></a>
+            <a href="#home"><img src="{{ settings.get('header_logo', 'assets/logo-new.webp?v=2') }}" alt="Goth Prods Logo" class="logo-img"></a>
         </div>
         <nav class="header-socials">
             <a href="https://www.tiktok.com/@goth_prods" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
@@ -457,7 +457,7 @@
             <div class="section-header">
                 <div class="header-titles" style="display: flex; flex-direction: column; align-items: flex-start; width: 100%; gap: 2rem; text-align: left;">
                     <div style="display: flex; align-items: center; gap: 1rem; justify-content: flex-start;">
-                        <img loading="lazy" src="assets/galeria-logo-new.webp" alt="La Galería Nocturna Logo" class="section-logo">
+                        <img loading="lazy" src="{{ settings.get('galeria_bg', 'assets/galeria-logo-new.webp') }}" alt="La Galería Nocturna Logo" class="section-logo">
                         <div class="header-text-group" style="text-align: left;">
                             <h2>La Galería Nocturna <span>Podcast</span></h2>
                             <p class="section-slogan">El podcast en donde hablamos de metal en serio.</p>
@@ -515,7 +515,7 @@
 
             <div class="section-header">
                 <div class="header-titles">
-                    <img loading="lazy" src="assets/metal-pulse-logo.webp" alt="Metal Pulse Logo" class="section-logo">
+                    <img loading="lazy" src="{{ settings.get('metalpulse_bg', 'assets/metal-pulse-logo.webp') }}" alt="Metal Pulse Logo" class="section-logo">
                     <div class="header-text-group">
                         <h2>Metal <span class="metal-pulse-text">Pulse</span></h2>
                         <p class="section-slogan">Lo Último en el Metal Mundial</p>
