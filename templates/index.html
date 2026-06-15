@@ -31,7 +31,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@300;400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@300;400;600&family=Metal+Mania&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -334,7 +334,7 @@
                     <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
                         <img loading="lazy" src="assets/banner_new.webp" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
-                            <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-color); margin-right: 8px;"></i>Agenda Metalera</h3>
+                            <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-color); margin-right: 8px;"></i>Agenda Metalera</h3>
                         </div>
                     </div>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
@@ -353,7 +353,7 @@
                         {% set img = noticiero_items[0].image_filename if noticiero_items else 'assets/reload_2.jpg' %}
                         <img loading="lazy" src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
-                            <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-newspaper" style="color: var(--accent-color); margin-right: 8px;"></i>El Noticiero Nocturno</h3>
+                            <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-newspaper" style="color: var(--accent-color); margin-right: 8px;"></i>El Noticiero Nocturno</h3>
                         </div>
                     </div>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
@@ -373,7 +373,7 @@
                         <a href="javascript:void(0);" data-target="dynNewsModal{{ reseñas_items[0].id if reseñas_items else '' }}" class="open-review-modal" style="display: block; height: 100%;">
                             <img loading="lazy" src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; cursor: pointer; filter: brightness(0.6) contrast(1.2);">
                             <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px; pointer-events: none;">
-                                <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-pen-to-square" style="color: var(--accent-color); margin-right: 8px;"></i>Reseñas Recientes</h3>
+                                <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-pen-to-square" style="color: var(--accent-color); margin-right: 8px;"></i>Reseñas Recientes</h3>
                             </div>
                         </a>
                     </div>
@@ -393,7 +393,7 @@
                         {% set img = entrevistas_items[0].image_filename if entrevistas_items else 'https://img.youtube.com/vi/2GDTVHHIRI8/maxresdefault.jpg' %}
                         <img loading="lazy" src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else 'assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
-                            <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-microphone" style="color: var(--accent-color); margin-right: 8px;"></i>Entrevistas Under</h3>
+                            <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-microphone" style="color: var(--accent-color); margin-right: 8px;"></i>Entrevistas Under</h3>
                         </div>
                     </div>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
@@ -412,7 +412,7 @@
                         {% set img = metalpulse_items[0].image_filename if metalpulse_items else 'assets/metal_pulse_cover.jpg' %}
                         <img loading="lazy" src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else 'assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
-                            <h3 style="margin: 0; font-size: 1.4rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-bolt" style="color: var(--accent-color); margin-right: 8px;"></i>Los 10 Favoritos del mes</h3>
+                            <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-bolt" style="color: var(--accent-color); margin-right: 8px;"></i>Los 10 Favoritos del mes</h3>
                         </div>
                     </div>
                     
