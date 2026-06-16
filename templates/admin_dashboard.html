@@ -436,6 +436,9 @@ input:checked + .slider:before { transform: translateX(20px); }
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Agrega la banda destacada que aparecerá en el sitio.</p>
         
         <form id="banda-form" method="POST" action="/admin/banda" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;">
+            <label>Título de la Reseña</label>
+            <input type="text" name="titulo_resena" placeholder="Ej. Una obra maestra del Death Metal" required style="margin-bottom: 15px;">
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div>
                     <label>Nombre de la Banda</label>
@@ -471,9 +474,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 
             <label style="margin-top: 15px;">Biografía Corta</label>
             <textarea name="bio_corta" rows="4" placeholder="Breve historia de la banda..." required></textarea>
-
-            <label style="margin-top: 15px;">Título de la Reseña</label>
-            <input type="text" name="titulo_resena" placeholder="Ej. Una obra maestra del Death Metal" required>
 
             <label style="margin-top: 15px;">Texto de la Reseña</label>
             <textarea name="texto_resena" rows="6" placeholder="Escribe aquí tu reseña sobre la banda..." required></textarea>
