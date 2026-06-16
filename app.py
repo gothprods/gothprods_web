@@ -93,6 +93,26 @@ def get_db_connection(live=False):
     except Exception as e:
         print("Schema migration error:", e)
 
+    # Auto-migrate schema for users
+    try:
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(users)")
+        columns = [col[1] for col in cursor.fetchall()]
+        
+        if 'nombre' not in columns:
+            cursor.execute("ALTER TABLE users ADD COLUMN nombre TEXT")
+        if 'username' not in columns:
+            cursor.execute("ALTER TABLE users ADD COLUMN username TEXT")
+        if 'is_active' not in columns:
+            cursor.execute("ALTER TABLE users ADD COLUMN is_active INTEGER DEFAULT 1")
+            
+        # Migrate existing root user
+        cursor.execute("UPDATE users SET username = 'root', nombre = 'Administrador', role = 'admin', is_active = 1 WHERE email = 'goth.prods@gmail.com' AND username IS NULL")
+        
+        conn.commit()
+    except Exception as e:
+        print("Schema migration error (users):", e)
+
     return conn
 
 def get_settings(live=False):
@@ -307,10 +327,12 @@ def admin_login():
         password = request.form['password']
         
         conn = get_db_connection()
-        user = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+        user = conn.execute("SELECT * FROM users WHERE email = ? OR username = ?", (email, email)).fetchone()
         
         if user:
-            if user['password'] and check_password_hash(user['password'], password):
+            if 'is_active' in user.keys() and user['is_active'] == 0:
+                flash('Tu cuenta ha sido desactivada.', 'error')
+            elif user['password'] and check_password_hash(user['password'], password):
                 if user.keys().count('must_change_password') > 0 and user['must_change_password'] == 1:
                     session['setup_email'] = user['email']
                     return redirect(url_for('setup_root_password'))
@@ -319,6 +341,8 @@ def admin_login():
                 session['user_id'] = user['id']
                 session['role'] = user['role']
                 session['email'] = user['email']
+                session['username'] = user['username'] if 'username' in user.keys() else ''
+                session['nombre'] = user['nombre'] if 'nombre' in user.keys() else ''
                 return redirect(url_for('admin_dashboard'))
             else:
                 flash('Credenciales incorrectas.', 'error')
@@ -397,6 +421,9 @@ def admin_dashboard():
 
     if request.method == 'POST':
         section = request.form.get('section')
+        if session.get('role') == 'editor' and section not in ['El Noticiero Nocturno', 'Reseñas de Conciertos']:
+            flash('Acceso denegado', 'error')
+            return redirect(url_for('admin_dashboard'))
         title = request.form.get('title')
         short_desc = request.form.get('short_desc')
         full_desc = request.form.get('full_desc')
@@ -450,14 +477,17 @@ def admin_dashboard():
     conn = get_db_connection()
     all_items = conn.execute("SELECT id, section, title, short_desc, full_desc, yt_link, sp_link, ap_link, created_at FROM content_items WHERE section IN ('El Noticiero Nocturno', 'Reseñas de Conciertos', 'Metal Pulse Tracks') ORDER BY id DESC LIMIT 100").fetchall()
     todas_bandas = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC").fetchall()
+    all_users = conn.execute('SELECT id, nombre, username, email, role, is_active FROM users ORDER BY id DESC').fetchall() if session.get('role') in ['admin', 'root'] else []
     conn.close()
 
-    return render_template('admin_dashboard.html', all_items=all_items, settings=get_settings(), todas_bandas=todas_bandas)
+    return render_template('admin_dashboard.html', all_items=all_items, settings=get_settings(), todas_bandas=todas_bandas, all_users=all_users)
 
 @app.route('/admin/settings', methods=['POST'])
 def update_settings():
     if 'user_id' not in session:
         return redirect(url_for('admin_login'))
+    if session.get('role') not in ['admin', 'root']:
+        return redirect(url_for('admin_dashboard'))
         
     hero_title = request.form.get('hero_title')
     hero_subtitle = request.form.get('hero_subtitle')
@@ -773,6 +803,8 @@ def update_single_setting():
 def sync_galeria():
     if 'user_id' not in session:
         return redirect(url_for('admin_login'))
+    if session.get('role') not in ['admin', 'root']:
+        return redirect(url_for('admin_dashboard'))
     import subprocess
     subprocess.run(['python3', 'sync_rss.py', 'galeria'])
     flash('La Galería Nocturna se ha sincronizado automáticamente desde YouTube.', 'success')
@@ -782,6 +814,8 @@ def sync_galeria():
 def sync_metal_pulse():
     if 'user_id' not in session:
         return redirect(url_for('admin_login'))
+    if session.get('role') not in ['admin', 'root']:
+        return redirect(url_for('admin_dashboard'))
     import subprocess
     subprocess.run(['python3', 'sync_rss.py', 'metal_pulse'])
     flash('Metal Pulse se ha sincronizado automáticamente desde Apple Podcast/Spotify (Ivoox).', 'success')
@@ -791,6 +825,8 @@ def sync_metal_pulse():
 def sync_entrevistas():
     if 'user_id' not in session:
         return redirect(url_for('admin_login'))
+    if session.get('role') not in ['admin', 'root']:
+        return redirect(url_for('admin_dashboard'))
     import subprocess
     subprocess.run(['python3', 'sync_rss.py', 'entrevistas'])
     flash('Entrevistas Under se ha sincronizado automáticamente desde la Playlist de YouTube.', 'success')
@@ -800,6 +836,8 @@ def sync_entrevistas():
 def sync_agenda():
     if 'user_id' not in session:
         return redirect(url_for('admin_login'))
+    if session.get('role') not in ['admin', 'root']:
+        return redirect(url_for('admin_dashboard'))
     
     import urllib.request
     import csv
@@ -852,6 +890,69 @@ def sync_agenda():
     except Exception as e:
         flash(f'Error al sincronizar Agenda: {str(e)}', 'error')
 
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/users/add', methods=['POST'])
+def add_user():
+    if session.get('role') not in ['admin', 'root']:
+        return redirect(url_for('admin_dashboard'))
+    nombre = request.form.get('nombre')
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    role = request.form.get('role')
+    
+    hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
+    conn = get_db_connection()
+    try:
+        conn.execute("INSERT INTO users (nombre, username, email, password, role, is_active) VALUES (?, ?, ?, ?, ?, 1)",
+                     (nombre, username, email, hashed_pw, role))
+        conn.commit()
+        flash('Usuario creado exitosamente.', 'success')
+    except Exception as e:
+        flash('Error al crear usuario. Verifica que el username o correo no existan ya.', 'error')
+    conn.close()
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/users/edit/<int:id>', methods=['POST'])
+def edit_user(id):
+    if session.get('role') not in ['admin', 'root']:
+        return redirect(url_for('admin_dashboard'))
+    nombre = request.form.get('nombre')
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    role = request.form.get('role')
+    
+    conn = get_db_connection()
+    try:
+        if password:
+            hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
+            conn.execute("UPDATE users SET nombre=?, username=?, email=?, password=?, role=? WHERE id=?", 
+                         (nombre, username, email, hashed_pw, role, id))
+        else:
+            conn.execute("UPDATE users SET nombre=?, username=?, email=?, role=? WHERE id=?", 
+                         (nombre, username, email, role, id))
+        conn.commit()
+        flash('Usuario actualizado exitosamente.', 'success')
+    except Exception as e:
+        flash('Error al editar usuario.', 'error')
+    conn.close()
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/users/toggle/<int:id>', methods=['POST'])
+def toggle_user(id):
+    if session.get('role') not in ['admin', 'root']:
+        return redirect(url_for('admin_dashboard'))
+    conn = get_db_connection()
+    user = conn.execute("SELECT is_active FROM users WHERE id=?", (id,)).fetchone()
+    if user:
+        new_status = 0 if user['is_active'] == 1 else 1
+        conn.execute("UPDATE users SET is_active=? WHERE id=?", (new_status, id))
+        conn.commit()
+    conn.close()
+    flash('Estado de usuario actualizado.', 'success')
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/logout')

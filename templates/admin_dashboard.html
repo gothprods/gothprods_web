@@ -32,14 +32,27 @@ input:checked + .slider:before { transform: translateX(20px); }
 <div class="tab-container">
     <div class="tab-buttons">
         <button class="tab-btn active" onclick="openTab(event, 'tab-crear')"><i class="fa-solid fa-pen-nib"></i> Crear/Editar Registro</button>
+        {% if session.get('role') in ['admin', 'root'] %}
         <button class="tab-btn" onclick="openTab(event, 'tab-sync')"><i class="fa-solid fa-rotate"></i> Sincronización Automática</button>
+        {% endif %}
         <button class="tab-btn" onclick="openTab(event, 'tab-noticiero')"><i class="fa-solid fa-newspaper"></i> Gestión Noticiero</button>
         <button class="tab-btn" onclick="openTab(event, 'tab-resenas')"><i class="fa-solid fa-guitar"></i> Gestión Reseñas</button>
+        {% if session.get('role') in ['admin', 'root'] %}
         <button class="tab-btn" onclick="openTab(event, 'tab-metalpulse')"><i class="fa-solid fa-headphones"></i> Metal Pulse</button>
+        {% endif %}
+        {% if session.get('role') in ['admin', 'root'] %}
         <button class="tab-btn" onclick="openTab(event, 'tab-banda')"><i class="fa-solid fa-star"></i> Banda de la Semana</button>
+        {% endif %}
+        {% if session.get('role') in ['admin', 'root'] %}
         <button class="tab-btn" onclick="openTab(event, 'tab-caos')"><i class="fa-solid fa-microphone"></i> Caos Sonoro</button>
+        {% endif %}
         <button class="tab-btn" onclick="openTab(event, 'tab-preview')"><i class="fa-solid fa-desktop"></i> Vista Previa</button>
+        {% if session.get('role') in ['admin', 'root'] %}
+        <button class="tab-btn" onclick="openTab(event, 'tab-users')"><i class="fa-solid fa-users"></i> Gestión de Usuarios</button>
+        {% endif %}
+        {% if session.get('role') in ['admin', 'root'] %}
         <button class="tab-btn" onclick="openTab(event, 'tab-lookfeel')"><i class="fa-solid fa-paint-roller"></i> Look & Feel</button>
+        {% endif %}
     </div>
 
     <!-- TAB 1: CREAR/EDITAR -->
@@ -52,10 +65,12 @@ input:checked + .slider:before { transform: translateX(20px); }
     <select name="section" required>
         <option value="Reseñas de Conciertos">Reseñas de Conciertos</option>
         <option value="El Noticiero Nocturno">El Noticiero Nocturno</option>
+        {% if session.get('role') in ['admin', 'root'] %}
         <option value="Metal Pulse Tracks">Metal Pulse Tracks</option>
         <option value="La Galería Nocturna">La Galería Nocturna</option>
         <option value="Caos Sonoro">Caos Sonoro</option>
         <option value="Colaboraciones">Colaboraciones</option>
+        {% endif %}
     </select>
     
     <label><i class="fa-solid fa-calendar-days"></i> Fecha de Publicación</label>
@@ -301,7 +316,34 @@ input:checked + .slider:before { transform: translateX(20px); }
                         document.getElementById('pulse_loading').style.display = 'none';
                     }
                 });
-            </script>
+            
+        // User Management scripts
+        function editUser(id, nombre, username, email, role) {
+            document.getElementById('form-users-title').innerHTML = '<i class="fa-solid fa-user-pen"></i> Editar Usuario';
+            var form = document.getElementById('users-form');
+            form.action = '/admin/users/edit/' + id;
+            document.getElementById('user_nombre').value = nombre;
+            document.getElementById('user_username').value = username;
+            document.getElementById('user_email').value = email;
+            document.getElementById('user_role').value = role;
+            
+            document.getElementById('submit-user-btn').innerHTML = '<i class="fa-solid fa-save"></i> Actualizar Usuario';
+            document.getElementById('cancel-user-btn').style.display = 'inline-block';
+            
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelUserEdit() {
+            document.getElementById('form-users-title').innerHTML = '<i class="fa-solid fa-user-plus"></i> Añadir Nuevo Usuario';
+            var form = document.getElementById('users-form');
+            form.action = '/admin/users/add';
+            form.reset();
+            
+            document.getElementById('submit-user-btn').innerHTML = '<i class="fa-solid fa-save"></i> Guardar Usuario';
+            document.getElementById('cancel-user-btn').style.display = 'none';
+        }
+
+</script>
 
             <script>
                 function updateSingleSetting(key, value) {
@@ -317,7 +359,34 @@ input:checked + .slider:before { transform: translateX(20px); }
                         }
                     });
                 }
-            </script>
+            
+        // User Management scripts
+        function editUser(id, nombre, username, email, role) {
+            document.getElementById('form-users-title').innerHTML = '<i class="fa-solid fa-user-pen"></i> Editar Usuario';
+            var form = document.getElementById('users-form');
+            form.action = '/admin/users/edit/' + id;
+            document.getElementById('user_nombre').value = nombre;
+            document.getElementById('user_username').value = username;
+            document.getElementById('user_email').value = email;
+            document.getElementById('user_role').value = role;
+            
+            document.getElementById('submit-user-btn').innerHTML = '<i class="fa-solid fa-save"></i> Actualizar Usuario';
+            document.getElementById('cancel-user-btn').style.display = 'inline-block';
+            
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelUserEdit() {
+            document.getElementById('form-users-title').innerHTML = '<i class="fa-solid fa-user-plus"></i> Añadir Nuevo Usuario';
+            var form = document.getElementById('users-form');
+            form.action = '/admin/users/add';
+            form.reset();
+            
+            document.getElementById('submit-user-btn').innerHTML = '<i class="fa-solid fa-save"></i> Guardar Usuario';
+            document.getElementById('cancel-user-btn').style.display = 'none';
+        }
+
+</script>
 
             <h3 style="margin-bottom: 15px;">Tracks Actuales</h3>
             <label style="display: flex; align-items: center; gap: 10px; color: #fff; margin-bottom: 15px; font-size: 0.9rem; background: #222; padding: 10px; border-radius: 8px; border: 1px solid #444;">
@@ -785,6 +854,33 @@ function confirmGoLive() {
         alert("✅ ¡Cambios publicados exitosamente! Tu sitio está en vivo.");
     }
 }
+
+        // User Management scripts
+        function editUser(id, nombre, username, email, role) {
+            document.getElementById('form-users-title').innerHTML = '<i class="fa-solid fa-user-pen"></i> Editar Usuario';
+            var form = document.getElementById('users-form');
+            form.action = '/admin/users/edit/' + id;
+            document.getElementById('user_nombre').value = nombre;
+            document.getElementById('user_username').value = username;
+            document.getElementById('user_email').value = email;
+            document.getElementById('user_role').value = role;
+            
+            document.getElementById('submit-user-btn').innerHTML = '<i class="fa-solid fa-save"></i> Actualizar Usuario';
+            document.getElementById('cancel-user-btn').style.display = 'inline-block';
+            
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelUserEdit() {
+            document.getElementById('form-users-title').innerHTML = '<i class="fa-solid fa-user-plus"></i> Añadir Nuevo Usuario';
+            var form = document.getElementById('users-form');
+            form.action = '/admin/users/add';
+            form.reset();
+            
+            document.getElementById('submit-user-btn').innerHTML = '<i class="fa-solid fa-save"></i> Guardar Usuario';
+            document.getElementById('cancel-user-btn').style.display = 'none';
+        }
+
 </script>
 
 
@@ -918,5 +1014,32 @@ function setLanguage(lang) {
     document.getElementById('btn-es').style.borderColor = lang === 'es' ? 'var(--accent-color)' : '#555';
     document.getElementById('btn-en').style.borderColor = lang === 'en' ? 'var(--accent-color)' : '#555';
 }
+
+        // User Management scripts
+        function editUser(id, nombre, username, email, role) {
+            document.getElementById('form-users-title').innerHTML = '<i class="fa-solid fa-user-pen"></i> Editar Usuario';
+            var form = document.getElementById('users-form');
+            form.action = '/admin/users/edit/' + id;
+            document.getElementById('user_nombre').value = nombre;
+            document.getElementById('user_username').value = username;
+            document.getElementById('user_email').value = email;
+            document.getElementById('user_role').value = role;
+            
+            document.getElementById('submit-user-btn').innerHTML = '<i class="fa-solid fa-save"></i> Actualizar Usuario';
+            document.getElementById('cancel-user-btn').style.display = 'inline-block';
+            
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelUserEdit() {
+            document.getElementById('form-users-title').innerHTML = '<i class="fa-solid fa-user-plus"></i> Añadir Nuevo Usuario';
+            var form = document.getElementById('users-form');
+            form.action = '/admin/users/add';
+            form.reset();
+            
+            document.getElementById('submit-user-btn').innerHTML = '<i class="fa-solid fa-save"></i> Guardar Usuario';
+            document.getElementById('cancel-user-btn').style.display = 'none';
+        }
+
 </script>
 {% endblock %}
