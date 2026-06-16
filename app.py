@@ -113,6 +113,33 @@ def get_db_connection(live=False):
     except Exception as e:
         print("Schema migration error (users):", e)
 
+    # Auto-create schema for eventos_semana
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS eventos_semana (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                titulo_articulo TEXT,
+                fecha_inicio_pub TEXT,
+                fecha_fin_pub TEXT,
+                nombre_evento TEXT,
+                promotor TEXT,
+                img_video_path TEXT,
+                pais TEXT,
+                ciudad TEXT,
+                fecha_evento TEXT,
+                bio_corta TEXT,
+                texto_articulo TEXT,
+                fb_link TEXT,
+                ig_link TEXT,
+                is_active INTEGER DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.commit()
+    except Exception as e:
+        print("Schema creation error (eventos_semana):", e)
+
     return conn
 
 def get_settings(live=False):
@@ -184,6 +211,24 @@ def index():
             bandas_semana.append(b)
             if len(bandas_semana) == 5:
                 break
+                
+    # Query for Eventos de la Semana
+    raw_eventos = conn.execute("SELECT * FROM eventos_semana ORDER BY id DESC").fetchall()
+    eventos_semana = []
+    for e in raw_eventos:
+        is_active = e['is_active'] if 'is_active' in e.keys() else 1
+        
+        fecha_inicio = e['fecha_inicio_pub'] if 'fecha_inicio_pub' in e.keys() and e['fecha_inicio_pub'] else None
+        fecha_fin = e['fecha_fin_pub'] if 'fecha_fin_pub' in e.keys() and e['fecha_fin_pub'] else None
+        
+        in_date_range = True
+        if fecha_inicio and current_date < fecha_inicio:
+            in_date_range = False
+        if fecha_fin and current_date > fecha_fin:
+            in_date_range = False
+            
+        if is_active == 1 and in_date_range:
+            eventos_semana.append(e)
     
     # Existing content queries
     noticiero_items = conn.execute("SELECT * FROM content_items WHERE section = 'El Noticiero Nocturno' ORDER BY created_at DESC").fetchall()
@@ -233,7 +278,8 @@ def index():
                            upcoming_agenda=upcoming_agenda,
                            current_date=current_date,
                            settings=get_settings(live=not is_preview),
-                           bandas_semana=bandas_semana)
+                           bandas_semana=bandas_semana,
+                           eventos_semana=eventos_semana)
 
 @app.route('/banda/<int:id>')
 def view_banda(id):
@@ -490,10 +536,11 @@ def admin_dashboard():
     conn = get_db_connection()
     all_items = conn.execute("SELECT id, section, title, short_desc, full_desc, yt_link, sp_link, ap_link, created_at FROM content_items WHERE section IN ('El Noticiero Nocturno', 'Reseñas de Conciertos', 'Metal Pulse Tracks') ORDER BY id DESC LIMIT 100").fetchall()
     todas_bandas = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC").fetchall()
+    todos_eventos = conn.execute("SELECT * FROM eventos_semana ORDER BY id DESC").fetchall()
     all_users = conn.execute('SELECT id, nombre, username, email, role, is_active FROM users ORDER BY id DESC').fetchall() if session.get('role') in ['admin', 'root'] else []
     conn.close()
 
-    return render_template('admin_dashboard.html', all_items=all_items, settings=get_settings(), todas_bandas=todas_bandas, all_users=all_users)
+    return render_template('admin_dashboard.html', all_items=all_items, settings=get_settings(), todas_bandas=todas_bandas, todos_eventos=todos_eventos, all_users=all_users)
 
 @app.route('/admin/settings', methods=['POST'])
 def update_settings():
@@ -728,6 +775,97 @@ def delete_banda(id):
     conn.close()
     flash('Banda eliminada en borrador. Es necesario validar en vista previa antes de liberar.', 'success')
     return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/eventos', methods=['POST'])
+def add_evento():
+    if 'user_id' not in session: return redirect(url_for('admin_login'))
+    
+    titulo_articulo = request.form.get('titulo_articulo', '')
+    fecha_inicio_pub = request.form.get('fecha_inicio_pub', '')
+    fecha_fin_pub = request.form.get('fecha_fin_pub', '')
+    if fecha_inicio_pub == '': fecha_inicio_pub = None
+    if fecha_fin_pub == '': fecha_fin_pub = None
+    
+    nombre_evento = request.form.get('nombre_evento', '')
+    promotor = request.form.get('promotor', '')
+    pais = request.form.get('pais', '')
+    ciudad = request.form.get('ciudad', '')
+    fecha_evento = request.form.get('fecha_evento', '')
+    bio_corta = request.form.get('bio_corta', '')
+    texto_articulo = request.form.get('texto_articulo', '')
+    fb_link = request.form.get('fb_link', '')
+    ig_link = request.form.get('ig_link', '')
+    
+    file = request.files.get('img_video_path')
+    filename = ''
+    if file and file.filename != '':
+        optimized_name = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="evento_")
+        filename = f"updates/{optimized_name}"
+        
+    conn = get_db_connection()
+    conn.execute('''
+        INSERT INTO eventos_semana (titulo_articulo, fecha_inicio_pub, fecha_fin_pub, nombre_evento, promotor, img_video_path, pais, ciudad, fecha_evento, bio_corta, texto_articulo, fb_link, ig_link)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (titulo_articulo, fecha_inicio_pub, fecha_fin_pub, nombre_evento, promotor, filename, pais, ciudad, fecha_evento, bio_corta, texto_articulo, fb_link, ig_link))
+    conn.commit()
+    conn.close()
+    
+    flash('Evento guardado exitosamente.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/eventos/edit/<int:id>', methods=['POST'])
+def edit_evento(id):
+    if 'user_id' not in session: return redirect(url_for('admin_login'))
+    
+    titulo_articulo = request.form.get('titulo_articulo', '')
+    fecha_inicio_pub = request.form.get('fecha_inicio_pub', '')
+    fecha_fin_pub = request.form.get('fecha_fin_pub', '')
+    if fecha_inicio_pub == '': fecha_inicio_pub = None
+    if fecha_fin_pub == '': fecha_fin_pub = None
+    
+    nombre_evento = request.form.get('nombre_evento', '')
+    promotor = request.form.get('promotor', '')
+    pais = request.form.get('pais', '')
+    ciudad = request.form.get('ciudad', '')
+    fecha_evento = request.form.get('fecha_evento', '')
+    bio_corta = request.form.get('bio_corta', '')
+    texto_articulo = request.form.get('texto_articulo', '')
+    fb_link = request.form.get('fb_link', '')
+    ig_link = request.form.get('ig_link', '')
+
+    conn = get_db_connection()
+    
+    file = request.files.get('img_video_path')
+    if file and file.filename != '':
+        optimized_name = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="evento_")
+        filename = f"updates/{optimized_name}"
+        conn.execute('''
+            UPDATE eventos_semana SET titulo_articulo=?, fecha_inicio_pub=?, fecha_fin_pub=?, nombre_evento=?, promotor=?, img_video_path=?, pais=?, ciudad=?, fecha_evento=?, bio_corta=?, texto_articulo=?, fb_link=?, ig_link=?
+            WHERE id=?
+        ''', (titulo_articulo, fecha_inicio_pub, fecha_fin_pub, nombre_evento, promotor, filename, pais, ciudad, fecha_evento, bio_corta, texto_articulo, fb_link, ig_link, id))
+    else:
+        conn.execute('''
+            UPDATE eventos_semana SET titulo_articulo=?, fecha_inicio_pub=?, fecha_fin_pub=?, nombre_evento=?, promotor=?, pais=?, ciudad=?, fecha_evento=?, bio_corta=?, texto_articulo=?, fb_link=?, ig_link=?
+            WHERE id=?
+        ''', (titulo_articulo, fecha_inicio_pub, fecha_fin_pub, nombre_evento, promotor, pais, ciudad, fecha_evento, bio_corta, texto_articulo, fb_link, ig_link, id))
+        
+    conn.commit()
+    conn.close()
+    
+    flash('Evento actualizado exitosamente.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/eventos/toggle/<int:id>', methods=['POST'])
+def toggle_evento(id):
+    if 'user_id' not in session: return jsonify({"success": False, "error": "Unauthorized"}), 403
+    conn = get_db_connection()
+    e = conn.execute("SELECT is_active FROM eventos_semana WHERE id = ?", (id,)).fetchone()
+    if e:
+        new_status = 0 if e['is_active'] == 1 else 1
+        conn.execute("UPDATE eventos_semana SET is_active = ? WHERE id = ?", (new_status, id))
+        conn.commit()
+    conn.close()
+    return jsonify({"success": True})
 
 @app.route('/admin/delete/<int:id>', methods=['POST'])
 def delete_record(id):
