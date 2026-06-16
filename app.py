@@ -294,6 +294,19 @@ def view_banda(id):
     settings = get_settings(live=not is_preview)
     return render_template('banda.html', banda=banda, settings=settings)
 
+@app.route('/evento/<int:id>')
+def view_evento(id):
+    is_preview = request.args.get('preview') == '1'
+    conn = get_db_connection(live=not is_preview)
+    evento = conn.execute("SELECT * FROM eventos_semana WHERE id = ?", (id,)).fetchone()
+    conn.close()
+    
+    if not evento:
+        return "Evento no encontrado", 404
+        
+    settings = get_settings(live=not is_preview)
+    return render_template('evento.html', evento=evento, settings=settings)
+
 @app.route('/articulo/<int:id>')
 def view_articulo(id):
     is_preview = request.args.get('preview') == '1'
