@@ -944,7 +944,7 @@ def edit_user(id):
 @app.route('/admin/users/toggle/<int:id>', methods=['POST'])
 def toggle_user(id):
     if session.get('role') not in ['admin', 'root']:
-        return redirect(url_for('admin_dashboard'))
+        return jsonify({"success": False, "error": "Unauthorized"}), 403
     conn = get_db_connection()
     user = conn.execute("SELECT is_active FROM users WHERE id=?", (id,)).fetchone()
     if user:
@@ -952,8 +952,7 @@ def toggle_user(id):
         conn.execute("UPDATE users SET is_active=? WHERE id=?", (new_status, id))
         conn.commit()
     conn.close()
-    flash('Estado de usuario actualizado.', 'success')
-    return redirect(url_for('admin_dashboard'))
+    return jsonify({"success": True})
 
 @app.route('/admin/logout')
 def admin_logout():
