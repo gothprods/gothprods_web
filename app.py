@@ -80,7 +80,7 @@ def get_db_connection(live=False):
             'discografia', 'ultimo_lanzamiento_titulo', 'ultimo_lanzamiento_tipo', 
             'ultimo_lanzamiento_url', 'ultimo_lanzamiento_plataforma', 
             'ultimo_lanzamiento_sp_link', 'ultimo_lanzamiento_ap_link',
-            'bio_larga', 'is_active'
+            'bio_larga', 'is_active', 'fecha_inicio', 'fecha_fin'
         ]
         
         for col in required_columns:
@@ -158,7 +158,9 @@ def send_verification_email(to_email, code, subject="Código de Verificación - 
 def index():
     is_preview = request.args.get('preview') == '1' and 'user_id' in session
     conn = get_db_connection(live=not is_preview)
-    
+    import datetime
+    current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+
     # Query for the latest Banda de la Semana
     raw_bandas = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC").fetchall()
     bandas_semana = []
@@ -166,7 +168,18 @@ def index():
     for b in raw_bandas:
         # Check if the band is active (default 1 if column just added, but could be 0)
         is_active = b['is_active'] if 'is_active' in b.keys() else 1
-        if is_active == 1 and b['nombre'] not in seen_bands:
+        
+        # Check dates
+        fecha_inicio = b['fecha_inicio'] if 'fecha_inicio' in b.keys() and b['fecha_inicio'] else None
+        fecha_fin = b['fecha_fin'] if 'fecha_fin' in b.keys() and b['fecha_fin'] else None
+        
+        in_date_range = True
+        if fecha_inicio and current_date < fecha_inicio:
+            in_date_range = False
+        if fecha_fin and current_date > fecha_fin:
+            in_date_range = False
+            
+        if is_active == 1 and in_date_range and b['nombre'] not in seen_bands:
             seen_bands.add(b['nombre'])
             bandas_semana.append(b)
             if len(bandas_semana) == 5:
@@ -608,6 +621,12 @@ def add_banda():
     ultimo_lanzamiento_titulo = request.form.get('ultimo_lanzamiento_titulo', '')
     ultimo_lanzamiento_tipo = request.form.get('ultimo_lanzamiento_tipo', 'Album')
     
+    fecha_inicio = request.form.get('fecha_inicio', None)
+    fecha_fin = request.form.get('fecha_fin', None)
+    
+    if fecha_inicio == '': fecha_inicio = None
+    if fecha_fin == '': fecha_fin = None
+    
     raw_sp = request.form.get('ultimo_lanzamiento_sp_link', '')
     raw_ap = request.form.get('ultimo_lanzamiento_ap_link', '')
     
@@ -622,9 +641,9 @@ def add_banda():
         
     conn = get_db_connection()
     conn.execute('''
-        INSERT INTO banda_semana (nombre, pais, ciudad, bio_corta, img_video_path, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (nombre, pais, ciudad, bio_corta, filename, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link))
+        INSERT INTO banda_semana (nombre, pais, ciudad, bio_corta, img_video_path, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link, fecha_inicio, fecha_fin)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (nombre, pais, ciudad, bio_corta, filename, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link, fecha_inicio, fecha_fin))
     conn.commit()
     conn.close()
     
@@ -653,6 +672,12 @@ def edit_banda(id):
     discografia = request.form.get('discografia', '')
     ultimo_lanzamiento_titulo = request.form.get('ultimo_lanzamiento_titulo', '')
     ultimo_lanzamiento_tipo = request.form.get('ultimo_lanzamiento_tipo', 'Album')
+
+    fecha_inicio = request.form.get('fecha_inicio', None)
+    fecha_fin = request.form.get('fecha_fin', None)
+    
+    if fecha_inicio == '': fecha_inicio = None
+    if fecha_fin == '': fecha_fin = None
     
     raw_sp = request.form.get('ultimo_lanzamiento_sp_link', '')
     raw_ap = request.form.get('ultimo_lanzamiento_ap_link', '')
@@ -667,14 +692,14 @@ def edit_banda(id):
         optimized_name = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="banda_")
         filename = f"updates/{optimized_name}"
         conn.execute('''
-            UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, img_video_path=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?, titulo_resena=?, texto_resena=?, discografia=?, ultimo_lanzamiento_titulo=?, ultimo_lanzamiento_tipo=?, ultimo_lanzamiento_sp_link=?, ultimo_lanzamiento_ap_link=?
+            UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, img_video_path=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?, titulo_resena=?, texto_resena=?, discografia=?, ultimo_lanzamiento_titulo=?, ultimo_lanzamiento_tipo=?, ultimo_lanzamiento_sp_link=?, ultimo_lanzamiento_ap_link=?, fecha_inicio=?, fecha_fin=?
             WHERE id=?
-        ''', (nombre, pais, ciudad, bio_corta, filename, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link, id))
+        ''', (nombre, pais, ciudad, bio_corta, filename, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link, fecha_inicio, fecha_fin, id))
     else:
         conn.execute('''
-            UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?, titulo_resena=?, texto_resena=?, discografia=?, ultimo_lanzamiento_titulo=?, ultimo_lanzamiento_tipo=?, ultimo_lanzamiento_sp_link=?, ultimo_lanzamiento_ap_link=?
+            UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?, titulo_resena=?, texto_resena=?, discografia=?, ultimo_lanzamiento_titulo=?, ultimo_lanzamiento_tipo=?, ultimo_lanzamiento_sp_link=?, ultimo_lanzamiento_ap_link=?, fecha_inicio=?, fecha_fin=?
             WHERE id=?
-        ''', (nombre, pais, ciudad, bio_corta, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link, id))
+        ''', (nombre, pais, ciudad, bio_corta, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link, fecha_inicio, fecha_fin, id))
         
     conn.commit()
     conn.close()

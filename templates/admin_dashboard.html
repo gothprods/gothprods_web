@@ -546,6 +546,17 @@ input:checked + .slider:before { transform: translateX(20px); }
             <label>Título de la Reseña</label>
             <input type="text" name="titulo_resena" placeholder="Ej. Una obra maestra del Death Metal" required style="margin-bottom: 15px;">
 
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                <div>
+                    <label>Fecha de Inicio <small>(Opcional)</small></label>
+                    <input type="date" name="fecha_inicio">
+                </div>
+                <div>
+                    <label>Fecha de Fin <small>(Opcional)</small></label>
+                    <input type="date" name="fecha_fin">
+                </div>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div>
                     <label>Nombre de la Banda</label>
@@ -623,7 +634,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <tr style="border-bottom: 1px solid #444;">
                         <th style="padding: 10px;">Banda</th>
                         <th style="padding: 10px;">Origen</th>
-                        <th style="padding: 10px;">Fecha Agregada</th>
+                        <th style="padding: 10px;">Vigencia</th>
                         <th style="padding: 10px; text-align: center;">Activo (Inicio)</th>
                         <th style="padding: 10px; text-align: right;">Acciones</th>
                     </tr>
@@ -633,7 +644,17 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <tr style="border-bottom: 1px solid #333;">
                         <td style="padding: 10px; color: #fff;">{{ b.nombre }}</td>
                         <td style="padding: 10px; color: #aaa;">{{ b.ciudad }}, {{ b.pais }}</td>
-                        <td style="padding: 10px; color: #888;">{{ b.created_at.split()[0] if b.created_at else '' }}</td>
+                        <td style="padding: 10px; color: #888; font-size: 0.8rem; line-height: 1.2;">
+                            {% if b.fecha_inicio and b.fecha_fin %}
+                                {{ b.fecha_inicio }} <br>al {{ b.fecha_fin }}
+                            {% elif b.fecha_inicio %}
+                                Desde {{ b.fecha_inicio }}
+                            {% elif b.fecha_fin %}
+                                Hasta {{ b.fecha_fin }}
+                            {% else %}
+                                Siempre
+                            {% endif %}
+                        </td>
                         <td style="padding: 10px; text-align: center;">
                             <label class="switch">
                                 {% set active = b.is_active if 'is_active' in b.keys() else 1 %}
@@ -645,6 +666,8 @@ input:checked + .slider:before { transform: translateX(20px); }
                             <button type="button" class="edit-banda-btn"
                                 data-id="{{ b.id }}"
                                 data-nombre="{{ b.nombre | default('', true) }}"
+                                data-fechainicio="{{ b.fecha_inicio | default('', true) }}"
+                                data-fechafin="{{ b.fecha_fin | default('', true) }}"
                                 data-pais="{{ b.pais | default('', true) }}"
                                 data-ciudad="{{ b.ciudad | default('', true) }}"
                                 data-biocorta="{{ b.bio_corta | default('', true) }}"
@@ -898,6 +921,8 @@ function editBandaRecord(btn) {
     document.getElementById('banda-cancel-btn').style.display = 'block';
     
     document.querySelector('#banda-form input[name="nombre"]').value = btn.getAttribute('data-nombre') || '';
+    document.querySelector('#banda-form input[name="fecha_inicio"]').value = btn.getAttribute('data-fechainicio') || '';
+    document.querySelector('#banda-form input[name="fecha_fin"]').value = btn.getAttribute('data-fechafin') || '';
     document.querySelector('#banda-form input[name="pais"]').value = btn.getAttribute('data-pais') || '';
     document.querySelector('#banda-form input[name="ciudad"]').value = btn.getAttribute('data-ciudad') || '';
     document.querySelector('#banda-form textarea[name="bio_corta"]').value = btn.getAttribute('data-biocorta') || '';
