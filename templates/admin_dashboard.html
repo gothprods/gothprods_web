@@ -61,7 +61,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <h3 id="form-title"><i class="fa-solid fa-pen-nib"></i> Crear Nuevo Registro</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">Llena este formulario para actualizar la web y generar automáticamente tus copys e imágenes para redes sociales.</p>
         
-        <form id="main-form" method="POST" action="/admin/dashboard" enctype="multipart/form-data">
+        <form id="main-form" method="POST" action="/admin/dashboard" enctype="multipart/form-data" onsubmit="syncAllEditorsToTextareas()">
     <label><i class="fa-solid fa-layer-group"></i> Sección de la Página</label>
     <select name="section" required>
         <option value="Reseñas de Conciertos">Reseñas de Conciertos</option>
@@ -85,13 +85,22 @@ input:checked + .slider:before { transform: translateX(20px); }
     
     <label><i class="fa-solid fa-align-justify"></i> Descripción Completa (Para modal/cuerpo de la noticia)</label>
     
-<div class="textarea-toolbar" data-target="full_desc" style="display: flex; gap: 10px; margin-bottom: 5px; background: #222; padding: 5px; border-radius: 4px; border: 1px solid #444;">
-    <button type="button" onclick="formatText(this, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
-    <button type="button" onclick="formatText(this, 'color', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-    <button type="button" onclick="formatText(this, 'color', 'var(--accent-color)')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+<div class="visual-editor-container" data-target="full_desc">
+    <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
+    <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <div style="width: 1px; background: #444; margin: 0 5px;"></div>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+    <div style="width: 1px; background: #444; margin: 0 5px;"></div>
+    <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
 </div>
-<textarea name="full_desc"
- rows="5" placeholder="Toda la información del evento, noticia o episodio..." required></textarea>
+    <div class="rich-editor" contenteditable="true" style="min-height: 120px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)"></div>
+    <textarea name="full_desc"
+ rows="5" placeholder="Toda la información del evento, noticia o episodio..." required style="display: none;"></textarea>
+</div>
     
     <label><i class="fa-regular fa-image"></i> Imagen de Portada</label>
     <input type="file" name="image" accept="image/*" required>
@@ -190,7 +199,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     data-pub="{{ item.created_at[:16] if item.created_at else '' }}"
                                     data-title="{{ item.title }}" data-author="{{ item.author }}"
                                     data-short="{{ item.short_desc }}"
-                                    data-full="{{ item.full_desc | default('', true) }}"
+                                    data-full="{{ item.full_desc | default('', true) | forceescape }}"
                                     data-yt="{{ item.yt_link | default('', true) }}"
                                     data-sp="{{ item.sp_link | default('', true) }}"
                                     data-ap="{{ item.ap_link | default('', true) }}"
@@ -240,7 +249,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     data-pub="{{ item.created_at[:16] if item.created_at else '' }}"
                                     data-title="{{ item.title }}" data-author="{{ item.author }}"
                                     data-short="{{ item.short_desc }}"
-                                    data-full="{{ item.full_desc | default('', true) }}"
+                                    data-full="{{ item.full_desc | default('', true) | forceescape }}"
                                     data-yt="{{ item.yt_link | default('', true) }}"
                                     data-sp="{{ item.sp_link | default('', true) }}"
                                     data-ap="{{ item.ap_link | default('', true) }}"
@@ -465,7 +474,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     data-pub=""
                                     data-title="{{ item.title }}" data-author="{{ item.author }}"
                                     data-short="{{ item.short_desc }}"
-                                    data-full="{{ item.full_desc | default('', true) }}"
+                                    data-full="{{ item.full_desc | default('', true) | forceescape }}"
                                     data-yt=""
                                     data-sp="{{ item.sp_link | default('', true) }}"
                                     data-ap=""
@@ -550,7 +559,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <h3 id="form-banda-title"><i class="fa-solid fa-star"></i> Gestión Banda de la Semana</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Agrega la banda destacada que aparecerá en el sitio.</p>
         
-        <form id="banda-form" method="POST" action="/admin/banda" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;">
+        <form id="banda-form" method="POST" action="/admin/banda" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()">
             <label>Título de la Reseña</label>
             <input type="text" name="titulo_resena" placeholder="Ej. Una obra maestra del Death Metal" required style="margin-bottom: 15px;">
 
@@ -600,33 +609,60 @@ input:checked + .slider:before { transform: translateX(20px); }
 
             <label style="margin-top: 15px;">Biografía Corta (Máximo 500 caracteres)</label>
             
-<div class="textarea-toolbar" data-target="bio_corta" style="display: flex; gap: 10px; margin-bottom: 5px; background: #222; padding: 5px; border-radius: 4px; border: 1px solid #444;">
-    <button type="button" onclick="formatText(this, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
-    <button type="button" onclick="formatText(this, 'color', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-    <button type="button" onclick="formatText(this, 'color', 'var(--accent-color)')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+<div class="visual-editor-container" data-target="bio_corta">
+    <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
+    <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <div style="width: 1px; background: #444; margin: 0 5px;"></div>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+    <div style="width: 1px; background: #444; margin: 0 5px;"></div>
+    <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
 </div>
-<textarea name="bio_corta"
- rows="5" maxlength="500" placeholder="Breve historia de la banda..." required></textarea>
+    <div class="rich-editor" contenteditable="true" style="min-height: 120px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)"></div>
+    <textarea name="bio_corta"
+ rows="5" maxlength="500" placeholder="Breve historia de la banda..." required style="display: none;"></textarea>
+</div>
 
             <label style="margin-top: 15px;">Texto de la Reseña</label>
             
-<div class="textarea-toolbar" data-target="texto_resena" style="display: flex; gap: 10px; margin-bottom: 5px; background: #222; padding: 5px; border-radius: 4px; border: 1px solid #444;">
-    <button type="button" onclick="formatText(this, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
-    <button type="button" onclick="formatText(this, 'color', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-    <button type="button" onclick="formatText(this, 'color', 'var(--accent-color)')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+<div class="visual-editor-container" data-target="texto_resena">
+    <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
+    <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <div style="width: 1px; background: #444; margin: 0 5px;"></div>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+    <div style="width: 1px; background: #444; margin: 0 5px;"></div>
+    <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
 </div>
-<textarea name="texto_resena"
- rows="6" placeholder="Escribe aquí tu reseña sobre la banda..." required></textarea>
+    <div class="rich-editor" contenteditable="true" style="min-height: 120px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)"></div>
+    <textarea name="texto_resena"
+ rows="6" placeholder="Escribe aquí tu reseña sobre la banda..." required style="display: none;"></textarea>
+</div>
 
             <label style="margin-top: 15px;">Discografía</label>
             
-<div class="textarea-toolbar" data-target="discografia" style="display: flex; gap: 10px; margin-bottom: 5px; background: #222; padding: 5px; border-radius: 4px; border: 1px solid #444;">
-    <button type="button" onclick="formatText(this, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
-    <button type="button" onclick="formatText(this, 'color', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-    <button type="button" onclick="formatText(this, 'color', 'var(--accent-color)')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+<div class="visual-editor-container" data-target="discografia">
+    <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
+    <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <div style="width: 1px; background: #444; margin: 0 5px;"></div>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+    <div style="width: 1px; background: #444; margin: 0 5px;"></div>
+    <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
 </div>
-<textarea name="discografia"
- rows="4" placeholder="Ej. Album 1 (2020), EP 1 (2022)..."></textarea>
+    <div class="rich-editor" contenteditable="true" style="min-height: 120px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)"></div>
+    <textarea name="discografia"
+ rows="4" placeholder="Ej. Album 1 (2020), EP 1 (2022)..." style="display: none;"></textarea>
+</div>
 
             <h4 style="color: var(--accent-color); margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;"><i class="fa-solid fa-compact-disc"></i> Último Lanzamiento</h4>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -737,7 +773,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <h3 id="form-eventos-title"><i class="fa-solid fa-calendar-star"></i> Gestión Eventos Destacados</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Agrega los eventos relevantes a los cuales daremos difusión.</p>
         
-        <form id="eventos-form" method="POST" action="/admin/eventos" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;">
+        <form id="eventos-form" method="POST" action="/admin/eventos" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()">
             <label>Título del Artículo</label>
             <input type="text" name="titulo_articulo" placeholder="Ej. El Festival de Metal Más Esperado" required style="margin-bottom: 15px;">
 
@@ -787,13 +823,22 @@ input:checked + .slider:before { transform: translateX(20px); }
 
             <label style="margin-top: 15px;">Sobre el Evento (Ilimitado en Panel de Control, 1200 en Portada)</label>
             
-<div class="textarea-toolbar" data-target="bio_corta" style="display: flex; gap: 10px; margin-bottom: 5px; background: #222; padding: 5px; border-radius: 4px; border: 1px solid #444;">
-    <button type="button" onclick="formatText(this, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
-    <button type="button" onclick="formatText(this, 'color', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-    <button type="button" onclick="formatText(this, 'color', 'var(--accent-color)')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+<div class="visual-editor-container" data-target="bio_corta">
+    <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
+    <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <div style="width: 1px; background: #444; margin: 0 5px;"></div>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+    <div style="width: 1px; background: #444; margin: 0 5px;"></div>
+    <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
 </div>
-<textarea name="bio_corta"
- rows="6" placeholder="Todo el texto que pongas aquí se mostrará en 'Leer nota completa'. La portada mostrará los primeros 1200 caracteres." required></textarea>
+    <div class="rich-editor" contenteditable="true" style="min-height: 120px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)"></div>
+    <textarea name="bio_corta"
+ rows="6" placeholder="Todo el texto que pongas aquí se mostrará en 'Leer nota completa'. La portada mostrará los primeros 1200 caracteres." required style="display: none;"></textarea>
+</div>
 
             <h4 style="margin-top: 25px; border-bottom: 1px solid #333; padding-bottom: 5px; color: var(--accent-color);"><i class="fa-solid fa-share-nodes"></i> Redes Sociales del Evento</h4>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -1067,6 +1112,7 @@ function editRecord(btn) {
     document.querySelector('#main-form input[name="image"]').required = false;
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    syncAllVisualsToEditors();
 }
 
 function cancelEdit() {
@@ -1077,6 +1123,7 @@ function cancelEdit() {
     
     document.getElementById('main-form').reset();
     document.querySelector('input[name="image"]').required = true;
+    syncAllVisualsToEditors();
 }
 
 function editBandaRecord(btn) {
@@ -1121,6 +1168,7 @@ function editBandaRecord(btn) {
     document.querySelector('#banda-form input[name="img_video_path"]').required = false;
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    syncAllVisualsToEditors();
 }
 
 function cancelBandaEdit() {
@@ -1175,6 +1223,7 @@ function editEventoRecord(btn) {
     document.querySelector('#eventos-form input[name="img_video_path"]').required = false;
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    syncAllVisualsToEditors();
 }
 
 function cancelEventoEdit() {
@@ -1439,38 +1488,56 @@ function setLanguage(lang) {
         }
 
 
-function formatText(btn, action, value=null) {
-    const targetName = btn.parentElement.getAttribute('data-target');
-    const textarea = btn.parentElement.nextElementSibling;
+
+function formatVisual(event, action, value=null) {
+    event.preventDefault(); // Keep focus on editor by preventing default click behavior
+    const btn = event.currentTarget;
+    const container = btn.closest('.visual-editor-container');
+    const editor = container.querySelector('.rich-editor');
     
-    if (!textarea || textarea.tagName.toLowerCase() !== 'textarea') {
-        console.error("No textarea found next to toolbar");
-        return;
+    // Focus the editor if it isn't already focused
+    if (document.activeElement !== editor) {
+        editor.focus();
     }
     
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    const selectedText = text.substring(start, end);
-    
-    let replacement = "";
-    if (action === 'bold') {
-        replacement = `<b>${selectedText}</b>`;
-    } else if (action === 'color') {
-        replacement = `<span style="color: ${value};">${selectedText}</span>`;
-    }
-    
-    textarea.value = text.substring(0, start) + replacement + text.substring(end);
-    textarea.focus();
-    
-    if (!selectedText) {
-        let offset = action === 'bold' ? 3 : `<span style="color: ${value};">`.length;
-        textarea.selectionStart = start + offset;
-        textarea.selectionEnd = start + offset;
+    if (action === 'foreColor') {
+        document.execCommand('styleWithCSS', false, true);
+        document.execCommand('foreColor', false, value);
     } else {
-        textarea.selectionStart = start;
-        textarea.selectionEnd = start + replacement.length;
+        document.execCommand(action, false, null);
     }
+    
+    syncEditor(editor);
+}
+
+function syncEditor(editorDiv) {
+    const container = editorDiv.closest('.visual-editor-container');
+    const textarea = container.querySelector('textarea');
+    textarea.value = editorDiv.innerHTML;
+}
+
+
+function syncAllEditorsToTextareas() {
+    document.querySelectorAll('.visual-editor-container').forEach(container => {
+        const textarea = container.querySelector('textarea');
+        const editor = container.querySelector('.rich-editor');
+        if(textarea && editor) {
+            textarea.value = editor.innerHTML;
+        }
+    });
+}
+
+function syncAllVisualsToEditors() {
+    // Also use setTimeout to ensure browser has updated textarea.value before we sync
+    setTimeout(() => {
+        document.querySelectorAll('.visual-editor-container').forEach(container => {
+            const textarea = container.querySelector('textarea');
+            const editor = container.querySelector('.rich-editor');
+            if(textarea && editor) {
+                editor.innerHTML = textarea.value;
+            }
+        });
+    }, 100);
 }
 
 </script>

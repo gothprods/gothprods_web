@@ -108,7 +108,7 @@
             </div>
             {% endif %}
 
-            <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ item.full_desc | safe }}</p>
+            <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ item.full_desc | safe }}</div>
 
             {% if item.yt_link or item.sp_link or item.ap_link %}
             <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 30px;">

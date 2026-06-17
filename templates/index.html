@@ -150,7 +150,7 @@
 
                             {% if banda_semana.discografia %}
                             <h4 style="color: var(--accent-color); font-family: 'Oswald', sans-serif; font-size: 1.1rem; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;"><i class="fa-solid fa-list-ul"></i> Discografía</h4>
-                            <p style="font-size: 0.9rem; line-height: 1.4; color: #aaa; white-space: pre-line; margin-bottom: 15px;">{{ banda_semana.discografia | safe }}</p>
+                            <div style="font-size: 0.9rem; line-height: 1.4; color: #aaa; white-space: pre-wrap; margin-bottom: 15px;">{{ banda_semana.discografia | safe }}</div>
                             {% endif %}
                         </div>
 
@@ -273,7 +273,7 @@
                     <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: center; border-left: 3px solid var(--accent-color);">
                         <p style="margin: 0; color: var(--accent-color); font-weight: bold; font-size: 1rem;"><strong><i class="fa-solid fa-bullhorn"></i> Presentado por:</strong> {{ evento.promotor }}</p>
                     </div>
-                    <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ evento.bio_corta | safe }}</p>
+                    <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ evento.bio_corta | safe }}</div>
                     <div style="margin-top: 40px; border-top: 1px solid #333; padding-top: 25px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center;">
                         <span style="color: #fff; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-right: 10px;"><i class="fa-solid fa-share-nodes"></i> Compartir:</span>
                         
@@ -309,12 +309,12 @@
                     </div>
                     {% endif %}
 
-                    <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ banda_semana.bio_corta | safe }}</p>
+                    <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ banda_semana.bio_corta | safe }}</div>
 
                     {% if banda_semana.titulo_resena and banda_semana.texto_resena %}
                     <div style="background: rgba(113, 109, 74, 0.1); padding: 25px; border-radius: 8px; margin-top: 30px; border-left: 4px solid var(--accent-color);">
                         <h3 style="color: var(--accent-color); font-size: 1.8rem; margin-bottom: 15px; font-family: 'Oswald', sans-serif; text-transform: uppercase;"><i class="fa-solid fa-pen-nib"></i> {{ banda_semana.titulo_resena }}</h3>
-                        <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin: 0; text-align: justify; white-space: pre-line;">{{ banda_semana.texto_resena | safe }}</p>
+                        <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin: 0; text-align: justify; white-space: pre-wrap;">{{ banda_semana.texto_resena | safe }}</div>
                     </div>
                     {% endif %}
                     
@@ -800,7 +800,7 @@
                     <h3>{{ item.title }}</h3>
                     <p style="color: var(--accent-color); font-weight: bold; font-size: 0.9rem; margin: 5px 0;">{{ item.author[8:10] }}/{{ item.author[5:7] }}</p>
                     <p>{{ item.short_desc | striptags }}</p>
-                    <p style="margin-top: 5px; font-weight: bold;">{{ item.full_desc | safe }}</p>
+                    <div style="margin-top: 5px; font-weight: bold;">{{ item.full_desc | safe }}</div>
                     {% if item.yt_link == 'Y' %}
                     <img loading="lazy" src="assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
                     {% endif %}
@@ -872,7 +872,7 @@
                     <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
                 </div>
 
-                <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ item.full_desc | safe }}</p>
+                <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ item.full_desc | safe }}</div>
 
                 {% if item.yt_link or item.sp_link or item.ap_link %}
                 <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 30px;">
