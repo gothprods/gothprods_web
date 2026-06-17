@@ -90,8 +90,8 @@
             
             <a href="/" style="color: var(--accent-color); text-decoration: none; font-size: 0.9rem; margin-bottom: 20px; display: inline-block; font-weight: bold;"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
             
-            <h2 class="notranslate" style="color: var(--accent-color); font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ banda.nombre }}</h2>
-            <p style="text-align: center; color: #888; font-size: 1.1rem; margin-bottom: 30px;">
+            <h2 class="notranslate" style="color: var(--accent-color); font-weight: bold; font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ banda.nombre }}</h2>
+            <p style="text-align: center; color: var(--accent-color); font-weight: bold; font-size: 1.1rem; margin-bottom: 30px;">
                 <i class="fa-solid fa-location-dot"></i> Origen: {{ banda.ciudad }}, {{ banda.pais }}
                 {% if banda.ano_formacion %} | <i class="fa-solid fa-calendar-days"></i> Formación: {{ banda.ano_formacion }}{% endif %}
             </p>
@@ -102,7 +102,7 @@
 
             {% if banda.line_up %}
             <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <p style="margin: 0; color: #ccc; font-size: 1rem;"><strong><i class="fa-solid fa-users"></i> Line Up:</strong> {{ banda.line_up }}</p>
+                <p style="margin: 0; color: var(--accent-color); font-weight: bold; font-size: 1rem;"><strong><i class="fa-solid fa-users"></i> Line Up:</strong> {{ banda.line_up }}</p>
             </div>
             {% endif %}
 

@@ -92,10 +92,10 @@
             {% if is_preview %}<a href="/admin/dashboard?edit_type=content&edit_id={{ item.id }}" target="_parent" class="preview-edit-btn" style="top: 20px; right: 20px;"><i class="fa-solid fa-pen"></i> Corregir Artículo en Panel</a>{% endif %}
             <a href="/" style="color: var(--accent-color); text-decoration: none; font-size: 0.9rem; margin-bottom: 20px; display: inline-block; font-weight: bold;"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
             
-            <h2 style="color: var(--accent-color); font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ item.title }}</h2>
+            <h2 style="color: var(--accent-color); font-weight: bold; font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ item.title }}</h2>
             
             {% if item.author %}
-            <p style="text-align: center; color: #888; font-size: 1.1rem; margin-bottom: 30px;">
+            <p style="text-align: center; color: var(--accent-color); font-weight: bold; font-size: 1.1rem; margin-bottom: 30px;">
                 <i class="fa-solid fa-pen-nib"></i> Escrito por: {{ item.author }}
             </p>
             {% else %}
