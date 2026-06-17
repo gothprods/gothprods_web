@@ -87,8 +87,9 @@
 
     <!-- MAIN CONTENT -->
     <main style="padding-top: 100px; min-height: 100vh; background: #000;">
-        <div style="max-width: 800px; margin: 0 auto; background: #111; padding: 40px; border: 1px solid var(--accent-color); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+        <div style="max-width: 800px; margin: 0 auto; background: #111; position: relative; padding: 40px; border: 1px solid var(--accent-color); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
             
+            {% if is_preview %}<a href="/admin/dashboard?edit_type=content&edit_id={{ item.id }}" target="_parent" class="preview-edit-btn" style="top: 20px; right: 20px;"><i class="fa-solid fa-pen"></i> Corregir Artículo en Panel</a>{% endif %}
             <a href="/" style="color: var(--accent-color); text-decoration: none; font-size: 0.9rem; margin-bottom: 20px; display: inline-block; font-weight: bold;"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
             
             <h2 style="color: var(--accent-color); font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ item.title }}</h2>

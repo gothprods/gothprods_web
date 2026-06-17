@@ -122,8 +122,10 @@
             </style>
             <div class="banda-slider-container" style="position: relative; overflow: hidden;">
                 {% for banda_semana in bandas_semana %}
-                <div class="banda-slide fade" style="animation: fadeEffect 1s; {% if loop.index != 1 %}display: none;{% endif %}">
-                    <div class="grid-container" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px;">
+                <div class="banda-slide fade" style="position:relative;" style="animation: fadeEffect 1s; {% if loop.index != 1 %}display: none;{% endif %}">
+                    {% if is_preview %}<a href="/admin/dashboard?edit_type=banda&edit_id={{ banda_semana.id }}" target="_parent" class="preview-edit-btn"><i class="fa-solid fa-pen"></i> Corregir Banda</a>{% endif %}
+
+                        <div class="grid-container" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px;">
                 <div style="flex: 1; min-width: 200px; max-width: 350px; margin: 0 auto;">
                     <img loading="lazy" src="{{ banda_semana.img_video_path }}" alt="{{ banda_semana.nombre }}" style="width: 100%; height: 350px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.8);">
                 </div>
@@ -217,7 +219,9 @@
                 </div>
                 <div class="evento-slider-container" style="position: relative; overflow: hidden;">
                     {% for evento in eventos_semana %}
-                    <div class="evento-slide fade" style="animation: fadeEffect 1s; {% if loop.index != 1 %}display: none;{% endif %}">
+                    <div class="evento-slide fade" style="position:relative;" style="animation: fadeEffect 1s; {% if loop.index != 1 %}display: none;{% endif %}">
+                        {% if is_preview %}<a href="/admin/dashboard?edit_type=banda&edit_id={{ banda_semana.id }}" target="_parent" class="preview-edit-btn"><i class="fa-solid fa-pen"></i> Corregir Banda</a>{% endif %}
+                            {% if is_preview %}<a href="/admin/dashboard?edit_type=evento&edit_id={{ evento.id }}" target="_parent" class="preview-edit-btn"><i class="fa-solid fa-pen"></i> Corregir Evento</a>{% endif %}
                         <div class="grid-container" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px;">
                             <div style="flex: 1; min-width: 200px; max-width: 350px; margin: 0 auto;">
                                 <img loading="lazy" src="{{ evento.img_video_path }}" alt="{{ evento.nombre_evento }}" style="width: 100%; height: 350px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.8);">

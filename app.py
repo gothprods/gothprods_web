@@ -279,7 +279,7 @@ def index():
                            current_date=current_date,
                            settings=get_settings(live=not is_preview),
                            bandas_semana=bandas_semana,
-                           eventos_semana=eventos_semana)
+                           eventos_semana=eventos_semana, is_preview=is_preview)
 
 @app.route('/banda/<int:id>')
 def view_banda(id):
@@ -292,7 +292,7 @@ def view_banda(id):
         return "Banda no encontrada", 404
         
     settings = get_settings(live=not is_preview)
-    return render_template('banda.html', banda=banda, settings=settings)
+    return render_template('banda.html', banda=banda, settings=settings, is_preview=is_preview)
 
 @app.route('/evento/<int:id>')
 def view_evento(id):
@@ -305,7 +305,7 @@ def view_evento(id):
         return "Evento no encontrado", 404
         
     settings = get_settings(live=not is_preview)
-    return render_template('evento.html', evento=evento, settings=settings)
+    return render_template('evento.html', evento=evento, settings=settings, is_preview=is_preview)
 
 @app.route('/articulo/<int:id>')
 def view_articulo(id):
@@ -318,7 +318,7 @@ def view_articulo(id):
         return "Artículo no encontrado", 404
         
     settings = get_settings(live=not is_preview)
-    return render_template('articulo.html', item=item, settings=settings)
+    return render_template('articulo.html', item=item, settings=settings, is_preview=is_preview)
 
 @app.route('/<path:path>')
 def serve_static(path):
