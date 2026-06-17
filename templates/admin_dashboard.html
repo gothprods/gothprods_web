@@ -84,7 +84,14 @@ input:checked + .slider:before { transform: translateX(20px); }
     <input type="text" name="short_desc" placeholder="Resumen de 1-2 líneas..." required>
     
     <label><i class="fa-solid fa-align-justify"></i> Descripción Completa (Para modal/cuerpo de la noticia)</label>
-    <textarea name="full_desc" rows="5" placeholder="Toda la información del evento, noticia o episodio..." required></textarea>
+    
+<div class="textarea-toolbar" data-target="full_desc" style="display: flex; gap: 10px; margin-bottom: 5px; background: #222; padding: 5px; border-radius: 4px; border: 1px solid #444;">
+    <button type="button" onclick="formatText(this, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <button type="button" onclick="formatText(this, 'color', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onclick="formatText(this, 'color', 'var(--accent-color)')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+</div>
+<textarea name="full_desc"
+ rows="5" placeholder="Toda la información del evento, noticia o episodio..." required></textarea>
     
     <label><i class="fa-regular fa-image"></i> Imagen de Portada</label>
     <input type="file" name="image" accept="image/*" required>
@@ -592,13 +599,34 @@ input:checked + .slider:before { transform: translateX(20px); }
             </div>
 
             <label style="margin-top: 15px;">Biografía Corta (Máximo 500 caracteres)</label>
-            <textarea name="bio_corta" rows="5" maxlength="500" placeholder="Breve historia de la banda..." required></textarea>
+            
+<div class="textarea-toolbar" data-target="bio_corta" style="display: flex; gap: 10px; margin-bottom: 5px; background: #222; padding: 5px; border-radius: 4px; border: 1px solid #444;">
+    <button type="button" onclick="formatText(this, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <button type="button" onclick="formatText(this, 'color', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onclick="formatText(this, 'color', 'var(--accent-color)')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+</div>
+<textarea name="bio_corta"
+ rows="5" maxlength="500" placeholder="Breve historia de la banda..." required></textarea>
 
             <label style="margin-top: 15px;">Texto de la Reseña</label>
-            <textarea name="texto_resena" rows="6" placeholder="Escribe aquí tu reseña sobre la banda..." required></textarea>
+            
+<div class="textarea-toolbar" data-target="texto_resena" style="display: flex; gap: 10px; margin-bottom: 5px; background: #222; padding: 5px; border-radius: 4px; border: 1px solid #444;">
+    <button type="button" onclick="formatText(this, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <button type="button" onclick="formatText(this, 'color', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onclick="formatText(this, 'color', 'var(--accent-color)')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+</div>
+<textarea name="texto_resena"
+ rows="6" placeholder="Escribe aquí tu reseña sobre la banda..." required></textarea>
 
             <label style="margin-top: 15px;">Discografía</label>
-            <textarea name="discografia" rows="4" placeholder="Ej. Album 1 (2020), EP 1 (2022)..."></textarea>
+            
+<div class="textarea-toolbar" data-target="discografia" style="display: flex; gap: 10px; margin-bottom: 5px; background: #222; padding: 5px; border-radius: 4px; border: 1px solid #444;">
+    <button type="button" onclick="formatText(this, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <button type="button" onclick="formatText(this, 'color', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onclick="formatText(this, 'color', 'var(--accent-color)')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+</div>
+<textarea name="discografia"
+ rows="4" placeholder="Ej. Album 1 (2020), EP 1 (2022)..."></textarea>
 
             <h4 style="color: var(--accent-color); margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;"><i class="fa-solid fa-compact-disc"></i> Último Lanzamiento</h4>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -758,7 +786,14 @@ input:checked + .slider:before { transform: translateX(20px); }
             </div>
 
             <label style="margin-top: 15px;">Sobre el Evento (Ilimitado en Panel de Control, 1200 en Portada)</label>
-            <textarea name="bio_corta" rows="6" placeholder="Todo el texto que pongas aquí se mostrará en 'Leer nota completa'. La portada mostrará los primeros 1200 caracteres." required></textarea>
+            
+<div class="textarea-toolbar" data-target="bio_corta" style="display: flex; gap: 10px; margin-bottom: 5px; background: #222; padding: 5px; border-radius: 4px; border: 1px solid #444;">
+    <button type="button" onclick="formatText(this, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <button type="button" onclick="formatText(this, 'color', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onclick="formatText(this, 'color', 'var(--accent-color)')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+</div>
+<textarea name="bio_corta"
+ rows="6" placeholder="Todo el texto que pongas aquí se mostrará en 'Leer nota completa'. La portada mostrará los primeros 1200 caracteres." required></textarea>
 
             <h4 style="margin-top: 25px; border-bottom: 1px solid #333; padding-bottom: 5px; color: var(--accent-color);"><i class="fa-solid fa-share-nodes"></i> Redes Sociales del Evento</h4>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">

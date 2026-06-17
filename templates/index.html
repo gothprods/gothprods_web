@@ -137,7 +137,7 @@
                         <!-- Columna 1: Biografía Corta -->
                         <div>
                             <h4 style="color: var(--accent-color); font-family: 'Oswald', sans-serif; font-size: 1.1rem; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;"><i class="fa-solid fa-align-left"></i> Biografía</h4>
-                            <p style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px; white-space: pre-line;">{{ banda_semana.bio_corta|truncate(500) }}</p>
+                            <p style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px; white-space: pre-line;">{{ banda_semana.bio_corta | striptags | truncate(500) }}</p>
                             <button onclick="openBandaModal({{ banda_semana.id }})" style="background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 5px 12px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-family: 'Oswald', sans-serif; letter-spacing: 1px; transition: all 0.3s;"><i class="fa-solid fa-book-open"></i> Leer historia completa</button>
                         </div>
 
@@ -150,7 +150,7 @@
 
                             {% if banda_semana.discografia %}
                             <h4 style="color: var(--accent-color); font-family: 'Oswald', sans-serif; font-size: 1.1rem; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;"><i class="fa-solid fa-list-ul"></i> Discografía</h4>
-                            <p style="font-size: 0.9rem; line-height: 1.4; color: #aaa; white-space: pre-line; margin-bottom: 15px;">{{ banda_semana.discografia }}</p>
+                            <p style="font-size: 0.9rem; line-height: 1.4; color: #aaa; white-space: pre-line; margin-bottom: 15px;">{{ banda_semana.discografia | safe }}</p>
                             {% endif %}
                         </div>
 
@@ -233,7 +233,7 @@
                                 <div style="display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; border: 1px solid #333;">
                                     <div>
                                         <h4 style="color: var(--accent-color); font-family: 'Oswald', sans-serif; font-size: 1.1rem; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;"><i class="fa-solid fa-align-left"></i> Sobre el Evento</h4>
-                                        <p style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px; color: #ccc; white-space: pre-line;">{{ evento.bio_corta|truncate(1300) }}</p>
+                                        <p style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px; color: #ccc; white-space: pre-line;">{{ evento.bio_corta | striptags | truncate(1300) }}</p>
                                         <button onclick="openEventoModal({{ evento.id }})" style="background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 5px 12px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-family: 'Oswald', sans-serif; letter-spacing: 1px; transition: all 0.3s;"><i class="fa-solid fa-book-open"></i> Leer nota completa</button>
                                     </div>
                                 </div>
@@ -273,7 +273,7 @@
                     <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: center; border-left: 3px solid var(--accent-color);">
                         <p style="margin: 0; color: var(--accent-color); font-weight: bold; font-size: 1rem;"><strong><i class="fa-solid fa-bullhorn"></i> Presentado por:</strong> {{ evento.promotor }}</p>
                     </div>
-                    <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ evento.bio_corta }}</p>
+                    <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ evento.bio_corta | safe }}</p>
                     <div style="margin-top: 40px; border-top: 1px solid #333; padding-top: 25px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center;">
                         <span style="color: #fff; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-right: 10px;"><i class="fa-solid fa-share-nodes"></i> Compartir:</span>
                         
@@ -309,12 +309,12 @@
                     </div>
                     {% endif %}
 
-                    <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ banda_semana.bio_corta }}</p>
+                    <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ banda_semana.bio_corta | safe }}</p>
 
                     {% if banda_semana.titulo_resena and banda_semana.texto_resena %}
                     <div style="background: rgba(113, 109, 74, 0.1); padding: 25px; border-radius: 8px; margin-top: 30px; border-left: 4px solid var(--accent-color);">
                         <h3 style="color: var(--accent-color); font-size: 1.8rem; margin-bottom: 15px; font-family: 'Oswald', sans-serif; text-transform: uppercase;"><i class="fa-solid fa-pen-nib"></i> {{ banda_semana.titulo_resena }}</h3>
-                        <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin: 0; text-align: justify; white-space: pre-line;">{{ banda_semana.texto_resena }}</p>
+                        <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin: 0; text-align: justify; white-space: pre-line;">{{ banda_semana.texto_resena | safe }}</p>
                     </div>
                     {% endif %}
                     
@@ -474,7 +474,7 @@
                     </div>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
                         {% for item in upcoming_agenda[:10] %}
-                        <li style="margin-bottom: 8px; line-height: 1.3;"><strong>{{ item.title }}</strong> <span style="color: var(--accent-color);">({{ item.author[8:10] }}/{{ item.author[5:7] }})</span> - <span style="color: #ccc;">{{ item.short_desc }}</span></li>
+                        <li style="margin-bottom: 8px; line-height: 1.3;"><strong>{{ item.title }}</strong> <span style="color: var(--accent-color);">({{ item.author[8:10] }}/{{ item.author[5:7] }})</span> - <span style="color: #ccc;">{{ item.short_desc | striptags }}</span></li>
                         {% endfor %}
                     </ul>
                     <a href="#agenda" class="read-more" style="color: var(--accent-color); font-weight: bold; margin-top:10px; display:inline-block; padding: 4px 10px; font-size: 0.8rem; border: 1px solid var(--accent-color); border-radius: 4px;">Ver Agenda Completa &rarr;</a>
@@ -715,7 +715,7 @@
                 <div class="news-card">
                     <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
                     <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
-                    <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc }}</p>
+                    <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc | striptags }}</p>
                     <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" class="open-review-modal" style="color: var(--accent-color); font-weight: bold; font-size: 0.85rem;">Leer reseña completa &rarr;</a>
                 </div>
                 {% endfor %}
@@ -799,8 +799,8 @@
                     {% endif %}
                     <h3>{{ item.title }}</h3>
                     <p style="color: var(--accent-color); font-weight: bold; font-size: 0.9rem; margin: 5px 0;">{{ item.author[8:10] }}/{{ item.author[5:7] }}</p>
-                    <p>{{ item.short_desc }}</p>
-                    <p style="margin-top: 5px; font-weight: bold;">{{ item.full_desc }}</p>
+                    <p>{{ item.short_desc | striptags }}</p>
+                    <p style="margin-top: 5px; font-weight: bold;">{{ item.full_desc | safe }}</p>
                     {% if item.yt_link == 'Y' %}
                     <img loading="lazy" src="assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
                     {% endif %}
@@ -872,7 +872,7 @@
                     <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
                 </div>
 
-                <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ item.full_desc }}</p>
+                <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ item.full_desc | safe }}</p>
 
                 {% if item.yt_link or item.sp_link or item.ap_link %}
                 <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 30px;">

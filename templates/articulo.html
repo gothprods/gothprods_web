@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ item.title }} | Goth Prods</title>
-    <meta name="description" content="{{ item.short_desc }}">
+    <meta name="description" content="{{ item.short_desc | striptags }}">
     <meta name="keywords" content="{{ item.section }}, goth prods, metal, heavy metal">
     <meta name="author" content="{{ item.author if item.author else 'Goth Prods' }}">
     <meta name="robots" content="index, follow">
@@ -15,14 +15,14 @@
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://gothprods.com/articulo/{{ item.id }}">
     <meta property="og:title" content="{{ item.title }} | Goth Prods">
-    <meta property="og:description" content="{{ item.short_desc }}">
+    <meta property="og:description" content="{{ item.short_desc | striptags }}">
     <meta property="og:image" content="https://gothprods.com/{{ image_url | replace(' ', '%20') }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://gothprods.com/articulo/{{ item.id }}">
     <meta property="twitter:title" content="{{ item.title }} | Goth Prods">
-    <meta property="twitter:description" content="{{ item.short_desc }}">
+    <meta property="twitter:description" content="{{ item.short_desc | striptags }}">
     <meta property="twitter:image" content="https://gothprods.com/{{ image_url | replace(' ', '%20') }}">
 
     <!-- Favicons -->
@@ -108,7 +108,7 @@
             </div>
             {% endif %}
 
-            <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ item.full_desc }}</p>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-line;">{{ item.full_desc | safe }}</p>
 
             {% if item.yt_link or item.sp_link or item.ap_link %}
             <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 30px;">
