@@ -916,18 +916,19 @@ def edit_record(id):
         sp_link = request.form.get('sp_link', '')
         ap_link = request.form.get('ap_link', '')
         pub_date = request.form.get('pub_date')
+        author = request.form.get('author')
         
         # Opcional imagen nueva
         image = request.files.get('image')
         if image and image.filename:
             image_filename = optimize_and_save_image(image, app.config['UPLOAD_FOLDER'], prefix="content_")
             conn.execute('''
-                UPDATE content_items SET title=?, short_desc=?, full_desc=?, image_filename=?, yt_link=?, sp_link=?, ap_link=?, created_at=? WHERE id=?
-            ''', (title, short_desc, full_desc, image_filename, yt_link, sp_link, ap_link, pub_date, id))
+                UPDATE content_items SET title=?, short_desc=?, full_desc=?, image_filename=?, yt_link=?, sp_link=?, ap_link=?, created_at=?, author=? WHERE id=?
+            ''', (title, short_desc, full_desc, image_filename, yt_link, sp_link, ap_link, pub_date, author, id))
         else:
             conn.execute('''
-                UPDATE content_items SET title=?, short_desc=?, full_desc=?, yt_link=?, sp_link=?, ap_link=?, created_at=? WHERE id=?
-            ''', (title, short_desc, full_desc, yt_link, sp_link, ap_link, pub_date, id))
+                UPDATE content_items SET title=?, short_desc=?, full_desc=?, yt_link=?, sp_link=?, ap_link=?, created_at=?, author=? WHERE id=?
+            ''', (title, short_desc, full_desc, yt_link, sp_link, ap_link, pub_date, author, id))
         
         conn.commit()
         conn.close()
