@@ -789,6 +789,17 @@ def delete_banda(id):
     flash('Banda eliminada en borrador. Es necesario validar en vista previa antes de liberar.', 'success')
     return redirect(url_for('admin_dashboard'))
 
+@app.route('/admin/evento/delete/<int:id>', methods=['POST'])
+def delete_evento(id):
+    if 'user_id' not in session: return redirect(url_for('admin_login'))
+    conn = get_db_connection()
+    conn.execute('DELETE FROM eventos_semana WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    flash('Evento eliminado en borrador. Es necesario validar en vista previa antes de liberar.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+
 @app.route('/admin/eventos', methods=['POST'])
 def add_evento():
     if 'user_id' not in session: return redirect(url_for('admin_login'))
