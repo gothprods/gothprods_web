@@ -563,6 +563,9 @@ def update_settings():
     show_metalpulse = request.form.get('show_metalpulse', '0')
     show_agenda = request.form.get('show_agenda', '0')
     show_banda_semana = request.form.get('show_banda_semana', '0')
+    show_el_pit = request.form.get('show_el_pit', '0')
+    show_galeria_nocturna = request.form.get('show_galeria_nocturna', '0')
+    show_contactanos = request.form.get('show_contactanos', '0')
     hamburger_active = request.form.get('hamburger_active', '0')
     
     conn = get_db_connection()
@@ -575,6 +578,9 @@ def update_settings():
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_metalpulse', ?)", (show_metalpulse,)),
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_agenda', ?)", (show_agenda,)),
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_banda_semana', ?)", (show_banda_semana,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_el_pit', ?)", (show_el_pit,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_galeria_nocturna', ?)", (show_galeria_nocturna,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_contactanos', ?)", (show_contactanos,)),
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('hamburger_active', ?)", (hamburger_active,))
     ]
     

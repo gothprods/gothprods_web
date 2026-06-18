@@ -105,11 +105,11 @@
             </div>
         </section>
 
-        {% if (settings.get('show_banda_semana', '1') == '1' and bandas_semana) or eventos_semana %}
+        {% if settings.get('show_banda_semana', '1') == '1' and (bandas_semana or eventos_semana) %}
         <section id="banda-eventos-semana" class="section highlights-section" style="background: linear-gradient(to right, #111, #000); border-bottom: 2px solid var(--accent-color); padding: 3.5rem 5%;">
-            <div style="display: flex; flex-wrap: wrap; gap: 40px;">
+            <div class="grid-container {{ 'two-cols' if bandas_semana and eventos_semana else 'one-col' }}" style="gap: 2rem;">
                 
-                {% if settings.get('show_banda_semana', '1') == '1' and bandas_semana %}
+                {% if bandas_semana %}
                 <div style="flex: 1; min-width: 300px;">
                     <div class="section-header" style="margin-bottom: 20px;">
                         <h2 style="font-size: 2.2rem;">Bandas de la <span>Semana</span></h2>
@@ -457,6 +457,7 @@
         </script>
         {% endif %}
 
+        {% if settings.get('show_el_pit', '1') == '1' %}
         <section id="highlights" class="section highlights-section">
             <div class="section-header">
                 <h2>El <span>Pit</span></h2>
@@ -584,8 +585,9 @@
 
             </div>
         </section>
+        {% endif %} <!-- End of show_el_pit -->
 
-        {% if settings.get('show_interviews', '1') == '1' %}
+        {% if settings.get('show_galeria_nocturna', '1') == '1' %}
         <section id="shows" class="section shows-section">
 
 
@@ -811,6 +813,7 @@
         </section>
         {% endif %}
 
+        {% if settings.get('show_contactanos', '1') == '1' %}
         <section id="contact" class="section contact-section">
             <div class="section-header">
                 <h2>Únete a los <span>Berserkers</span></h2>
@@ -828,6 +831,7 @@
                 <button type="submit" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> ENVIAR MENSAJE</button>
             </form>
         </section>
+        {% endif %}
     </main>
 
     <footer>
