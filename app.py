@@ -186,7 +186,9 @@ def index():
     is_preview = request.args.get('preview') == '1' and 'user_id' in session
     conn = get_db_connection(live=not is_preview)
     import datetime
-    current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    import pytz
+    mexico_tz = pytz.timezone('America/Mexico_City')
+    current_date = datetime.datetime.now(mexico_tz).strftime("%Y-%m-%d")
 
     # Query for the latest Banda de la Semana
     raw_bandas = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC").fetchall()
@@ -201,10 +203,11 @@ def index():
         fecha_fin = b['fecha_fin'] if 'fecha_fin' in b.keys() and b['fecha_fin'] else None
         
         in_date_range = True
-        if fecha_inicio and current_date < fecha_inicio:
-            in_date_range = False
-        if fecha_fin and current_date > fecha_fin:
-            in_date_range = False
+        if not is_preview:
+            if fecha_inicio and current_date < fecha_inicio:
+                in_date_range = False
+            if fecha_fin and current_date > fecha_fin:
+                in_date_range = False
             
         if is_active == 1 and in_date_range and b['nombre'] not in seen_bands:
             seen_bands.add(b['nombre'])
@@ -222,10 +225,11 @@ def index():
         fecha_fin = e['fecha_fin_pub'] if 'fecha_fin_pub' in e.keys() and e['fecha_fin_pub'] else None
         
         in_date_range = True
-        if fecha_inicio and current_date < fecha_inicio:
-            in_date_range = False
-        if fecha_fin and current_date > fecha_fin:
-            in_date_range = False
+        if not is_preview:
+            if fecha_inicio and current_date < fecha_inicio:
+                in_date_range = False
+            if fecha_fin and current_date > fecha_fin:
+                in_date_range = False
             
         if is_active == 1 and in_date_range:
             eventos_semana.append(e)
