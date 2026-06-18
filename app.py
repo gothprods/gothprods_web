@@ -170,9 +170,9 @@ def send_verification_email(to_email, code, subject="Código de Verificación - 
         msg['From'] = SENDER_EMAIL
         msg['To'] = to_email
 
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        server.starttls()
-        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        server = smtplib.SMTP_SSL(SMTP_SERVER, 465, timeout=10)
+        if SENDER_PASSWORD:
+            server.login(SENDER_EMAIL, SENDER_PASSWORD)
         server.send_message(msg)
         server.quit()
         return True
@@ -365,8 +365,7 @@ def submit_contact():
                 
     try:
         # Enviar correo
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        server.starttls()
+        server = smtplib.SMTP_SSL(SMTP_SERVER, 465, timeout=10)
         if SENDER_PASSWORD:
             server.login(SENDER_EMAIL, SENDER_PASSWORD)
         server.send_message(msg)
