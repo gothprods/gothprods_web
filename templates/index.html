@@ -75,15 +75,41 @@
             <div class="close-btn" id="close-menu">&times;</div>
         </div>
         <ul class="sidebar-links">
+            {% if settings.get('show_banda_semana', '1') == '1' %}
             <li><a href="#banda-eventos-semana">Bandas y Eventos Destacados</a></li>
+            {% endif %}
+            
+            {% if settings.get('show_el_pit', '1') == '1' %}
             <li><a href="#highlights">El Pit</a></li>
+            {% endif %}
+            
+            {% if settings.get('show_galeria_nocturna', '1') == '1' %}
             <li><a href="#shows">La Galería Nocturna</a></li>
+            {% endif %}
+            
+            {% if settings.get('show_metalpulse', '1') == '1' %}
             <li><a href="#metal-pulse">Metal Pulse</a></li>
+            {% endif %}
+            
+            {% if settings.get('show_reviews', '1') == '1' %}
             <li><a href="#reviews">Reseñas de Conciertos</a></li>
+            {% endif %}
+            
+            {% if settings.get('show_news', '1') == '1' %}
             <li><a href="#news">El Noticiero Nocturno</a></li>
+            {% endif %}
+            
+            {% if settings.get('show_interviews', '1') == '1' %}
             <li><a href="#under-interviews">Entrevistas Under</a></li>
+            {% endif %}
+            
+            {% if settings.get('show_agenda', '1') == '1' %}
             <li><a href="#agenda">Agenda Metalera</a></li>
+            {% endif %}
+            
+            {% if settings.get('show_contactanos', '1') == '1' %}
             <li><a href="#contact">Contáctanos</a></li>
+            {% endif %}
         </ul>
     </div>
 
