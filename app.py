@@ -186,8 +186,7 @@ def index():
     is_preview = request.args.get('preview') == '1' and 'user_id' in session
     conn = get_db_connection(live=not is_preview)
     import datetime
-    import pytz
-    mexico_tz = pytz.timezone('America/Mexico_City')
+    mexico_tz = datetime.timezone(datetime.timedelta(hours=-6))
     current_date = datetime.datetime.now(mexico_tz).strftime("%Y-%m-%d")
 
     # Query for the latest Banda de la Semana
