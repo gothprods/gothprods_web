@@ -375,7 +375,7 @@ def submit_contact():
         return redirect('/#contact')
     except Exception as e:
         print(f"Error al enviar contacto: {e}")
-        flash("Hubo un error al enviar el correo. Por favor, inténtalo más tarde.")
+        flash(f"Hubo un error al enviar el correo: {str(e)}")
         return redirect('/#contact')
 
 # --- ADMIN ROUTES ---
