@@ -158,7 +158,7 @@ def get_settings(live=False):
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SENDER_EMAIL = "goth.prods@gmail.com"
-SENDER_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
+SENDER_PASSWORD = "vywvezpzobnwurdd"
 
 def send_verification_email(to_email, code, subject="Código de Verificación - Goth Prods"):
     if not SENDER_PASSWORD:
@@ -372,21 +372,12 @@ def submit_contact():
         server.send_message(msg)
         server.quit()
         # Si se envió correctamente, puedes devolver a la página con un mensaje
-        # Si se necesita un popup o flash, se puede usar flash()
-        return """
-        <script>
-            alert("¡Mensaje y material enviados exitosamente a contacto@gothprods.com!");
-            window.location.href = "/#contact";
-        </script>
-        """
+        flash("¡Mensaje y material enviados exitosamente a contacto@gothprods.com!")
+        return redirect('/#contact')
     except Exception as e:
         print(f"Error al enviar contacto: {e}")
-        return """
-        <script>
-            alert("Hubo un error al enviar el correo. Por favor, inténtalo más tarde.");
-            window.location.href = "/#contact";
-        </script>
-        """
+        flash("Hubo un error al enviar el correo. Por favor, inténtalo más tarde.")
+        return redirect('/#contact')
 
 # --- ADMIN ROUTES ---
 @app.route('/admin')
