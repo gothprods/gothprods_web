@@ -48,25 +48,30 @@
             </div>
             {% endif %}
         </div>
-        <div class="logo">
+        <div class="logo" style="position: absolute; left: 50%; transform: translateX(-50%);">
             <a href="#home"><img src="{{ settings.get('header_logo', 'assets/logo-new.webp?v=2') }}" alt="Goth Prods Logo" class="logo-img"></a>
         </div>
-        <nav class="header-socials">
-            <a href="https://www.tiktok.com/@goth_prods" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
-            <a href="https://www.facebook.com/Goth-Prods-104237088306624/" target="_blank"><i
-                    class="fa-brands fa-facebook-f"></i></a>
-            <a href="https://www.instagram.com/goth_prods/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-            <a href="https://www.youtube.com/@gothprods44" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-            <a href="https://podcasts.apple.com/mx/podcast/goth-prods/id1606324255?l=en" target="_blank"><i
-                    class="fa-solid fa-podcast"></i></a>
-            <a href="https://open.spotify.com/show/2hnlgkcGNl9GOAPa0WT9HW?si=7e9b95f203464fe6" target="_blank"><i
-                    class="fa-brands fa-spotify"></i></a>
-            <div class="lang-controls" style="display: flex; gap: 5px; margin-left: 10px; align-items: center; border-left: 1px solid #444; padding-left: 10px;">
-                <i class="fa-solid fa-globe" style="font-size: 1.2rem; color: #fff; margin-right: 2px;" title="Cambiar Idioma"></i>
-                <button class="lang-btn-es" onclick="changeLanguage('es')" style="background: var(--accent-color); color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇲🇽 ES</button>
-                <button class="lang-btn-en" onclick="changeLanguage('en')" style="background: #333; color: #fff; border: 1px solid var(--accent-color); padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇺🇸 EN</button>
-            </div>
-        </nav>
+        <div class="header-right-group" style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; padding-right: 15px;">
+            <nav class="header-socials" style="margin-bottom: 0;">
+                <a href="https://www.tiktok.com/@goth_prods" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="https://www.facebook.com/Goth-Prods-104237088306624/" target="_blank"><i
+                        class="fa-brands fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/goth_prods/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://www.youtube.com/@gothprods44" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+                <a href="https://podcasts.apple.com/mx/podcast/goth-prods/id1606324255?l=en" target="_blank"><i
+                        class="fa-solid fa-podcast"></i></a>
+                <a href="https://open.spotify.com/show/2hnlgkcGNl9GOAPa0WT9HW?si=7e9b95f203464fe6" target="_blank"><i
+                        class="fa-brands fa-spotify"></i></a>
+                <div class="lang-controls" style="display: flex; gap: 5px; margin-left: 10px; align-items: center; border-left: 1px solid #444; padding-left: 10px;">
+                    <i class="fa-solid fa-globe" style="font-size: 1.2rem; color: #fff; margin-right: 2px;" title="Cambiar Idioma"></i>
+                    <button class="lang-btn-es" onclick="changeLanguage('es')" style="background: var(--accent-color); color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇲🇽 ES</button>
+                    <button class="lang-btn-en" onclick="changeLanguage('en')" style="background: #333; color: #fff; border: 1px solid var(--accent-color); padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇺🇸 EN</button>
+                </div>
+            </nav>
+            <a href="mailto:contacto@gothprods.com?subject=Contacto%20con%20Goth%20Prods" style="color: #ffffff; font-size: 1.15rem; text-decoration: none; font-family: 'Oswald', sans-serif; letter-spacing: 0.5px; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                <i class="fa-solid fa-envelope" style="color: #716d4a;"></i> Envíanos un email a <span style="color: #716d4a;">contacto@gothprods.com</span>
+            </a>
+        </div>
     </header>
 
     <div id="sidebar-menu" class="sidebar">
