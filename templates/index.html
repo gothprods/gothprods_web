@@ -817,7 +817,7 @@
             
             <div class="agenda-tabs" id="agendaTabs">
                 {% for month_name, items in agenda_grouped.items() %}
-                {% set is_past_month = items[-1].author < current_date %}
+                {% set is_past_month = items[-1].author[:7] < current_date[:7] %}
                 <button class="agenda-tab-btn {% if is_past_month %}past-month{% endif %}" data-month="{{ month_name }}" onclick="openAgendaTab('{{ month_name }}')">{{ month_name }}</button>
                 {% endfor %}
             </div>
