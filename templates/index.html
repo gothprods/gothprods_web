@@ -27,7 +27,7 @@
     <!-- Favicons -->
     <link rel="icon" href="assets/viking.webp" type="image/jpeg">
     <link rel="apple-touch-icon" href="assets/viking.webp">
-    <link rel="stylesheet" href="index.css?v=6">
+    <link rel="stylesheet" href="index.css?v=7">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -658,7 +658,8 @@
                             class="fa-brands fa-youtube"></i> YouTube</a>
                 </div>
             </div>
-                                    <div class="news-rail" style="padding: 0 15px;">
+                                    <div class="rail-wrapper">
+                <div class="news-rail">
                 {% for item in galeria_items %}
                 <div class="news-card">
                     <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
@@ -696,45 +697,23 @@
                         class="platform-btn apple-btn"><i class="fa-solid fa-podcast"></i> Apple</a>
                 </div>
             </div>
-            {% set ordered_months = [] %}
-            {% set pulse_by_month = {} %}
-            {% for item in metalpulse_items %}
-                {% set month = item.full_desc if item.full_desc else 'Abril 2026' %}
-                {% if month not in pulse_by_month %}
-                    {% set _ = ordered_months.append(month) %}
-                    {% set _ = pulse_by_month.update({month: []}) %}
-                {% endif %}
-                {% set _ = pulse_by_month[month].append(item) %}
-            {% endfor %}
-
-            {% if settings.get('hide_past_metalpulse', '0') == '1' and ordered_months|length > 0 %}
-                {% set ordered_months = [ordered_months[0]] %}
-            {% endif %}
-
-            {% for month in ordered_months %}
-            <div class="pulse-month-collapsible" style="background: #111; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--accent-color);">
-                <button class="pulse-collapsible-btn" style="width: 100%; text-align: left; padding: 15px; background: none; border: none; color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="const content = this.nextElementSibling; if(content.style.display === 'none'){content.style.display='block'; this.querySelector('i').classList.replace('fa-chevron-down', 'fa-chevron-up');}else{content.style.display='none'; this.querySelector('i').classList.replace('fa-chevron-up', 'fa-chevron-down');}">
-                    {{ month }} <i class="fa-solid {% if loop.index == 1 %}fa-chevron-up{% else %}fa-chevron-down{% endif %}"></i>
-                </button>
-                <div class="pulse-collapsible-content" style="padding: 15px; display: {% if loop.index == 1 %}block{% else %}none{% endif %}; border-top: 1px solid #333;">
-                    <div class="news-rail">
-                        {% for item in pulse_by_month[month] %}
-                        <div class="news-card">
-                            <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
-                            <div class="card-content">
-                                <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
-                                <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
-                                <div class="episode-actions" style="margin-top: 15px;">
-                                    <a href="{{ item.sp_link if item.sp_link else 'https://open.spotify.com/show/2hnlgkcGNl9GOAPa0WT9HW?si=7e9b95f203464fe6' }}" target="_blank" class="platform-btn spotify-btn"><i class="fa-brands fa-spotify"></i> Spotify</a>
-                                    <a href="{{ item.ap_link if item.ap_link else 'https://podcasts.apple.com/mx/podcast/goth-prods/id1606324255?l=en' }}" target="_blank" class="platform-btn apple-btn"><i class="fa-solid fa-podcast"></i> Apple</a>
-                                </div>
+            <div class="rail-wrapper">
+                <div class="news-rail">
+                    {% for item in metalpulse_items %}
+                    <div class="news-card">
+                        <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
+                        <div class="card-content">
+                            <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
+                            <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
+                            <div class="episode-actions" style="margin-top: 15px;">
+                                <a href="{{ item.sp_link if item.sp_link else 'https://open.spotify.com/show/2hnlgkcGNl9GOAPa0WT9HW?si=7e9b95f203464fe6' }}" target="_blank" class="platform-btn spotify-btn"><i class="fa-brands fa-spotify"></i> Spotify</a>
+                                <a href="{{ item.ap_link if item.ap_link else 'https://podcasts.apple.com/mx/podcast/goth-prods/id1606324255?l=en' }}" target="_blank" class="platform-btn apple-btn"><i class="fa-solid fa-podcast"></i> Apple</a>
                             </div>
                         </div>
-                        {% endfor %}
                     </div>
+                    {% endfor %}
                 </div>
             </div>
-            {% endfor %}
         </section>
         {% endif %}
 
@@ -743,8 +722,9 @@
             <div class="section-header">
                 <h2>Reseñas de <span>Conciertos</span></h2>
             </div>
-            <div class="news-rail" style="padding: 0 15px;">
-                {% for item in reseñas_items %}
+            <div class="rail-wrapper">
+                <div class="news-rail">
+                    {% for item in reseñas_items %}
                 <div class="news-card">
                     <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
                     <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
@@ -762,8 +742,9 @@
             <div class="section-header">
                 <h2>El Noticiero <span>Nocturno</span></h2>
             </div>
-            <div class="news-rail" style="padding: 0 15px;">
-                {% for item in noticiero_items %}
+            <div class="rail-wrapper">
+                <div class="news-rail">
+                    {% for item in noticiero_items %}
                 <div class="news-card">
                     <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" class="open-review-modal" style="display: block;">
                         <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center; cursor: pointer;">
@@ -792,8 +773,9 @@
                             class="fa-brands fa-youtube"></i> YouTube</a>
                 </div>
             </div>
-            <div class="news-rail" style="padding: 0 15px;">
-                {% for item in entrevistas_items[:20] %}
+            <div class="rail-wrapper">
+                <div class="news-rail">
+                    {% for item in entrevistas_items[:20] %}
                 <div class="news-card">
                     <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
                     <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>

@@ -1228,6 +1228,14 @@ footer {
     border-radius: 4px;
 }
 
+.rail-wrapper {
+    background: #111;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--accent-color);
+    padding: 15px;
+}
+
 .news-card {
     flex: 0 0 300px;
     background-color: var(--bg-secondary);
