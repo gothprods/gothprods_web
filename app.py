@@ -256,7 +256,7 @@ def index():
     }
     
     agenda_grouped = OrderedDict()
-    current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    current_date = (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%Y-%m-%d")
     
     for item in agenda_items:
         # author has 'YYYY-MM-DD'
