@@ -1548,3 +1548,92 @@ html, body {
     transform: scale(1.05);
     color: #000;
 }
+
+/* Header Email Link & Responsive Adjustments */
+.header-right-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    padding-right: 15px;
+    z-index: 20;
+}
+
+.header-socials {
+    margin-bottom: 0;
+}
+
+.header-email-link {
+    color: #ffffff;
+    font-size: 1.25rem; /* A little larger as requested */
+    text-decoration: none;
+    font-family: var(--font-heading);
+    letter-spacing: 0.5px;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+}
+
+.header-email-link:hover {
+    opacity: 0.8;
+}
+
+.header-email-link .icon, .header-email-link .email-text {
+    color: var(--accent-color);
+}
+
+.logo-centered {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+@media (max-width: 1024px) {
+    .logo-centered {
+        position: static;
+        transform: none;
+    }
+}
+
+@media (max-width: 900px) {
+    /* Hide prefix text on tablet/mobile to save space */
+    .header-email-link .text-prefix {
+        display: none;
+    }
+    .header-email-link {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-right-group {
+        gap: 2px;
+        padding-right: 0;
+    }
+    .header-email-link {
+        font-size: 0.8rem;
+    }
+    .lang-controls {
+        border-left: none !important;
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+    }
+    .lang-btn-es, .lang-btn-en {
+        padding: 2px 4px !important;
+        font-size: 0.7rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-email-link {
+        font-size: 0.7rem;
+    }
+    .logo-img {
+        height: 50px !important;
+    }
+    .viking-icon {
+        height: 25px !important;
+    }
+    .lang-controls i {
+        display: none; /* Hide globe icon on very small screens */
+    }
+}

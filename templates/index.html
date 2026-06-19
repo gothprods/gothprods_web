@@ -27,7 +27,7 @@
     <!-- Favicons -->
     <link rel="icon" href="assets/viking.webp" type="image/jpeg">
     <link rel="apple-touch-icon" href="assets/viking.webp">
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="index.css?v=3">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -48,11 +48,11 @@
             </div>
             {% endif %}
         </div>
-        <div class="logo" style="position: absolute; left: 50%; transform: translateX(-50%);">
+        <div class="logo logo-centered">
             <a href="#home"><img src="{{ settings.get('header_logo', 'assets/logo-new.webp?v=2') }}" alt="Goth Prods Logo" class="logo-img"></a>
         </div>
-        <div class="header-right-group" style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; padding-right: 15px;">
-            <nav class="header-socials" style="margin-bottom: 0;">
+        <div class="header-right-group">
+            <nav class="header-socials">
                 <a href="https://www.tiktok.com/@goth_prods" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
                 <a href="https://www.facebook.com/Goth-Prods-104237088306624/" target="_blank"><i
                         class="fa-brands fa-facebook-f"></i></a>
@@ -68,8 +68,8 @@
                     <button class="lang-btn-en" onclick="changeLanguage('en')" style="background: #333; color: #fff; border: 1px solid var(--accent-color); padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇺🇸 EN</button>
                 </div>
             </nav>
-            <a href="mailto:contacto@gothprods.com?subject=Contacto%20con%20Goth%20Prods" style="color: #ffffff; font-size: 1.15rem; text-decoration: none; font-family: 'Oswald', sans-serif; letter-spacing: 0.5px; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                <i class="fa-solid fa-envelope" style="color: #716d4a;"></i> Envíanos un email a <span style="color: #716d4a;">contacto@gothprods.com</span>
+            <a href="mailto:contacto@gothprods.com?subject=Contacto%20con%20Goth%20Prods" class="header-email-link">
+                <i class="fa-solid fa-envelope icon"></i> <span class="text-prefix">Envíanos un email a</span> <span class="email-text">contacto@gothprods.com</span>
             </a>
         </div>
     </header>
