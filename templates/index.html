@@ -27,7 +27,7 @@
     <!-- Favicons -->
     <link rel="icon" href="assets/viking.webp" type="image/jpeg">
     <link rel="apple-touch-icon" href="assets/viking.webp">
-    <link rel="stylesheet" href="index.css?v=5">
+    <link rel="stylesheet" href="index.css?v=6">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -743,7 +743,7 @@
             <div class="section-header">
                 <h2>Reseñas de <span>Conciertos</span></h2>
             </div>
-            <div class="news-rail">
+            <div class="news-rail" style="padding: 0 15px;">
                 {% for item in reseñas_items %}
                 <div class="news-card">
                     <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
@@ -762,7 +762,7 @@
             <div class="section-header">
                 <h2>El Noticiero <span>Nocturno</span></h2>
             </div>
-            <div class="news-rail">
+            <div class="news-rail" style="padding: 0 15px;">
                 {% for item in noticiero_items %}
                 <div class="news-card">
                     <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" class="open-review-modal" style="display: block;">
@@ -792,7 +792,7 @@
                             class="fa-brands fa-youtube"></i> YouTube</a>
                 </div>
             </div>
-            <div class="news-rail">
+            <div class="news-rail" style="padding: 0 15px;">
                 {% for item in entrevistas_items[:20] %}
                 <div class="news-card">
                     <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">

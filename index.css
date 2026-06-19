@@ -1619,9 +1619,6 @@ html, body {
         padding: 2px 4px !important;
         font-size: 0.7rem !important;
     }
-    .news-card {
-        flex: 0 0 280px; /* Homologar tamaño fijo en móviles para ambos rieles */
-    }
 }
 
 @media (max-width: 480px) {
@@ -1636,8 +1633,5 @@ html, body {
     }
     .lang-controls i {
         display: none; /* Hide globe icon on very small screens */
-    }
-    .news-card {
-        flex: 0 0 85vw; /* Homologar tamaño basado en pantalla en móviles pequeños */
     }
 }
