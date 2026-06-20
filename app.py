@@ -157,6 +157,24 @@ def get_db_connection(live=False):
     except Exception as e:
         print("Schema migration error (content_items):", e)
 
+    # Auto-migrate schema for comments
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS comments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                item_id INTEGER NOT NULL,
+                parent_id INTEGER,
+                author_name TEXT NOT NULL,
+                content TEXT NOT NULL,
+                likes INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.commit()
+    except Exception as e:
+        print("Schema creation error (comments):", e)
+
     return conn
 
 def get_settings(live=False):
@@ -213,6 +231,70 @@ def track_view(item_id):
     
     new_views = row['views'] if row else 0
     return jsonify({"success": True, "views": new_views})
+
+@app.route('/api/comments/<int:item_id>', methods=['GET'])
+def get_comments(item_id):
+    conn = get_db_connection(live=True)
+    comments = conn.execute("SELECT * FROM comments WHERE item_id = ? ORDER BY created_at ASC", (item_id,)).fetchall()
+    conn.close()
+    
+    # Build a tree structure
+    comments_list = [dict(c) for c in comments]
+    tree = []
+    lookup = {}
+    for c in comments_list:
+        c['replies'] = []
+        lookup[c['id']] = c
+        
+    for c in comments_list:
+        if c['parent_id']:
+            parent = lookup.get(c['parent_id'])
+            if parent:
+                parent['replies'].append(c)
+            else:
+                tree.append(c) # Fallback if parent missing
+        else:
+            tree.append(c)
+            
+    return jsonify({"success": True, "comments": tree})
+
+@app.route('/api/comments/<int:item_id>', methods=['POST'])
+def post_comment(item_id):
+    data = request.json
+    author_name = data.get('author_name', 'Anónimo').strip()
+    content = data.get('content', '').strip()
+    parent_id = data.get('parent_id')
+    
+    if not author_name:
+        author_name = 'Anónimo'
+    if not content:
+        return jsonify({"success": False, "error": "El comentario no puede estar vacío"}), 400
+        
+    is_preview = request.args.get('preview') == '1' and 'user_id' in session
+    conn = get_db_connection(live=not is_preview)
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO comments (item_id, parent_id, author_name, content) VALUES (?, ?, ?, ?)",
+        (item_id, parent_id, author_name, content)
+    )
+    conn.commit()
+    conn.close()
+    
+    return jsonify({"success": True})
+
+@app.route('/api/comments/like/<int:comment_id>', methods=['POST'])
+def like_comment(comment_id):
+    is_preview = request.args.get('preview') == '1' and 'user_id' in session
+    conn = get_db_connection(live=not is_preview)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE comments SET likes = COALESCE(likes, 0) + 1 WHERE id = ?", (comment_id,))
+    conn.commit()
+    
+    cursor.execute("SELECT likes FROM comments WHERE id = ?", (comment_id,))
+    row = cursor.fetchone()
+    conn.close()
+    
+    return jsonify({"success": True, "likes": row['likes'] if row else 0})
 
 @app.route('/api/track_like/<int:item_id>', methods=['POST'])
 def track_like(item_id):

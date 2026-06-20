@@ -88,6 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         })
                         .catch(err => console.error('Error tracking view:', err));
+                        
+                    // Load comments
+                    loadComments(itemId);
                 }
             }
         });
@@ -149,12 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check URL for direct link to an item
     const urlParams = new URLSearchParams(window.location.search);
-    const itemId = urlParams.get('item');
-    if (itemId) {
-        const directModal = document.getElementById('dynNewsModal' + itemId);
+    const directItemId = urlParams.get('item');
+    if (directItemId) {
+        const directModal = document.getElementById('dynNewsModal' + directItemId);
         if (directModal) {
             directModal.classList.add('show');
             document.body.style.overflow = 'hidden';
+            loadComments(directItemId);
         }
     }
 
@@ -163,6 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.classList.contains('modal')) {
             e.target.classList.remove('show');
             document.body.style.overflow = '';
+            if (window.location.hash.startsWith('#article-')) {
+                history.replaceState(null, null, ' ');
+            }
         }
         
         // Close sidebar if clicking outside of it and not on the hamburger menu
@@ -243,3 +250,134 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+// --- Comments Logic ---
+window.loadComments = function(itemId) {
+    const listDiv = document.getElementById('comments-list-' + itemId);
+    if (!listDiv) return;
+    
+    listDiv.innerHTML = '<div style="text-align: center; color: #888; margin-top: 20px;">Cargando comentarios...</div>';
+    
+    fetch('/api/comments/' + itemId)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                renderComments(itemId, data.comments);
+            }
+        })
+        .catch(err => console.error('Error loading comments:', err));
+};
+
+function renderComments(itemId, comments) {
+    const listDiv = document.getElementById('comments-list-' + itemId);
+    listDiv.innerHTML = '';
+    
+    if (comments.length === 0) {
+        listDiv.innerHTML = '<div style="text-align: center; color: #888; font-size: 0.9rem; margin-top: 20px;">Sé el primero en comentar.</div>';
+        return;
+    }
+
+    comments.forEach(c => {
+        listDiv.appendChild(createCommentElement(c, itemId, false));
+        if (c.replies && c.replies.length > 0) {
+            c.replies.forEach(r => {
+                listDiv.appendChild(createCommentElement(r, itemId, true));
+            });
+        }
+    });
+    
+    // Scroll to bottom
+    listDiv.scrollTop = listDiv.scrollHeight;
+}
+
+function createCommentElement(c, itemId, isReply) {
+    const div = document.createElement('div');
+    div.className = 'comment-bubble' + (isReply ? ' reply' : '');
+    
+    const date = new Date(c.created_at + 'Z');
+    const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    const liked = localStorage.getItem('liked_comment_' + c.id);
+    const iconClass = liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+    const btnClass = liked ? 'liked' : '';
+    const disabled = liked ? 'disabled' : '';
+
+    div.innerHTML = `
+        <div class="comment-author">
+            <span>${escapeHtml(c.author_name)}</span>
+            <span class="comment-date">${dateStr}</span>
+        </div>
+        <div>${escapeHtml(c.content)}</div>
+        <div class="comment-actions">
+            <button type="button" class="${btnClass}" onclick="likeCommentModal(${c.id}, this)" ${disabled}><i class="${iconClass}"></i> <span class="c-like-count">${c.likes}</span></button>
+            ${!isReply ? `<button type="button" onclick="replyTo(${c.id}, '${escapeHtml(c.author_name)}', ${itemId})"><i class="fa-solid fa-reply"></i> Responder</button>` : ''}
+        </div>
+    `;
+    return div;
+}
+
+window.submitComment = function(e, itemId) {
+    e.preventDefault();
+    const authorInput = document.getElementById('comment-name-' + itemId);
+    const textInput = document.getElementById('comment-text-' + itemId);
+    const parentInput = document.getElementById('comment-parent-' + itemId);
+    
+    const author_name = authorInput.value;
+    const content = textInput.value;
+    const parent_id = parentInput.value || null;
+    
+    fetch('/api/comments/' + itemId, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ author_name, content, parent_id })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            textInput.value = '';
+            cancelReply(itemId);
+            loadComments(itemId);
+        } else {
+            alert(data.error || 'Error al publicar comentario');
+        }
+    })
+    .catch(err => console.error('Error posting comment:', err));
+};
+
+window.replyTo = function(commentId, authorName, itemId) {
+    const parentInput = document.getElementById('comment-parent-' + itemId);
+    const indicator = document.getElementById('replying-to-' + itemId);
+    const nameSpan = document.getElementById('replying-name-' + itemId);
+    const textInput = document.getElementById('comment-text-' + itemId);
+    
+    parentInput.value = commentId;
+    nameSpan.innerText = 'Respondiendo a ' + authorName;
+    indicator.style.display = 'flex';
+    textInput.focus();
+};
+
+window.cancelReply = function(itemId) {
+    document.getElementById('comment-parent-' + itemId).value = '';
+    document.getElementById('replying-to-' + itemId).style.display = 'none';
+};
+
+window.likeCommentModal = function(commentId, btnEl) {
+    if (btnEl.disabled || localStorage.getItem('liked_comment_' + commentId)) return;
+    
+    fetch('/api/comments/like/' + commentId, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.setItem('liked_comment_' + commentId, 'true');
+                btnEl.querySelector('.c-like-count').innerText = data.likes;
+                btnEl.querySelector('i').classList.remove('fa-regular');
+                btnEl.querySelector('i').classList.add('fa-solid');
+                btnEl.classList.add('liked');
+                btnEl.disabled = true;
+            }
+        });
+};
+
+function escapeHtml(unsafe) {
+    return (unsafe || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}

@@ -27,7 +27,7 @@
     <!-- Favicons -->
     <link rel="icon" href="assets/viking.webp" type="image/jpeg">
     <link rel="apple-touch-icon" href="assets/viking.webp">
-    <link rel="stylesheet" href="index.css?v=7">
+    <link rel="stylesheet" href="index.css?v=8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -899,49 +899,79 @@
 
     {% for items_list in [noticiero_items, reseñas_items, entrevistas_items, agenda_items] %}
     {% for item in items_list %}
-    <!-- Modal Dinámico -->
-    <div id="dynNewsModal{{ item.id }}" class="modal">
-        <div class="modal-content" style="background: #111; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--accent-color); border-radius: 8px; position: relative; padding: 0;">
+    <div id="dynNewsModal{{ item.id }}" class="modal" data-item-id="{{ item.id }}">
+        <div class="modal-content split-layout" style="background: #111; border: 1px solid var(--accent-color); border-radius: 8px; position: relative; padding: 0;">
             <button class="close-modal" style="position: absolute; right: 20px; top: 20px; background: transparent; border: none; color: #fff; font-size: 2rem; cursor: pointer; z-index: 10;"><i class="fa-solid fa-times"></i></button>
-            <div style="padding: 40px 30px; position: relative;">
-                <div class="lang-controls" style="position: absolute; top: 20px; left: 20px; display: flex; gap: 5px; align-items: center;">
-                    <button class="lang-btn-es" onclick="changeLanguage('es')" style="background: var(--accent-color); color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇲🇽 ES</button>
-                    <button class="lang-btn-en" onclick="changeLanguage('en')" style="background: #333; color: #fff; border: 1px solid var(--accent-color); padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇺🇸 EN</button>
-                </div>
-                <h2 style="color: var(--accent-color); font-weight: bold; font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ item.title }}</h2>
-                {% if item.author %}
-                <p style="text-align: center; color: var(--accent-color); font-weight: bold; font-size: 1.1rem; margin-bottom: 30px;">
-                    <i class="fa-solid fa-pen-nib"></i> Escrito por: {{ item.author }}
-                </p>
-                {% else %}
-                <div style="margin-bottom: 30px;"></div>
-                {% endif %}
-                
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
-                </div>
-
-                <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ item.full_desc | safe }}</div>
-
-                {% if item.yt_link or item.sp_link or item.ap_link %}
-                <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 30px;">
-                    {% if item.yt_link %}<a href="{{ item.yt_link }}" target="_blank" class="platform-btn"><i class="fa-brands fa-youtube"></i> YouTube</a>{% endif %}
-                    {% if item.sp_link %}<a href="{{ item.sp_link }}" target="_blank" class="platform-btn spotify-btn"><i class="fa-brands fa-spotify"></i> Spotify</a>{% endif %}
-                    {% if item.ap_link %}<a href="{{ item.ap_link }}" target="_blank" class="platform-btn apple-btn"><i class="fa-solid fa-podcast"></i> Apple</a>{% endif %}
-                </div>
-                {% endif %}
-
-                <!-- Botones Compartir en Redes -->
-                <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 40px; border-top: 1px solid #333; padding-top: 25px;">
-                    <span style="color: #fff; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-right: 10px;"><i class="fa-solid fa-share-nodes"></i> Compartir:</span>
+            
+            <div class="modal-article-pane">
+                <div style="padding: 20px 0; position: relative;">
+                    <div class="lang-controls" style="position: absolute; top: 0px; left: 0px; display: flex; gap: 5px; align-items: center;">
+                        <button class="lang-btn-es" onclick="changeLanguage('es')" style="background: var(--accent-color); color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇲🇽 ES</button>
+                        <button class="lang-btn-en" onclick="changeLanguage('en')" style="background: #333; color: #fff; border: 1px solid var(--accent-color); padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇺🇸 EN</button>
+                    </div>
+                    <h2 style="color: var(--accent-color); font-weight: bold; font-size: 2.5rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase; line-height: 1.1;">{{ item.title }}</h2>
+                    {% if item.author %}
+                    <p style="text-align: center; color: var(--accent-color); font-weight: bold; font-size: 1.1rem; margin-bottom: 20px;">
+                        <i class="fa-solid fa-pen-nib"></i> Escrito por: {{ item.author }}
+                    </p>
+                    {% else %}
+                    <div style="margin-bottom: 20px;"></div>
+                    {% endif %}
                     
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=https://gothprods.com/articulo/{{ item.id }}" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-facebook-f"></i> Facebook</a>
+                    {% if item.image_filename %}
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
+                    </div>
+                    {% endif %}
+                    {% if item.full_desc %}
+                    <div style="font-size: 1.1rem; color: #ddd; line-height: 1.8; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ item.full_desc | safe }}</div>
+                    {% else %}
+                    <div style="font-size: 1.1rem; color: #ddd; line-height: 1.8; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ item.short_desc | safe }}</div>
+                    {% endif %}
                     
-                    <a href="https://www.instagram.com/goth_prods/" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-instagram"></i> Instagram</a>
-                    
-                    <button onclick="navigator.clipboard.writeText('https://gothprods.com/articulo/{{ item.id }}'); alert('Enlace copiado al portapapeles');" class="platform-btn" style="background: transparent; border: 1px solid var(--accent-color); padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); cursor: pointer; text-decoration: none; min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-link"></i> Copiar Link</button>
+                    {% if item.yt_link or item.sp_link or item.ap_link %}
+                    <div style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
+                        <h4 style="color: var(--accent-color); margin-bottom: 15px;">Escucha en:</h4>
+                        {% if item.yt_link %}<a href="{{ item.yt_link }}" target="_blank" class="platform-btn youtube-btn"><i class="fa-brands fa-youtube"></i> YouTube</a>{% endif %}
+                        {% if item.sp_link %}<a href="{{ item.sp_link }}" target="_blank" class="platform-btn spotify-btn"><i class="fa-brands fa-spotify"></i> Spotify</a>{% endif %}
+                        {% if item.ap_link %}<a href="{{ item.ap_link }}" target="_blank" class="platform-btn apple-btn"><i class="fa-solid fa-podcast"></i> Apple</a>{% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Botones Compartir en Redes -->
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 40px; border-top: 1px solid #333; padding-top: 25px;">
+                        <span style="color: #fff; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-right: 10px;"><i class="fa-solid fa-share-nodes"></i> Compartir:</span>
+                        
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=https://gothprods.com/articulo/{{ item.id }}" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-facebook-f"></i> Facebook</a>
+                        
+                        <a href="https://www.instagram.com/goth_prods/" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-instagram"></i> Instagram</a>
+                        
+                        <button onclick="navigator.clipboard.writeText('https://gothprods.com/articulo/{{ item.id }}'); alert('Enlace copiado al portapapeles');" class="platform-btn" style="background: transparent; border: 1px solid var(--accent-color); padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); cursor: pointer; text-decoration: none; min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-link"></i> Copiar Link</button>
+                    </div>
                 </div>
             </div>
+
+            <div class="modal-comments-pane">
+                <div class="comments-header">
+                    <span>Comentarios</span>
+                </div>
+                <div class="comments-list" id="comments-list-{{ item.id }}">
+                    <div style="text-align: center; color: #888; margin-top: 20px;">Cargando comentarios...</div>
+                </div>
+                <div class="comment-input-area">
+                    <form onsubmit="submitComment(event, {{ item.id }})">
+                        <div class="replying-indicator" id="replying-to-{{ item.id }}">
+                            <span id="replying-name-{{ item.id }}">Respondiendo...</span>
+                            <button type="button" onclick="cancelReply({{ item.id }})" style="background: none; border: none; color: #888; cursor: pointer; padding: 0;"><i class="fa-solid fa-times"></i></button>
+                        </div>
+                        <input type="hidden" id="comment-parent-{{ item.id }}" value="">
+                        <input type="text" id="comment-name-{{ item.id }}" placeholder="Tu Nombre o Apodo" required>
+                        <textarea id="comment-text-{{ item.id }}" placeholder="Escribe tu comentario..." required></textarea>
+                        <button type="submit" class="comment-submit-btn">Publicar</button>
+                    </form>
+                </div>
+            </div>
+
         </div>
     </div>
     {% endfor %}
@@ -998,7 +1028,7 @@
     observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
     </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    <script src="app.js?v=4"></script>
+    <script src="app.js?v=5"></script>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <script>
