@@ -151,6 +151,8 @@ def get_db_connection(live=False):
         columns = [col[1] for col in cursor.fetchall()]
         if 'views' not in columns:
             cursor.execute("ALTER TABLE content_items ADD COLUMN views INTEGER DEFAULT 0")
+        if 'likes' not in columns:
+            cursor.execute("ALTER TABLE content_items ADD COLUMN likes INTEGER DEFAULT 0")
         conn.commit()
     except Exception as e:
         print("Schema migration error (content_items):", e)
@@ -211,6 +213,22 @@ def track_view(item_id):
     
     new_views = row['views'] if row else 0
     return jsonify({"success": True, "views": new_views})
+
+@app.route('/api/track_like/<int:item_id>', methods=['POST'])
+def track_like(item_id):
+    is_preview = request.args.get('preview') == '1' and 'user_id' in session
+    conn = get_db_connection(live=not is_preview)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE content_items SET likes = COALESCE(likes, 0) + 1 WHERE id = ?", (item_id,))
+    conn.commit()
+    
+    # Return the new like count
+    cursor.execute("SELECT likes FROM content_items WHERE id = ?", (item_id,))
+    row = cursor.fetchone()
+    conn.close()
+    
+    new_likes = row['likes'] if row else 0
+    return jsonify({"success": True, "likes": new_likes})
 
 @app.route('/')
 def index():

@@ -107,6 +107,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Like button logic
+    const likeBtns = document.querySelectorAll('.like-btn');
+    likeBtns.forEach(btn => {
+        const itemId = btn.getAttribute('data-id');
+        // Check local storage
+        if (localStorage.getItem('liked_' + itemId)) {
+            const icon = btn.querySelector('i');
+            icon.classList.remove('fa-regular');
+            icon.classList.add('fa-solid');
+            btn.style.color = 'var(--accent-color)';
+            btn.disabled = true;
+        }
+
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation(); // prevent opening modal if inside link (though it's not)
+            
+            if (btn.disabled || localStorage.getItem('liked_' + itemId)) return;
+
+            fetch('/api/track_like/' + itemId, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        localStorage.setItem('liked_' + itemId, 'true');
+                        document.querySelectorAll('.like-count-' + itemId).forEach(el => {
+                            el.innerText = data.likes;
+                        });
+                        document.querySelectorAll('.like-btn[data-id="' + itemId + '"]').forEach(b => {
+                            const icon = b.querySelector('i');
+                            icon.classList.remove('fa-regular');
+                            icon.classList.add('fa-solid');
+                            b.style.color = 'var(--accent-color)';
+                            b.disabled = true;
+                        });
+                    }
+                })
+                .catch(err => console.error('Error tracking like:', err));
+        });
+    });
+
     // Check URL for direct link to an item
     const urlParams = new URLSearchParams(window.location.search);
     const itemId = urlParams.get('item');
