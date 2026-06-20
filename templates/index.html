@@ -929,6 +929,13 @@
                     <div style="font-size: 1.1rem; color: #ddd; line-height: 1.8; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ item.short_desc | safe }}</div>
                     {% endif %}
                     
+                    <div style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;">
+                        <button class="like-btn" data-id="{{ item.id }}" style="background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 1.2rem; padding: 8px 25px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Oswald', sans-serif; text-transform: uppercase;" onmouseover="if(!this.disabled){this.style.background='var(--accent-color)'; this.style.color='#000';}" onmouseout="if(!this.disabled){this.style.background='transparent'; this.style.color='var(--accent-color)';}">
+                            <i class="fa-regular fa-heart"></i>
+                            <span>Love <span class="like-count-{{ item.id }}">{{ item.likes if item.likes else 0 }}</span></span>
+                        </button>
+                    </div>
+                    
                     {% if item.yt_link or item.sp_link or item.ap_link %}
                     <div style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
                         <h4 style="color: var(--accent-color); margin-bottom: 15px;">Escucha en:</h4>
