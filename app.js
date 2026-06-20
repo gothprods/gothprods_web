@@ -70,10 +70,25 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             const targetId = btn.getAttribute('data-target');
+            const itemId = btn.getAttribute('data-id');
             const modal = document.getElementById(targetId);
             if (modal) {
                 modal.classList.add('show');
                 document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                
+                // Track view
+                if (itemId) {
+                    fetch('/api/track_view/' + itemId, { method: 'POST' })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                document.querySelectorAll('.view-count-' + itemId).forEach(el => {
+                                    el.innerText = data.views;
+                                });
+                            }
+                        })
+                        .catch(err => console.error('Error tracking view:', err));
+                }
             }
         });
     });

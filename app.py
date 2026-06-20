@@ -105,6 +105,10 @@ def get_db_connection(live=False):
             cursor.execute("ALTER TABLE users ADD COLUMN username TEXT")
         if 'is_active' not in columns:
             cursor.execute("ALTER TABLE users ADD COLUMN is_active INTEGER DEFAULT 1")
+        if 'reset_token' not in columns:
+            cursor.execute("ALTER TABLE users ADD COLUMN reset_token TEXT")
+        if 'reset_token_expiry' not in columns:
+            cursor.execute("ALTER TABLE users ADD COLUMN reset_token_expiry TIMESTAMP")
             
         # Migrate existing root user
         cursor.execute("UPDATE users SET username = 'root', nombre = 'Administrador', role = 'admin', is_active = 1 WHERE email = 'goth.prods@gmail.com' AND username IS NULL")
@@ -139,6 +143,17 @@ def get_db_connection(live=False):
         conn.commit()
     except Exception as e:
         print("Schema creation error (eventos_semana):", e)
+
+    # Auto-migrate schema for content_items
+    try:
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(content_items)")
+        columns = [col[1] for col in cursor.fetchall()]
+        if 'views' not in columns:
+            cursor.execute("ALTER TABLE content_items ADD COLUMN views INTEGER DEFAULT 0")
+        conn.commit()
+    except Exception as e:
+        print("Schema migration error (content_items):", e)
 
     return conn
 
@@ -181,6 +196,22 @@ def send_verification_email(to_email, code, subject="Código de Verificación - 
         return False
 
 # --- FRONTEND ---
+@app.route('/api/track_view/<int:item_id>', methods=['POST'])
+def track_view(item_id):
+    is_preview = request.args.get('preview') == '1' and 'user_id' in session
+    conn = get_db_connection(live=not is_preview)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE content_items SET views = COALESCE(views, 0) + 1 WHERE id = ?", (item_id,))
+    conn.commit()
+    
+    # Return the new view count
+    cursor.execute("SELECT views FROM content_items WHERE id = ?", (item_id,))
+    row = cursor.fetchone()
+    conn.close()
+    
+    new_views = row['views'] if row else 0
+    return jsonify({"success": True, "views": new_views})
+
 @app.route('/')
 def index():
     is_preview = request.args.get('preview') == '1' and 'user_id' in session

@@ -525,7 +525,12 @@
                     </div>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
                         {% for item in noticiero_items[:5] %}
-                        <li style="margin-bottom: 8px; line-height: 1.3;"><a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" class="open-review-modal" style="color: #716d4a;"><strong style="color: inherit;">{{ item.title }}:</strong></a> <span style="color: #ccc;">{{ item.short_desc[:40] }}...</span></li>
+                        <li style="margin-bottom: 8px; line-height: 1.3;">
+                            <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="color: #716d4a; display: flex; justify-content: space-between; align-items: baseline;">
+                                <span><strong style="color: inherit;">{{ item.title }}:</strong> <span style="color: #ccc;">{{ item.short_desc[:40] }}...</span></span>
+                                <span style="font-size: 0.7rem; color: #555; white-space: nowrap; margin-left: 8px;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}">{{ item.views if item.views else 0 }}</span></span>
+                            </a>
+                        </li>
                         {% endfor %}
                     </ul>
                     <a href="#news" class="read-more" style="color: var(--accent-color); font-weight: bold; margin-top:10px; display:inline-block; padding: 4px 10px; font-size: 0.8rem; border: 1px solid var(--accent-color); border-radius: 4px;">Ir al Noticiero &rarr;</a>
@@ -746,12 +751,15 @@
                 <div class="news-rail">
                     {% for item in noticiero_items %}
                 <div class="news-card">
-                    <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" class="open-review-modal" style="display: block;">
+                    <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="display: block;">
                         <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center; cursor: pointer;">
                     </a>
                     <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
                     <p style="font-size: 0.85rem; margin-bottom: 5px; margin-top: 5px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
-                    <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" class="open-review-modal" style="color: var(--accent-color); font-weight: bold; font-size: 0.85rem; display: inline-block; margin-top: 5px;">Leer más &rarr;</a>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+                        <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="color: var(--accent-color); font-weight: bold; font-size: 0.85rem; display: inline-block;">Leer más &rarr;</a>
+                        <span style="font-size: 0.75rem; color: #666; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}">{{ item.views if item.views else 0 }}</span></span>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -966,7 +974,7 @@
     observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
     </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    <script src="app.js"></script>
+    <script src="app.js?v=3"></script>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <script>
