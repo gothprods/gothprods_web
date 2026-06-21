@@ -144,6 +144,32 @@ def get_db_connection(live=False):
     except Exception as e:
         print("Schema creation error (eventos_semana):", e)
 
+    # Auto-migrate schema for eventos_semana
+    try:
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(eventos_semana)")
+        columns = [col[1] for col in cursor.fetchall()]
+        if 'views' not in columns:
+            cursor.execute("ALTER TABLE eventos_semana ADD COLUMN views INTEGER DEFAULT 0")
+        if 'likes' not in columns:
+            cursor.execute("ALTER TABLE eventos_semana ADD COLUMN likes INTEGER DEFAULT 0")
+        conn.commit()
+    except Exception as e:
+        print("Schema migration error (eventos_semana):", e)
+
+    # Auto-migrate schema for banda_semana
+    try:
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(banda_semana)")
+        columns = [col[1] for col in cursor.fetchall()]
+        if 'views' not in columns:
+            cursor.execute("ALTER TABLE banda_semana ADD COLUMN views INTEGER DEFAULT 0")
+        if 'likes' not in columns:
+            cursor.execute("ALTER TABLE banda_semana ADD COLUMN likes INTEGER DEFAULT 0")
+        conn.commit()
+    except Exception as e:
+        print("Schema migration error (banda_semana):", e)
+
     # Auto-migrate schema for content_items
     try:
         cursor = conn.cursor()
@@ -171,9 +197,13 @@ def get_db_connection(live=False):
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+        cursor.execute("PRAGMA table_info(comments)")
+        columns = [col[1] for col in cursor.fetchall()]
+        if 'item_type' not in columns:
+            cursor.execute("ALTER TABLE comments ADD COLUMN item_type TEXT DEFAULT 'content'")
         conn.commit()
     except Exception as e:
-        print("Schema creation error (comments):", e)
+        print("Schema creation/migration error (comments):", e)
 
     return conn
 
@@ -218,14 +248,23 @@ def send_verification_email(to_email, code, subject="Código de Verificación - 
 # --- FRONTEND ---
 @app.route('/api/track_view/<int:item_id>', methods=['POST'])
 def track_view(item_id):
+    item_type = request.args.get('type', 'content')
     is_preview = request.args.get('preview') == '1' and 'user_id' in session
     conn = get_db_connection(live=not is_preview)
     cursor = conn.cursor()
-    cursor.execute("UPDATE content_items SET views = COALESCE(views, 0) + 1 WHERE id = ?", (item_id,))
+    
+    if item_type == 'banda':
+        table = 'banda_semana'
+    elif item_type == 'evento':
+        table = 'eventos_semana'
+    else:
+        table = 'content_items'
+        
+    cursor.execute(f"UPDATE {table} SET views = COALESCE(views, 0) + 1 WHERE id = ?", (item_id,))
     conn.commit()
     
     # Return the new view count
-    cursor.execute("SELECT views FROM content_items WHERE id = ?", (item_id,))
+    cursor.execute(f"SELECT views FROM {table} WHERE id = ?", (item_id,))
     row = cursor.fetchone()
     conn.close()
     
@@ -234,8 +273,9 @@ def track_view(item_id):
 
 @app.route('/api/comments/<int:item_id>', methods=['GET'])
 def get_comments(item_id):
+    item_type = request.args.get('type', 'content')
     conn = get_db_connection(live=True)
-    comments = conn.execute("SELECT * FROM comments WHERE item_id = ? ORDER BY created_at ASC", (item_id,)).fetchall()
+    comments = conn.execute("SELECT * FROM comments WHERE item_id = ? AND item_type = ? ORDER BY created_at ASC", (item_id, item_type)).fetchall()
     conn.close()
     
     # Build a tree structure
@@ -260,6 +300,7 @@ def get_comments(item_id):
 
 @app.route('/api/comments/<int:item_id>', methods=['POST'])
 def post_comment(item_id):
+    item_type = request.args.get('type', 'content')
     data = request.json
     author_name = data.get('author_name', 'Anónimo').strip()
     content = data.get('content', '').strip()
@@ -274,8 +315,8 @@ def post_comment(item_id):
     conn = get_db_connection(live=not is_preview)
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO comments (item_id, parent_id, author_name, content) VALUES (?, ?, ?, ?)",
-        (item_id, parent_id, author_name, content)
+        "INSERT INTO comments (item_id, item_type, parent_id, author_name, content) VALUES (?, ?, ?, ?, ?)",
+        (item_id, item_type, parent_id, author_name, content)
     )
     conn.commit()
     conn.close()
@@ -298,14 +339,23 @@ def like_comment(comment_id):
 
 @app.route('/api/track_like/<int:item_id>', methods=['POST'])
 def track_like(item_id):
+    item_type = request.args.get('type', 'content')
     is_preview = request.args.get('preview') == '1' and 'user_id' in session
     conn = get_db_connection(live=not is_preview)
     cursor = conn.cursor()
-    cursor.execute("UPDATE content_items SET likes = COALESCE(likes, 0) + 1 WHERE id = ?", (item_id,))
+    
+    if item_type == 'banda':
+        table = 'banda_semana'
+    elif item_type == 'evento':
+        table = 'eventos_semana'
+    else:
+        table = 'content_items'
+        
+    cursor.execute(f"UPDATE {table} SET likes = COALESCE(likes, 0) + 1 WHERE id = ?", (item_id,))
     conn.commit()
     
     # Return the new like count
-    cursor.execute("SELECT likes FROM content_items WHERE id = ?", (item_id,))
+    cursor.execute(f"SELECT likes FROM {table} WHERE id = ?", (item_id,))
     row = cursor.fetchone()
     conn.close()
     

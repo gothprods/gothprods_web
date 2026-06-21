@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const targetId = btn.getAttribute('data-target');
             const itemId = btn.getAttribute('data-id');
+            const itemType = btn.getAttribute('data-type') || 'content';
             const modal = document.getElementById(targetId);
             if (modal) {
                 modal.classList.add('show');
@@ -78,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Track view
                 if (itemId) {
-                    fetch('/api/track_view/' + itemId, { method: 'POST' })
+                    fetch('/api/track_view/' + itemId + '?type=' + itemType, { method: 'POST' })
                         .then(res => res.json())
                         .then(data => {
                             if (data.success) {
@@ -90,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         .catch(err => console.error('Error tracking view:', err));
                         
                     // Load comments
-                    loadComments(itemId);
+                    loadComments(itemId, itemType);
                 }
             }
         });
@@ -114,12 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const likeBtns = document.querySelectorAll('.like-btn');
     likeBtns.forEach(btn => {
         const itemId = btn.getAttribute('data-id');
+        const itemType = btn.getAttribute('data-type') || 'content';
         // Check local storage
-        if (localStorage.getItem('liked_' + itemId)) {
+        if (localStorage.getItem('liked_' + itemType + '_' + itemId)) {
             const icon = btn.querySelector('i');
-            icon.classList.remove('fa-regular');
-            icon.classList.add('fa-solid');
+            if (icon) {
+                icon.classList.remove('fa-regular');
+                icon.classList.add('fa-solid');
+            }
             btn.style.color = 'var(--accent-color)';
+            if (btn.hasAttribute('onmouseover')) {
+                btn.style.background = 'transparent';
+            }
             btn.disabled = true;
         }
 
@@ -127,21 +134,26 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             e.stopPropagation(); // prevent opening modal if inside link (though it's not)
             
-            if (btn.disabled || localStorage.getItem('liked_' + itemId)) return;
+            if (btn.disabled || localStorage.getItem('liked_' + itemType + '_' + itemId)) return;
 
-            fetch('/api/track_like/' + itemId, { method: 'POST' })
+            fetch('/api/track_like/' + itemId + '?type=' + itemType, { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        localStorage.setItem('liked_' + itemId, 'true');
+                        localStorage.setItem('liked_' + itemType + '_' + itemId, 'true');
                         document.querySelectorAll('.like-count-' + itemId).forEach(el => {
                             el.innerText = data.likes;
                         });
                         document.querySelectorAll('.like-btn[data-id="' + itemId + '"]').forEach(b => {
                             const icon = b.querySelector('i');
-                            icon.classList.remove('fa-regular');
-                            icon.classList.add('fa-solid');
+                            if (icon) {
+                                icon.classList.remove('fa-regular');
+                                icon.classList.add('fa-solid');
+                            }
                             b.style.color = 'var(--accent-color)';
+                            if (b.hasAttribute('onmouseover')) {
+                                b.style.background = 'transparent';
+                            }
                             b.disabled = true;
                         });
                     }
@@ -252,23 +264,23 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- Comments Logic ---
-window.loadComments = function(itemId) {
+window.loadComments = function(itemId, itemType = 'content') {
     const listDiv = document.getElementById('comments-list-' + itemId);
     if (!listDiv) return;
     
     listDiv.innerHTML = '<div style="text-align: center; color: #888; margin-top: 20px;">Cargando comentarios...</div>';
     
-    fetch('/api/comments/' + itemId)
+    fetch('/api/comments/' + itemId + '?type=' + itemType)
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                renderComments(itemId, data.comments);
+                renderComments(itemId, itemType, data.comments);
             }
         })
         .catch(err => console.error('Error loading comments:', err));
 };
 
-function renderComments(itemId, comments) {
+function renderComments(itemId, itemType, comments) {
     const listDiv = document.getElementById('comments-list-' + itemId);
     listDiv.innerHTML = '';
     
@@ -278,10 +290,10 @@ function renderComments(itemId, comments) {
     }
 
     comments.forEach(c => {
-        listDiv.appendChild(createCommentElement(c, itemId, false));
+        listDiv.appendChild(createCommentElement(c, itemId, itemType, false));
         if (c.replies && c.replies.length > 0) {
             c.replies.forEach(r => {
-                listDiv.appendChild(createCommentElement(r, itemId, true));
+                listDiv.appendChild(createCommentElement(r, itemId, itemType, true));
             });
         }
     });
@@ -290,7 +302,7 @@ function renderComments(itemId, comments) {
     listDiv.scrollTop = listDiv.scrollHeight;
 }
 
-function createCommentElement(c, itemId, isReply) {
+function createCommentElement(c, itemId, itemType, isReply) {
     const div = document.createElement('div');
     div.className = 'comment-bubble' + (isReply ? ' reply' : '');
     
@@ -310,13 +322,13 @@ function createCommentElement(c, itemId, isReply) {
         <div>${escapeHtml(c.content)}</div>
         <div class="comment-actions">
             <button type="button" class="${btnClass}" onclick="likeCommentModal(${c.id}, this)" ${disabled}><i class="${iconClass}"></i> <span class="c-like-count">${c.likes}</span></button>
-            ${!isReply ? `<button type="button" onclick="replyTo(${c.id}, '${escapeHtml(c.author_name)}', ${itemId})"><i class="fa-solid fa-reply"></i> Responder</button>` : ''}
+            ${!isReply ? `<button type="button" onclick="replyTo(${c.id}, '${escapeHtml(c.author_name)}', ${itemId}, '${itemType}')"><i class="fa-solid fa-reply"></i> Responder</button>` : ''}
         </div>
     `;
     return div;
 }
 
-window.submitComment = function(e, itemId) {
+window.submitComment = function(e, itemId, itemType = 'content') {
     e.preventDefault();
     const authorInput = document.getElementById('comment-name-' + itemId);
     const textInput = document.getElementById('comment-text-' + itemId);
@@ -326,7 +338,7 @@ window.submitComment = function(e, itemId) {
     const content = textInput.value;
     const parent_id = parentInput.value || null;
     
-    fetch('/api/comments/' + itemId, {
+    fetch('/api/comments/' + itemId + '?type=' + itemType, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ author_name, content, parent_id })
@@ -336,7 +348,7 @@ window.submitComment = function(e, itemId) {
         if (data.success) {
             textInput.value = '';
             cancelReply(itemId);
-            loadComments(itemId);
+            loadComments(itemId, itemType);
         } else {
             alert(data.error || 'Error al publicar comentario');
         }
@@ -344,7 +356,7 @@ window.submitComment = function(e, itemId) {
     .catch(err => console.error('Error posting comment:', err));
 };
 
-window.replyTo = function(commentId, authorName, itemId) {
+window.replyTo = function(commentId, authorName, itemId, itemType) {
     const parentInput = document.getElementById('comment-parent-' + itemId);
     const indicator = document.getElementById('replying-to-' + itemId);
     const nameSpan = document.getElementById('replying-name-' + itemId);

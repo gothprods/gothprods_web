@@ -169,7 +169,11 @@
                         <div>
                             <h4 style="color: var(--accent-color); font-family: 'Oswald', sans-serif; font-size: 1.1rem; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;"><i class="fa-solid fa-align-left"></i> Biografía</h4>
                             <div style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px; text-align: justify; white-space: pre-wrap; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; overflow: hidden;">{{ banda_semana.bio_corta | safe }}</div>
-                            <button onclick="openBandaModal({{ banda_semana.id }})" style="background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 5px 12px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-family: 'Oswald', sans-serif; letter-spacing: 1px; transition: all 0.3s;"><i class="fa-solid fa-book-open"></i> Leer historia completa</button>
+                            <button class="open-review-modal" data-target="banda-modal-{{ banda_semana.id }}" data-id="{{ banda_semana.id }}" data-type="banda" style="background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 5px 12px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-family: 'Oswald', sans-serif; letter-spacing: 1px; transition: all 0.3s;"><i class="fa-solid fa-book-open"></i> Leer historia completa</button>
+                            <div style="display: flex; gap: 15px; margin-top: 15px; font-size: 0.9rem;">
+                                <span style="color: #888;"><i class="fa-regular fa-eye"></i> <span class="view-count-{{ banda_semana.id }}">{{ banda_semana.views if banda_semana.views else 0 }}</span> vistas</span>
+                                <span style="color: var(--accent-color);"><i class="fa-solid fa-heart"></i> <span class="like-count-{{ banda_semana.id }}">{{ banda_semana.likes if banda_semana.likes else 0 }}</span></span>
+                            </div>
                         </div>
 
                         <!-- Columna 2: Alineación y Discografía -->
@@ -265,7 +269,11 @@
                                     <div>
                                         <h4 style="color: var(--accent-color); font-family: 'Oswald', sans-serif; font-size: 1.1rem; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;"><i class="fa-solid fa-align-left"></i> Sobre el Evento</h4>
                                         <div style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px; color: #ccc; text-align: justify; white-space: pre-wrap; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 15; overflow: hidden;">{{ evento.bio_corta | safe }}</div>
-                                        <button onclick="openEventoModal({{ evento.id }})" style="background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 5px 12px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-family: 'Oswald', sans-serif; letter-spacing: 1px; transition: all 0.3s;"><i class="fa-solid fa-book-open"></i> Leer nota completa</button>
+                                        <button class="open-review-modal" data-target="evento-modal-{{ evento.id }}" data-id="{{ evento.id }}" data-type="evento" style="background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 5px 12px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-family: 'Oswald', sans-serif; letter-spacing: 1px; transition: all 0.3s;"><i class="fa-solid fa-book-open"></i> Leer nota completa</button>
+                                        <div style="display: flex; gap: 15px; margin-top: 15px; font-size: 0.9rem;">
+                                            <span style="color: #888;"><i class="fa-regular fa-eye"></i> <span class="view-count-{{ evento.id }}">{{ evento.views if evento.views else 0 }}</span> vistas</span>
+                                            <span style="color: var(--accent-color);"><i class="fa-solid fa-heart"></i> <span class="like-count-{{ evento.id }}">{{ evento.likes if evento.likes else 0 }}</span></span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -286,79 +294,144 @@
         </div>
         </section>
 
-                <!-- EVENTO MODALS -->
+        <!-- EVENTO MODALS -->
         {% for evento in eventos_semana %}
-        <div id="evento-modal-{{ evento.id }}" class="banda-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
-            <div id="evento-modal-content-{{ evento.id }}" style="background: #111; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--accent-color); border-radius: 8px; position: relative;">
-                <button onclick="closeEventoModal({{ evento.id }})" style="position: absolute; right: 20px; top: 20px; background: transparent; border: none; color: #fff; font-size: 2rem; cursor: pointer; z-index: 10;"><i class="fa-solid fa-times"></i></button>
-                <div style="padding: 40px 30px;">
-                    <h2 class="notranslate" style="color: var(--accent-color); font-weight: bold; font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ evento.titulo_articulo }}</h2>
-                    <h3 style="text-align: center; color: var(--accent-color); font-weight: bold; font-size: 1.5rem; margin-bottom: 10px;">{{ evento.nombre_evento }}</h3>
-                    <p style="text-align: center; color: var(--accent-color); font-weight: bold; font-size: 1.1rem; margin-bottom: 30px;">
-                        <i class="fa-solid fa-location-dot"></i> {{ evento.ciudad }}, {{ evento.pais }} | <i class="fa-solid fa-calendar-days"></i> {{ evento.fecha_evento }}
-                    </p>
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <img loading="lazy" src="{{ evento.img_video_path }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
-                    </div>
-                    
-                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: center; border-left: 3px solid var(--accent-color);">
-                        <p style="margin: 0; color: var(--accent-color); font-weight: bold; font-size: 1rem;"><strong><i class="fa-solid fa-bullhorn"></i> Presentado por:</strong> {{ evento.promotor }}</p>
-                    </div>
-                    <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ evento.bio_corta | safe }}</div>
-                    <div style="margin-top: 40px; border-top: 1px solid #333; padding-top: 25px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center;">
-                        <span style="color: #fff; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-right: 10px;"><i class="fa-solid fa-share-nodes"></i> Compartir:</span>
+        <div id="evento-modal-{{ evento.id }}" class="modal banda-modal" data-item-id="{{ evento.id }}" data-type="evento">
+            <div class="modal-content split-layout" style="background: #111; border: 1px solid var(--accent-color); border-radius: 8px; position: relative; padding: 0;">
+                <button class="close-modal" style="position: absolute; right: 20px; top: 20px; background: transparent; border: none; color: #fff; font-size: 2rem; cursor: pointer; z-index: 10;"><i class="fa-solid fa-times"></i></button>
+                
+                <div class="modal-article-pane">
+                    <div style="padding: 40px 30px;">
+                        <h2 class="notranslate" style="color: var(--accent-color); font-weight: bold; font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ evento.titulo_articulo }}</h2>
+                        <h3 style="text-align: center; color: var(--accent-color); font-weight: bold; font-size: 1.5rem; margin-bottom: 10px;">{{ evento.nombre_evento }}</h3>
+                        <p style="text-align: center; color: var(--accent-color); font-weight: bold; font-size: 1.1rem; margin-bottom: 30px;">
+                            <i class="fa-solid fa-location-dot"></i> {{ evento.ciudad }}, {{ evento.pais }} | <i class="fa-solid fa-calendar-days"></i> {{ evento.fecha_evento }}
+                        </p>
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <img loading="lazy" src="{{ evento.img_video_path }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
+                        </div>
                         
-                        <a href="https://www.facebook.com/sharer/sharer.php?u=https://gothprods.com/evento/{{ evento.id }}" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-facebook-f"></i> Facebook</a>
+                        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: center; border-left: 3px solid var(--accent-color);">
+                            <p style="margin: 0; color: var(--accent-color); font-weight: bold; font-size: 1rem;"><strong><i class="fa-solid fa-bullhorn"></i> Presentado por:</strong> {{ evento.promotor }}</p>
+                        </div>
+                        <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ evento.bio_corta | safe }}</div>
                         
-                        <a href="https://www.instagram.com/goth_prods/" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-instagram"></i> Instagram</a>
+                        <div style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;">
+                            <button class="like-btn" data-id="{{ evento.id }}" data-type="evento" style="background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 1.2rem; padding: 8px 25px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Oswald', sans-serif; text-transform: uppercase;" onmouseover="if(!this.disabled){this.style.background='var(--accent-color)'; this.style.color='#000';}" onmouseout="if(!this.disabled){this.style.background='transparent'; this.style.color='var(--accent-color)';}">
+                                <i class="fa-regular fa-heart"></i>
+                                <span class="like-count-{{ evento.id }}">{{ evento.likes if evento.likes else 0 }}</span>
+                            </button>
+                        </div>
                         
-                        <button onclick="navigator.clipboard.writeText('https://gothprods.com/evento/{{ evento.id }}'); alert('Enlace copiado al portapapeles');" class="platform-btn" style="background: transparent; border: 1px solid var(--accent-color); padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); cursor: pointer; text-decoration: none; min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-link"></i> Copiar Link</button>
+                        <div style="margin-top: 40px; border-top: 1px solid #333; padding-top: 25px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center;">
+                            <span style="color: #fff; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-right: 10px;"><i class="fa-solid fa-share-nodes"></i> Compartir:</span>
+                            
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=https://gothprods.com/evento/{{ evento.id }}" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-facebook-f"></i> Facebook</a>
+                            
+                            <a href="https://www.instagram.com/goth_prods/" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-instagram"></i> Instagram</a>
+                            
+                            <button onclick="navigator.clipboard.writeText('https://gothprods.com/evento/{{ evento.id }}'); alert('Enlace copiado al portapapeles');" class="platform-btn" style="background: transparent; border: 1px solid var(--accent-color); padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); cursor: pointer; text-decoration: none; min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-link"></i> Copiar Link</button>
+                        </div>
                     </div>
                 </div>
+                
+                <div class="modal-comments-pane">
+                    <div class="comments-header">
+                        <span>Comentarios</span>
+                    </div>
+                    <div class="comments-list" id="comments-list-{{ evento.id }}">
+                        <div style="text-align: center; color: #888; margin-top: 20px;">Cargando comentarios...</div>
+                    </div>
+                    <div class="comment-input-area">
+                        <form onsubmit="submitComment(event, {{ evento.id }}, 'evento')">
+                            <div class="replying-indicator" id="replying-to-{{ evento.id }}">
+                                <span id="replying-name-{{ evento.id }}">Respondiendo...</span>
+                                <button type="button" onclick="cancelReply({{ evento.id }})" style="background: none; border: none; color: #888; cursor: pointer; padding: 0;"><i class="fa-solid fa-times"></i></button>
+                            </div>
+                            <input type="hidden" id="comment-parent-{{ evento.id }}" value="">
+                            <input type="text" id="comment-name-{{ evento.id }}" placeholder="Tu Nombre o Apodo" required>
+                            <textarea id="comment-text-{{ evento.id }}" placeholder="Escribe tu comentario..." required></textarea>
+                            <button type="submit" class="comment-submit-btn">Publicar</button>
+                        </form>
+                    </div>
+                </div>
+                
             </div>
         </div>
         {% endfor %}
 
         <!-- BANDA MODALS (One for each band) -->
         {% for banda_semana in bandas_semana %}
-        <div id="banda-modal-{{ banda_semana.id }}" class="banda-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
-            <div id="banda-modal-content-{{ banda_semana.id }}" style="background: #111; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--accent-color); border-radius: 8px; position: relative;">
-                <button onclick="closeBandaModal({{ banda_semana.id }})" style="position: absolute; right: 20px; top: 20px; background: transparent; border: none; color: #fff; font-size: 2rem; cursor: pointer; z-index: 10;"><i class="fa-solid fa-times"></i></button>
-                <div style="padding: 40px 30px;">
-                    <h2 class="notranslate" style="color: var(--accent-color); font-weight: bold; font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ banda_semana.nombre }}</h2>
-                    <p style="text-align: center; color: var(--accent-color); font-weight: bold; font-size: 1.1rem; margin-bottom: 30px;">
-                        <i class="fa-solid fa-location-dot"></i> Origen: {{ banda_semana.ciudad }}, {{ banda_semana.pais }}
-                        {% if banda_semana.ano_formacion %} | <i class="fa-solid fa-calendar-days"></i> Formación: {{ banda_semana.ano_formacion }}{% endif %}
-                    </p>
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <img loading="lazy" src="{{ banda_semana.img_video_path }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
-                    </div>
+        <div id="banda-modal-{{ banda_semana.id }}" class="modal banda-modal" data-item-id="{{ banda_semana.id }}" data-type="banda">
+            <div class="modal-content split-layout" style="background: #111; border: 1px solid var(--accent-color); border-radius: 8px; position: relative; padding: 0;">
+                <button class="close-modal" style="position: absolute; right: 20px; top: 20px; background: transparent; border: none; color: #fff; font-size: 2rem; cursor: pointer; z-index: 10;"><i class="fa-solid fa-times"></i></button>
+                
+                <div class="modal-article-pane">
+                    <div style="padding: 40px 30px;">
+                        <h2 class="notranslate" style="color: var(--accent-color); font-weight: bold; font-size: 3rem; margin-bottom: 5px; text-align: center; font-family: 'Oswald', sans-serif; text-transform: uppercase; line-height: 1.1;">{{ banda_semana.nombre }}</h2>
+                        <p style="text-align: center; color: var(--accent-color); font-weight: bold; font-size: 1.1rem; margin-bottom: 30px;">
+                            <i class="fa-solid fa-location-dot"></i> Origen: {{ banda_semana.ciudad }}, {{ banda_semana.pais }}
+                            {% if banda_semana.ano_formacion %} | <i class="fa-solid fa-calendar-days"></i> Formación: {{ banda_semana.ano_formacion }}{% endif %}
+                        </p>
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <img loading="lazy" src="{{ banda_semana.img_video_path }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
+                        </div>
 
-                    {% if banda_semana.line_up %}
-                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: center; border-left: 3px solid var(--accent-color);">
-                        <p style="margin: 0; color: var(--accent-color); font-weight: bold; font-size: 1rem;"><strong><i class="fa-solid fa-users"></i> Line Up:</strong> {{ banda_semana.line_up }}</p>
-                    </div>
-                    {% endif %}
+                        {% if banda_semana.line_up %}
+                        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: center; border-left: 3px solid var(--accent-color);">
+                            <p style="margin: 0; color: var(--accent-color); font-weight: bold; font-size: 1rem;"><strong><i class="fa-solid fa-users"></i> Line Up:</strong> {{ banda_semana.line_up }}</p>
+                        </div>
+                        {% endif %}
 
-                    <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ banda_semana.bio_corta | safe }}</div>
+                        <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ banda_semana.bio_corta | safe }}</div>
 
-                    {% if banda_semana.titulo_resena and banda_semana.texto_resena %}
-                    <div style="background: rgba(113, 109, 74, 0.1); padding: 25px; border-radius: 8px; margin-top: 30px; border-left: 4px solid var(--accent-color);">
-                        <h3 style="color: var(--accent-color); font-size: 1.8rem; margin-bottom: 15px; font-family: 'Oswald', sans-serif; text-transform: uppercase;"><i class="fa-solid fa-pen-nib"></i> {{ banda_semana.titulo_resena }}</h3>
-                        <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin: 0; text-align: justify; white-space: pre-wrap;">{{ banda_semana.texto_resena | safe }}</div>
-                    </div>
-                    {% endif %}
-                    
-                    <div style="margin-top: 40px; border-top: 1px solid #333; padding-top: 25px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center;">
-                        <span style="color: #fff; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-right: 10px;"><i class="fa-solid fa-share-nodes"></i> Compartir:</span>
+                        {% if banda_semana.titulo_resena and banda_semana.texto_resena %}
+                        <div style="background: rgba(113, 109, 74, 0.1); padding: 25px; border-radius: 8px; margin-top: 30px; border-left: 4px solid var(--accent-color);">
+                            <h3 style="color: var(--accent-color); font-size: 1.8rem; margin-bottom: 15px; font-family: 'Oswald', sans-serif; text-transform: uppercase;"><i class="fa-solid fa-pen-nib"></i> {{ banda_semana.titulo_resena }}</h3>
+                            <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin: 0; text-align: justify; white-space: pre-wrap;">{{ banda_semana.texto_resena | safe }}</div>
+                        </div>
+                        {% endif %}
                         
-                        <a href="https://www.facebook.com/sharer/sharer.php?u=https://gothprods.com/banda/{{ banda_semana.id }}" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-facebook-f"></i> Facebook</a>
+                        <div style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;">
+                            <button class="like-btn" data-id="{{ banda_semana.id }}" data-type="banda" style="background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 1.2rem; padding: 8px 25px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Oswald', sans-serif; text-transform: uppercase;" onmouseover="if(!this.disabled){this.style.background='var(--accent-color)'; this.style.color='#000';}" onmouseout="if(!this.disabled){this.style.background='transparent'; this.style.color='var(--accent-color)';}">
+                                <i class="fa-regular fa-heart"></i>
+                                <span class="like-count-{{ banda_semana.id }}">{{ banda_semana.likes if banda_semana.likes else 0 }}</span>
+                            </button>
+                        </div>
                         
-                        <a href="https://www.instagram.com/goth_prods/" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-instagram"></i> Instagram</a>
-                        
-                        <button onclick="navigator.clipboard.writeText('https://gothprods.com/banda/{{ banda_semana.id }}'); alert('Enlace copiado al portapapeles');" class="platform-btn" style="background: transparent; border: 1px solid var(--accent-color); padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); cursor: pointer; text-decoration: none; min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-link"></i> Copiar Link</button>
+                        <div style="margin-top: 40px; border-top: 1px solid #333; padding-top: 25px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: center;">
+                            <span style="color: #fff; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; margin-right: 10px;"><i class="fa-solid fa-share-nodes"></i> Compartir:</span>
+                            
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=https://gothprods.com/banda/{{ banda_semana.id }}" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-facebook-f"></i> Facebook</a>
+                            
+                            <a href="https://www.instagram.com/goth_prods/" target="_blank" class="platform-btn" style="background: transparent; padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-brands fa-instagram"></i> Instagram</a>
+                            
+                            <button onclick="navigator.clipboard.writeText('https://gothprods.com/banda/{{ banda_semana.id }}'); alert('Enlace copiado al portapapeles');" class="platform-btn" style="background: transparent; border: 1px solid var(--accent-color); padding: 8px 15px; font-size: 0.95rem; border-radius: 4px; color: var(--accent-color); cursor: pointer; text-decoration: none; min-width: auto; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-link"></i> Copiar Link</button>
+                        </div>
                     </div>
                 </div>
+                
+                <div class="modal-comments-pane">
+                    <div class="comments-header">
+                        <span>Comentarios</span>
+                    </div>
+                    <div class="comments-list" id="comments-list-{{ banda_semana.id }}">
+                        <div style="text-align: center; color: #888; margin-top: 20px;">Cargando comentarios...</div>
+                    </div>
+                    <div class="comment-input-area">
+                        <form onsubmit="submitComment(event, {{ banda_semana.id }}, 'banda')">
+                            <div class="replying-indicator" id="replying-to-{{ banda_semana.id }}">
+                                <span id="replying-name-{{ banda_semana.id }}">Respondiendo...</span>
+                                <button type="button" onclick="cancelReply({{ banda_semana.id }})" style="background: none; border: none; color: #888; cursor: pointer; padding: 0;"><i class="fa-solid fa-times"></i></button>
+                            </div>
+                            <input type="hidden" id="comment-parent-{{ banda_semana.id }}" value="">
+                            <input type="text" id="comment-name-{{ banda_semana.id }}" placeholder="Tu Nombre o Apodo" required>
+                            <textarea id="comment-text-{{ banda_semana.id }}" placeholder="Escribe tu comentario..." required></textarea>
+                            <button type="submit" class="comment-submit-btn">Publicar</button>
+                        </form>
+                    </div>
+                </div>
+                
             </div>
         </div>
         {% endfor %}
@@ -905,7 +978,7 @@
             
             <div class="modal-article-pane">
                 <div style="padding: 40px 0 20px 0; position: relative;">
-                    <div class="lang-controls" style="position: absolute; top: 0px; left: 0px; display: flex; gap: 5px; align-items: center; z-index: 5;">
+                    <div class="lang-controls" style="display: flex; justify-content: flex-start; gap: 5px; align-items: center; z-index: 5; margin-bottom: 15px; padding-left: 20px;">
                         <button class="lang-btn-es" onclick="changeLanguage('es')" style="background: var(--accent-color); color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇲🇽 ES</button>
                         <button class="lang-btn-en" onclick="changeLanguage('en')" style="background: #333; color: #fff; border: 1px solid var(--accent-color); padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇺🇸 EN</button>
                     </div>
