@@ -303,7 +303,14 @@ main {
     }
 
     .dock-logo {
-        display: none; /* Hide logo on mobile bottom bar */
+        display: flex;
+        align-items: center;
+        margin-bottom: 0;
+        margin-right: 0.5rem;
+    }
+    
+    .dock-logo img {
+        width: 40px;
     }
 
     .dock-menu {
@@ -323,12 +330,12 @@ main {
     }
 
     .dock-item:hover {
-        transform: scale(1.3) translateY(-10px);
+        transform: scale(1.05);
     }
     
     .dock-item:has(+ .dock-item:hover),
     .dock-item:hover + .dock-item {
-        transform: scale(1.1) translateY(-5px);
+        transform: scale(1.02);
     }
 
     .dock-text {
