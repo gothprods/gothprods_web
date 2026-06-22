@@ -27,7 +27,7 @@
     <!-- Favicons -->
     <link rel="icon" href="assets/viking.webp" type="image/jpeg">
     <link rel="apple-touch-icon" href="assets/viking.webp">
-    <link rel="stylesheet" href="index.css?v=13">
+    <link rel="stylesheet" href="index.css?v=16">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -41,6 +41,8 @@
         <div class="dock-logo">
             <a href="#home"><img src="assets/dock_header_icon.png" alt="Goth Prods Logo" class="logo-img"></a>
         </div>
+        
+        <hr class="dock-divider">
 
         <ul class="dock-menu">
             {% if settings.get('show_banda_semana', '1') == '1' %}
@@ -85,12 +87,16 @@
                 <a href="mailto:contacto@gothprods.com"><img src="assets/contacto_icon.png?v=1" alt="Contáctanos" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Contáctanos</span></a>
             </li>
         </ul>
-
+        
         <div class="dock-controls">
+            <hr class="dock-divider">
+            
             <div class="lang-controls dock-lang">
                 <button class="lang-btn-es" onclick="changeLanguage('es')" title="Español">🇲🇽</button>
                 <button class="lang-btn-en" onclick="changeLanguage('en')" title="English">🇺🇸</button>
             </div>
+            
+            <hr class="dock-divider">
             
             <div class="dock-socials">
                 <a href="https://www.tiktok.com/@goth_prods" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
