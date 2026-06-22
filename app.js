@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         .then(res => res.json())
                         .then(data => {
                             if (data.success) {
-                                document.querySelectorAll('.view-count-' + itemId).forEach(el => {
+                                document.querySelectorAll('.view-count-' + itemId + '[data-type="' + itemType + '"]').forEach(el => {
                                     el.innerText = data.views;
                                 });
                             }
@@ -124,9 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon.classList.add('fa-solid');
             }
             btn.style.color = 'var(--accent-color)';
-            if (btn.hasAttribute('onmouseover')) {
-                btn.style.background = 'transparent';
-            }
+            btn.style.background = 'transparent';
+            btn.style.cursor = 'default';
             btn.disabled = true;
         }
 
@@ -141,20 +140,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     if (data.success) {
                         localStorage.setItem('liked_' + itemType + '_' + itemId, 'true');
-                        document.querySelectorAll('.like-count-' + itemId).forEach(el => {
-                            el.innerText = data.likes;
-                        });
                         document.querySelectorAll('.like-btn[data-id="' + itemId + '"]').forEach(b => {
+                            const bType = b.getAttribute('data-type') || 'content';
+                            if (bType !== itemType) return;
+                            
                             const icon = b.querySelector('i');
                             if (icon) {
                                 icon.classList.remove('fa-regular');
                                 icon.classList.add('fa-solid');
                             }
                             b.style.color = 'var(--accent-color)';
-                            if (b.hasAttribute('onmouseover')) {
-                                b.style.background = 'transparent';
-                            }
+                            b.style.background = 'transparent';
+                            b.style.cursor = 'default';
                             b.disabled = true;
+                        });
+                        
+                        // Update ALL standalone counts for this type exactly
+                        document.querySelectorAll('.like-count-' + itemId + '[data-type="' + itemType + '"]').forEach(el => {
+                            el.innerText = data.likes;
                         });
                     }
                 })

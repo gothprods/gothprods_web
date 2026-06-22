@@ -171,8 +171,8 @@
                             <div style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px; text-align: justify; white-space: pre-wrap; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; overflow: hidden;">{{ banda_semana.bio_corta | safe }}</div>
                             <button class="open-review-modal" data-target="banda-modal-{{ banda_semana.id }}" data-id="{{ banda_semana.id }}" data-type="banda" style="background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 5px 12px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-family: 'Oswald', sans-serif; letter-spacing: 1px; transition: all 0.3s;"><i class="fa-solid fa-book-open"></i> Leer historia completa</button>
                             <div style="display: flex; gap: 15px; margin-top: 15px; font-size: 0.9rem;">
-                                <span style="color: #888;"><i class="fa-regular fa-eye"></i> <span class="view-count-{{ banda_semana.id }}">{{ banda_semana.views if banda_semana.views else 0 }}</span> vistas</span>
-                                <span style="color: var(--accent-color);"><i class="fa-solid fa-heart"></i> <span class="like-count-{{ banda_semana.id }}">{{ banda_semana.likes if banda_semana.likes else 0 }}</span></span>
+                                <span style="color: #888;"><i class="fa-regular fa-eye"></i> <span class="view-count-{{ banda_semana.id }}" data-type="banda">{{ banda_semana.views if banda_semana.views else 0 }}</span> vistas</span>
+                                <span style="color: var(--accent-color);"><i class="fa-solid fa-heart"></i> <span class="like-count-{{ banda_semana.id }}" data-type="banda">{{ banda_semana.likes if banda_semana.likes else 0 }}</span></span>
                             </div>
                         </div>
 
@@ -271,8 +271,8 @@
                                         <div style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px; color: #ccc; text-align: justify; white-space: pre-wrap; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 15; overflow: hidden;">{{ evento.bio_corta | safe }}</div>
                                         <button class="open-review-modal" data-target="evento-modal-{{ evento.id }}" data-id="{{ evento.id }}" data-type="evento" style="background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 5px 12px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-family: 'Oswald', sans-serif; letter-spacing: 1px; transition: all 0.3s;"><i class="fa-solid fa-book-open"></i> Leer nota completa</button>
                                         <div style="display: flex; gap: 15px; margin-top: 15px; font-size: 0.9rem;">
-                                            <span style="color: #888;"><i class="fa-regular fa-eye"></i> <span class="view-count-{{ evento.id }}">{{ evento.views if evento.views else 0 }}</span> vistas</span>
-                                            <span style="color: var(--accent-color);"><i class="fa-solid fa-heart"></i> <span class="like-count-{{ evento.id }}">{{ evento.likes if evento.likes else 0 }}</span></span>
+                                            <span style="color: #888;"><i class="fa-regular fa-eye"></i> <span class="view-count-{{ evento.id }}" data-type="evento">{{ evento.views if evento.views else 0 }}</span> vistas</span>
+                                            <span style="color: var(--accent-color);"><i class="fa-solid fa-heart"></i> <span class="like-count-{{ evento.id }}" data-type="evento">{{ evento.likes if evento.likes else 0 }}</span></span>
                                         </div>
                                     </div>
                                 </div>
@@ -319,7 +319,7 @@
                         <div style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;">
                             <button class="like-btn" data-id="{{ evento.id }}" data-type="evento" style="background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 1.2rem; padding: 8px 25px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Oswald', sans-serif; text-transform: uppercase;" onmouseover="if(!this.disabled){this.style.background='var(--accent-color)'; this.style.color='#000';}" onmouseout="if(!this.disabled){this.style.background='transparent'; this.style.color='var(--accent-color)';}">
                                 <i class="fa-regular fa-heart"></i>
-                                <span class="like-count-{{ evento.id }}">{{ evento.likes if evento.likes else 0 }}</span>
+                                <span class="like-count-{{ evento.id }}" data-type="evento">{{ evento.likes if evento.likes else 0 }}</span>
                             </button>
                         </div>
                         
@@ -395,7 +395,7 @@
                         <div style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;">
                             <button class="like-btn" data-id="{{ banda_semana.id }}" data-type="banda" style="background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 1.2rem; padding: 8px 25px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Oswald', sans-serif; text-transform: uppercase;" onmouseover="if(!this.disabled){this.style.background='var(--accent-color)'; this.style.color='#000';}" onmouseout="if(!this.disabled){this.style.background='transparent'; this.style.color='var(--accent-color)';}">
                                 <i class="fa-regular fa-heart"></i>
-                                <span class="like-count-{{ banda_semana.id }}">{{ banda_semana.likes if banda_semana.likes else 0 }}</span>
+                                <span class="like-count-{{ banda_semana.id }}" data-type="banda">{{ banda_semana.likes if banda_semana.likes else 0 }}</span>
                             </button>
                         </div>
                         
@@ -604,8 +604,8 @@
                                     <span><strong style="color: inherit;">{{ item.title }}:</strong> <span style="color: #ccc;">{{ item.short_desc[:40] }}...</span></span>
                                 </a>
                                 <div style="display: flex; gap: 8px; align-items: center;">
-                                    <span style="font-size: 0.7rem; color: #555; white-space: nowrap;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}">{{ item.views if item.views else 0 }}</span></span>
-                                    <button class="like-btn" data-id="{{ item.id }}" style="background: none; border: none; color: #555; font-size: 0.7rem; cursor: pointer; padding: 0; white-space: nowrap; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}">{{ item.likes if item.likes else 0 }}</span></button>
+                                    <span style="font-size: 0.7rem; color: #555; white-space: nowrap;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}" data-type="content">{{ item.views if item.views else 0 }}</span></span>
+                                    <button class="like-btn" data-id="{{ item.id }}" data-type="content" style="background: none; border: none; color: #555; font-size: 0.7rem; cursor: pointer; padding: 0; white-space: nowrap; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}" data-type="content">{{ item.likes if item.likes else 0 }}</span></button>
                                 </div>
                             </div>
                         </li>
@@ -635,8 +635,8 @@
                                     <span><strong style="color: inherit;">{{ item.title }}</strong> - <span style="color: #ccc;">{{ item.short_desc[:60] if item.short_desc else '' }}...</span></span>
                                 </a>
                                 <div style="display: flex; gap: 8px; align-items: center;">
-                                    <span style="font-size: 0.7rem; color: #555; white-space: nowrap;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}">{{ item.views if item.views else 0 }}</span></span>
-                                    <button class="like-btn" data-id="{{ item.id }}" style="background: none; border: none; color: #555; font-size: 0.7rem; cursor: pointer; padding: 0; white-space: nowrap; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}">{{ item.likes if item.likes else 0 }}</span></button>
+                                    <span style="font-size: 0.7rem; color: #555; white-space: nowrap;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}" data-type="content">{{ item.views if item.views else 0 }}</span></span>
+                                    <button class="like-btn" data-id="{{ item.id }}" data-type="content" style="background: none; border: none; color: #555; font-size: 0.7rem; cursor: pointer; padding: 0; white-space: nowrap; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}" data-type="content">{{ item.likes if item.likes else 0 }}</span></button>
                                 </div>
                             </div>
                         </li>
@@ -825,8 +825,8 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
                         <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="color: var(--accent-color); font-weight: bold; font-size: 0.85rem; display: inline-block;">Leer reseña completa &rarr;</a>
                         <div style="display: flex; gap: 10px; align-items: center;">
-                            <span style="font-size: 0.75rem; color: #666; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}">{{ item.views if item.views else 0 }}</span></span>
-                            <button class="like-btn" data-id="{{ item.id }}" style="background: none; border: none; color: #666; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 0; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}">{{ item.likes if item.likes else 0 }}</span></button>
+                            <span style="font-size: 0.75rem; color: #666; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}" data-type="content">{{ item.views if item.views else 0 }}</span></span>
+                            <button class="like-btn" data-id="{{ item.id }}" data-type="content" style="background: none; border: none; color: #666; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 0; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}" data-type="content">{{ item.likes if item.likes else 0 }}</span></button>
                         </div>
                     </div>
                 </div>
@@ -853,8 +853,8 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
                         <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="color: var(--accent-color); font-weight: bold; font-size: 0.85rem; display: inline-block;">Leer más &rarr;</a>
                         <div style="display: flex; gap: 10px; align-items: center;">
-                            <span style="font-size: 0.75rem; color: #666; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}">{{ item.views if item.views else 0 }}</span></span>
-                            <button class="like-btn" data-id="{{ item.id }}" style="background: none; border: none; color: #666; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 0; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}">{{ item.likes if item.likes else 0 }}</span></button>
+                            <span style="font-size: 0.75rem; color: #666; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}" data-type="content">{{ item.views if item.views else 0 }}</span></span>
+                            <button class="like-btn" data-id="{{ item.id }}" data-type="content" style="background: none; border: none; color: #666; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 0; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}" data-type="content">{{ item.likes if item.likes else 0 }}</span></button>
                         </div>
                     </div>
                 </div>
@@ -1005,7 +1005,7 @@
                     <div style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;">
                         <button class="like-btn" data-id="{{ item.id }}" style="background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 1.2rem; padding: 8px 25px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Oswald', sans-serif; text-transform: uppercase;" onmouseover="if(!this.disabled){this.style.background='var(--accent-color)'; this.style.color='#000';}" onmouseout="if(!this.disabled){this.style.background='transparent'; this.style.color='var(--accent-color)';}">
                             <i class="fa-regular fa-heart"></i>
-                            <span class="like-count-{{ item.id }}">{{ item.likes if item.likes else 0 }}</span>
+                            <span class="like-count-{{ item.id }}" data-type="content">{{ item.likes if item.likes else 0 }}</span>
                         </button>
                     </div>
                     
@@ -1108,7 +1108,7 @@
     observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
     </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    <script src="app.js?v=5"></script>
+    <script src="app.js?v=6"></script>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <script>
