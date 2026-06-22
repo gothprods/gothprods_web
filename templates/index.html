@@ -27,7 +27,7 @@
     <!-- Favicons -->
     <link rel="icon" href="assets/viking.webp" type="image/jpeg">
     <link rel="apple-touch-icon" href="assets/viking.webp">
-    <link rel="stylesheet" href="index.css?v=9">
+    <link rel="stylesheet" href="index.css?v=10">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -137,7 +137,7 @@
         </section>
 
         {% if settings.get('show_banda_semana', '1') == '1' and (bandas_semana or eventos_semana) %}
-        <section id="banda-eventos-semana" class="section highlights-section" style="background: linear-gradient(to right, #111, #000); border-bottom: 2px solid var(--accent-color); padding: 3.5rem 5%;">
+        <section id="banda-eventos-semana" class="section highlights-section" style="background: linear-gradient(to right, #111, #000); border-bottom: 2px solid var(--accent-color); padding: 1rem 5%;">
             <div class="grid-container {{ 'two-cols' if bandas_semana and eventos_semana else 'one-col' }}" style="gap: 2rem;">
                 
                 {% if bandas_semana %}

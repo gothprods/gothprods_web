@@ -327,15 +327,15 @@ a {
 
 /* Sections Global */
 .section {
-    padding: 3.5rem 5%;
+    padding: 1rem 5%;
 }
 
 .section-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--border-color);
 }
 
