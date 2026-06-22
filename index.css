@@ -45,8 +45,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h2 {
+    font-family: 'Metal Mania', system-ui;
     font-size: 3.25rem;
     margin-bottom: 1rem;
+    letter-spacing: 2px;
 }
 
 h2 span {

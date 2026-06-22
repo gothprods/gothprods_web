@@ -140,8 +140,28 @@ def get_db_connection(live=False):
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+        
+        # Auto-create schema for performance_analytics
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS performance_analytics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT,
+                user_id TEXT,
+                page_url TEXT,
+                device_type TEXT,
+                country TEXT,
+                referrer TEXT,
+                is_new_user INTEGER DEFAULT 0,
+                scroll_depth INTEGER DEFAULT 0,
+                time_on_page INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Add tracking columns to eventos_semana if not exists (existing logic follows)
         conn.commit()
     except Exception as e:
+        print("Schema creation error (eventos_semana / performance):", e)
         print("Schema creation error (eventos_semana):", e)
 
     # Auto-migrate schema for eventos_semana
@@ -246,6 +266,54 @@ def send_verification_email(to_email, code, subject="Código de Verificación - 
         return False
 
 # --- FRONTEND ---
+@app.route('/api/analytics/init', methods=['POST'])
+def init_analytics():
+    data = request.json
+    session_id = data.get('session_id')
+    user_id = data.get('user_id')
+    page_url = data.get('page_url')
+    device_type = data.get('device_type')
+    country = data.get('country')
+    referrer = data.get('referrer')
+    is_new_user = 1 if data.get('is_new_user') else 0
+    
+    conn = get_db_connection(live=True)
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO performance_analytics 
+        (session_id, user_id, page_url, device_type, country, referrer, is_new_user, scroll_depth, time_on_page)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+    ''', (session_id, user_id, page_url, device_type, country, referrer, is_new_user))
+    record_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    
+    return jsonify({"success": True, "record_id": record_id})
+
+@app.route('/api/analytics/update', methods=['POST'])
+def update_analytics():
+    data = request.json
+    record_id = data.get('record_id')
+    scroll_depth = data.get('scroll_depth', 0)
+    time_on_page = data.get('time_on_page', 0)
+    
+    if not record_id:
+        return jsonify({"success": False}), 400
+        
+    conn = get_db_connection(live=True)
+    cursor = conn.cursor()
+    
+    # Only update if the new values are greater (e.g., they scrolled further or spent more time)
+    cursor.execute('''
+        UPDATE performance_analytics 
+        SET scroll_depth = MAX(scroll_depth, ?), time_on_page = MAX(time_on_page, ?)
+        WHERE id = ?
+    ''', (scroll_depth, time_on_page, record_id))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({"success": True})
 @app.route('/api/track_view/<int:item_id>', methods=['POST'])
 def track_view(item_id):
     item_type = request.args.get('type', 'content')
@@ -725,9 +793,15 @@ def admin_dashboard():
     todas_bandas = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC").fetchall()
     todos_eventos = conn.execute("SELECT * FROM eventos_semana ORDER BY id DESC").fetchall()
     all_users = conn.execute('SELECT id, nombre, username, email, role, is_active FROM users ORDER BY id DESC').fetchall() if session.get('role') in ['admin', 'root'] else []
+    conn_live = get_db_connection(live=True)
+    analytics_rows = conn_live.execute('SELECT * FROM performance_analytics ORDER BY id DESC').fetchall()
+    conn_live.close()
+    
+    analytics_data = [dict(row) for row in analytics_rows]
+    
     conn.close()
 
-    return render_template('admin_dashboard.html', all_items=all_items, settings=get_settings(), todas_bandas=todas_bandas, todos_eventos=todos_eventos, all_users=all_users)
+    return render_template('admin_dashboard.html', all_items=all_items, settings=get_settings(), todas_bandas=todas_bandas, todos_eventos=todos_eventos, all_users=all_users, analytics_data=analytics_data)
 
 @app.route('/admin/settings', methods=['POST'])
 def update_settings():
