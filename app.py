@@ -821,7 +821,17 @@ def update_settings():
     show_el_pit = request.form.get('show_el_pit', '0')
     show_galeria_nocturna = request.form.get('show_galeria_nocturna', '0')
     show_contactanos = request.form.get('show_contactanos', '0')
-    hamburger_active = request.form.get('hamburger_active', '0')
+    show_medios_aliados = request.form.get('show_medios_aliados', '0')
+    
+    title_destacados = request.form.get('title_destacados')
+    title_el_pit = request.form.get('title_el_pit')
+    title_galeria = request.form.get('title_galeria')
+    title_metalpulse = request.form.get('title_metalpulse')
+    title_reviews = request.form.get('title_reviews')
+    title_news = request.form.get('title_news')
+    title_interviews = request.form.get('title_interviews')
+    title_agenda = request.form.get('title_agenda')
+    title_contacto = request.form.get('title_contacto')
     
     conn = get_db_connection()
     queries = [
@@ -836,10 +846,29 @@ def update_settings():
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_el_pit', ?)", (show_el_pit,)),
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_galeria_nocturna', ?)", (show_galeria_nocturna,)),
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_contactanos', ?)", (show_contactanos,)),
-        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('hamburger_active', ?)", (hamburger_active,))
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_medios_aliados', ?)", (show_medios_aliados,))
     ]
     
-    file_keys = ['hero_bg', 'header_logo', 'hamburger_icon', 'galeria_bg', 'metalpulse_bg']
+    titles_dict = {
+        'title_destacados': title_destacados,
+        'title_el_pit': title_el_pit,
+        'title_galeria': title_galeria,
+        'title_metalpulse': title_metalpulse,
+        'title_reviews': title_reviews,
+        'title_news': title_news,
+        'title_interviews': title_interviews,
+        'title_agenda': title_agenda,
+        'title_contacto': title_contacto
+    }
+    for k, v in titles_dict.items():
+        if v is not None:
+            queries.append(("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (k, v)))
+    
+    file_keys = ['hero_bg', 'header_logo', 'galeria_bg', 'metalpulse_bg', 
+                 'icon_destacados', 'icon_el_pit', 'icon_galeria', 'icon_metalpulse',
+                 'icon_reviews', 'icon_news', 'icon_interviews', 'icon_agenda', 'icon_contacto',
+                 'logo_aliado_1', 'logo_aliado_2', 'logo_aliado_3', 'logo_aliado_4', 'logo_aliado_5',
+                 'logo_aliado_6', 'logo_aliado_7', 'logo_aliado_8', 'logo_aliado_9', 'logo_aliado_10']
     for fk in file_keys:
         file = request.files.get(fk)
         if file and file.filename != '':

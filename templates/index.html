@@ -46,45 +46,45 @@
 
         <ul class="dock-menu">
             {% if settings.get('show_banda_semana', '1') == '1' %}
-            <li class="dock-item" data-title="Bandas y Eventos Destacados">
-                <a href="#banda-eventos-semana"><img src="assets/destacados_icon.png?v=2" alt="Bandas y Eventos Destacados" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Bandas y Eventos Destacados</span></a>
+            <li class="dock-item" data-title="{{ settings.get('title_destacados', 'Bandas y Eventos Destacados') }}">
+                <a href="#banda-eventos-semana"><img src="{{ settings.get('icon_destacados', 'assets/destacados_icon.png') }}" alt="{{ settings.get('title_destacados', 'Bandas y Eventos Destacados') }}" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_destacados', 'Bandas y Eventos Destacados') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_el_pit', '1') == '1' %}
-            <li class="dock-item" data-title="El Pit">
-                <a href="#highlights"><img src="assets/el_pit_icon.png?v=1" alt="El Pit" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">El Pit</span></a>
+            <li class="dock-item" data-title="{{ settings.get('title_el_pit', 'El Pit') }}">
+                <a href="#highlights"><img src="{{ settings.get('icon_el_pit', 'assets/el_pit_icon.png') }}" alt="{{ settings.get('title_el_pit', 'El Pit') }}" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_el_pit', 'El Pit') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_galeria_nocturna', '1') == '1' %}
-            <li class="dock-item" data-title="La Galería Nocturna">
-                <a href="#shows"><img src="assets/galeria_nocturna_icon.jpg" alt="La Galería Nocturna" style="width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">La Galería Nocturna</span></a>
+            <li class="dock-item" data-title="{{ settings.get('title_galeria', 'La Galería Nocturna') }}">
+                <a href="#shows"><img src="{{ settings.get('icon_galeria', 'assets/galeria_nocturna_icon.jpg') }}" alt="{{ settings.get('title_galeria', 'La Galería Nocturna') }}" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_galeria', 'La Galería Nocturna') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_metalpulse', '1') == '1' %}
-            <li class="dock-item" data-title="Metal Pulse">
-                <a href="#metal-pulse"><img src="assets/metal_pulse_icon.jpg" alt="Metal Pulse" style="width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Metal Pulse</span></a>
+            <li class="dock-item" data-title="{{ settings.get('title_metalpulse', 'Metal Pulse') }}">
+                <a href="#metal-pulse"><img src="{{ settings.get('icon_metalpulse', 'assets/metal_pulse_icon.jpg') }}" alt="{{ settings.get('title_metalpulse', 'Metal Pulse') }}" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_metalpulse', 'Metal Pulse') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_reviews', '1') == '1' %}
-            <li class="dock-item" data-title="Reseñas de Conciertos">
-                <a href="#reviews"><img src="assets/resenas_icon.png?v=1" alt="Reseñas de Conciertos" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Reseñas de Conciertos</span></a>
+            <li class="dock-item" data-title="{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}">
+                <a href="#reviews"><img src="{{ settings.get('icon_reviews', 'assets/resenas_icon.png') }}" alt="{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_noticiero', '1') == '1' %}
-            <li class="dock-item" data-title="El Noticiero Nocturno">
-                <a href="#news"><img src="assets/noticiero_icon.png?v=1" alt="El Noticiero Nocturno" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">El Noticiero Nocturno</span></a>
+            <li class="dock-item" data-title="{{ settings.get('title_news', 'El Noticiero Nocturno') }}">
+                <a href="#news"><img src="{{ settings.get('icon_news', 'assets/noticiero_icon.png') }}" alt="{{ settings.get('title_news', 'El Noticiero Nocturno') }}" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_news', 'El Noticiero Nocturno') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_entrevistas', '1') == '1' %}
-            <li class="dock-item" data-title="Entrevistas Under">
-                <a href="#under-interviews"><img src="assets/entrevistas_icon.png?v=1" alt="Entrevistas Under" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Entrevistas Under</span></a>
+            <li class="dock-item" data-title="{{ settings.get('title_interviews', 'Entrevistas Under') }}">
+                <a href="#under-interviews"><img src="{{ settings.get('icon_interviews', 'assets/entrevistas_icon.png') }}" alt="{{ settings.get('title_interviews', 'Entrevistas Under') }}" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_interviews', 'Entrevistas Under') }}</span></a>
             </li>
             {% endif %}
-            <li class="dock-item" data-title="Agenda Metalera">
-                <a href="#agenda"><img src="assets/agenda_icon.png?v=1" alt="Agenda Metalera" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Agenda Metalera</span></a>
+            <li class="dock-item" data-title="{{ settings.get('title_agenda', 'Agenda Metalera') }}">
+                <a href="#agenda"><img src="{{ settings.get('icon_agenda', 'assets/agenda_icon.png') }}" alt="{{ settings.get('title_agenda', 'Agenda Metalera') }}" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_agenda', 'Agenda Metalera') }}</span></a>
             </li>
-            <li class="dock-item" data-title="Contáctanos">
-                <a href="mailto:contacto@gothprods.com"><img src="assets/contacto_icon.png?v=1" alt="Contáctanos" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Contáctanos</span></a>
+            <li class="dock-item" data-title="{{ settings.get('title_contacto', 'Contáctanos') }}">
+                <a href="mailto:contacto@gothprods.com"><img src="{{ settings.get('icon_contacto', 'assets/contacto_icon.png') }}" alt="{{ settings.get('title_contacto', 'Contáctanos') }}" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_contacto', 'Contáctanos') }}</span></a>
             </li>
         </ul>
         
@@ -137,7 +137,13 @@
                 {% if bandas_semana %}
                 <div style="flex: 1; min-width: 300px;">
                     <div class="section-header" style="margin-bottom: 20px;">
-                        <h2 style="font-size: 2.2rem;">Bandas de la <span>Semana</span></h2>
+                        <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
+                            {% set icon_path = settings.get('icon_destacados', 'assets/destacados_icon.png') %}
+                            <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal">
+                            <div class="header-text-group" style="text-align: left; margin: 0;">
+                                <h2 style="font-size: 2.2rem;">Bandas de la <span>Semana</span></h2>
+                            </div>
+                        </div>
                     </div>
             <style>
                 @keyframes fadeEffect {
@@ -244,7 +250,13 @@
             {% if eventos_semana %}
             <div style="flex: 1; min-width: 300px;">
                 <div class="section-header" style="margin-bottom: 20px;">
-                    <h2 style="font-size: 2.2rem;">Eventos <span>Destacados</span></h2>
+                        <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
+                            {% set icon_path = settings.get('icon_destacados', 'assets/destacados_icon.png') %}
+                            <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal">
+                            <div class="header-text-group" style="text-align: left; margin: 0;">
+                                <h2 style="font-size: 2.2rem;">Eventos <span>Destacados</span></h2>
+                            </div>
+                        </div>
                 </div>
                 <div class="evento-slider-container" style="position: relative; overflow: hidden;">
                     {% for evento in eventos_semana %}
@@ -558,7 +570,13 @@
         {% if settings.get('show_el_pit', '1') == '1' %}
         <section id="highlights" class="section highlights-section">
             <div class="section-header">
-                <h2>El <span>Pit</span></h2>
+                <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
+                    {% set icon_path = settings.get('icon_el_pit', 'assets/el_pit_icon.png') %}
+                    <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal">
+                    <div class="header-text-group" style="text-align: left; margin: 0;">
+                        <h2>El <span>Pit</span></h2>
+                    </div>
+                </div>
             </div>
             <div class="grid-container highlights-grid">
 
@@ -712,10 +730,10 @@
             <div class="section-header">
                 <div class="header-titles shows-header-layout">
                     <div style="display: flex; align-items: center; gap: 1rem; justify-content: flex-start;">
-                        <img loading="lazy" src="{{ settings.get('galeria_bg', 'assets/galeria-logo-new.webp') }}" alt="La Galería Nocturna Logo" class="section-logo">
+                        {% set icon_path = settings.get('icon_galeria', 'assets/galeria_nocturna_icon.jpg') %}
+                        <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" alt="La Galería Nocturna Logo" class="section-medal">
                         <div class="header-text-group" style="text-align: left;">
                             <h2>La Galería Nocturna <span>Podcast</span></h2>
-                            <p class="section-slogan">El podcast en donde hablamos de metal en serio.</p>
                         </div>
                     </div>
 
@@ -771,10 +789,10 @@
 
             <div class="section-header">
                 <div class="header-titles">
-                    <img loading="lazy" src="{{ settings.get('metalpulse_bg', 'assets/metal-pulse-logo.webp') }}" alt="Metal Pulse Logo" class="section-logo">
+                    {% set icon_path = settings.get('icon_metalpulse', 'assets/metal_pulse_icon.jpg') %}
+                    <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" alt="Metal Pulse Logo" class="section-medal">
                     <div class="header-text-group">
                         <h2>Metal <span class="metal-pulse-text">Pulse</span></h2>
-                        <p class="section-slogan">Lo Último en el Metal Mundial</p>
                     </div>
                 </div>
                 <div class="header-actions">
@@ -807,7 +825,13 @@
         {% if settings.get('show_reviews', '1') == '1' %}
                 <section id="reviews" class="section reviews-section">
             <div class="section-header">
-                <h2>Reseñas de <span>Conciertos</span></h2>
+                <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
+                    {% set icon_path = settings.get('icon_reviews', 'assets/resenas_icon.png') %}
+                    <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal">
+                    <div class="header-text-group" style="text-align: left; margin: 0;">
+                        <h2>Reseñas de <span>Conciertos</span></h2>
+                    </div>
+                </div>
             </div>
             <div class="rail-wrapper">
                 <div class="news-rail">
@@ -833,7 +857,13 @@
         {% if settings.get('show_news', '1') == '1' %}
         <section id="news" class="section news-section">
             <div class="section-header">
-                <h2>El Noticiero <span>Nocturno</span></h2>
+                <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
+                    {% set icon_path = settings.get('icon_news', 'assets/noticiero_icon.png') %}
+                    <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal">
+                    <div class="header-text-group" style="text-align: left; margin: 0;">
+                        <h2>El Noticiero <span>Nocturno</span></h2>
+                    </div>
+                </div>
             </div>
             <div class="rail-wrapper">
                 <div class="news-rail">
@@ -860,8 +890,12 @@
         {% if settings.get('show_interviews', '1') == '1' %}
         <section id="under-interviews" class="section interviews-section">
             <div class="section-header">
-                <div class="header-titles">
-                    <h2>Entrevistas <span>Under</span></h2>
+                <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
+                    {% set icon_path = settings.get('icon_interviews', 'assets/entrevistas_icon.png') %}
+                    <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal">
+                    <div class="header-text-group" style="text-align: left; margin: 0;">
+                        <h2>Entrevistas <span>Under</span></h2>
+                    </div>
                 </div>
                 <div class="header-actions">
                     <a href="https://open.spotify.com/show/2hnlgkcGNl9GOAPa0WT9HW?si=7e9b95f203464fe6" target="_blank"
@@ -892,8 +926,13 @@
 
         {% if settings.get('show_agenda', '1') == '1' %}
                 <section id="agenda" class="section agenda-section">
-            <div class="section-header">
-                <h2>Agenda <span>Metalera 2026</span></h2>
+            <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
+                    {% set icon_path = settings.get('icon_agenda', 'assets/agenda_icon.png') %}
+                    <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal">
+                    <div class="header-text-group" style="text-align: left; margin: 0;">
+                        <h2>Agenda <span>Metalera 2026</span></h2>
+                    </div>
+                </div>
             </div>
             
             <div class="agenda-tabs" id="agendaTabs">
@@ -946,6 +985,19 @@
         {% endif %}
     </main>
 
+    {% if settings.get('show_medios_aliados', '0') == '1' %}
+    <section id="medios-aliados">
+        <h2>Medios <span>Aliados</span></h2>
+        <div class="aliados-grid">
+            {% for i in range(1, 11) %}
+                {% set logo_path = settings.get('logo_aliado_' ~ i) %}
+                {% if logo_path %}
+                    <img src="{{ logo_path if logo_path.startswith('http') or logo_path.startswith('assets') else 'updates/' + logo_path }}" alt="Medio Aliado {{ i }}" class="aliado-logo" loading="lazy">
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
     <footer>
         <div class="footer-content">
             <img loading="lazy" src="assets/logo.webp?v=2" alt="Goth Prods Logo" class="footer-logo">

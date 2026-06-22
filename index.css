@@ -462,7 +462,7 @@ main {
 
 .section-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: flex-end;
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
@@ -1942,4 +1942,68 @@ html, body {
         border-left: none;
         border-top: 1px solid #333;
     }
+}
+
+/* Medios Aliados Section */
+#medios-aliados {
+    background-color: var(--bg-dark);
+    padding: 60px 20px;
+    border-top: 2px solid #333;
+    text-align: left;
+}
+
+#medios-aliados h2 {
+    font-family: 'Metal Mania', system-ui;
+    font-size: 2.5rem;
+    color: var(--text-light);
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.aliados-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.aliado-logo {
+    max-width: 150px;
+    max-height: 100px;
+    object-fit: contain;
+    filter: grayscale(100%) opacity(0.8);
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.aliado-logo:hover {
+    filter: grayscale(0%) opacity(1);
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    #medios-aliados h2 {
+        font-size: 2rem;
+    }
+    .aliados-grid {
+        gap: 20px;
+    }
+    .aliado-logo {
+        max-width: 100px;
+        max-height: 80px;
+    }
+}
+
+.section-medal {
+    width: 65px;
+    height: 65px;
+    object-fit: contain;
+    background: #000;
+    border: 2px solid rgba(113, 109, 74, 0.6);
+    filter: drop-shadow(0 0 6px rgba(113, 109, 74, 0.8));
+    border-radius: 50%;
+    flex-shrink: 0;
 }
