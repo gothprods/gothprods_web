@@ -36,31 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 1000);
 
-    // Sidebar Menu Toggle
-    const menuToggle = document.getElementById('mobile-menu');
-    const closeBtn = document.getElementById('close-menu');
-    const sidebarMenu = document.getElementById('sidebar-menu');
-    const sidebarLinks = document.querySelectorAll('.sidebar-links a');
 
-    if(menuToggle && sidebarMenu) {
-        menuToggle.addEventListener('click', () => {
-            sidebarMenu.classList.add('active');
-        });
-    }
-
-    if(closeBtn && sidebarMenu) {
-        closeBtn.addEventListener('click', () => {
-            sidebarMenu.classList.remove('active');
-        });
-    }
-
-    if(sidebarLinks) {
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                sidebarMenu.classList.remove('active');
-            });
-        });
-    }
 
     // Review Modal Logic
     const openReviewBtns = document.querySelectorAll('.open-review-modal');

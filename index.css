@@ -97,168 +97,248 @@ a {
     color: #fff;
 }
 
-/* Navbar */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 5%;
-    background: linear-gradient(to bottom, rgba(113, 109, 74, 0.6) 0%, rgba(0, 0, 0, 0.9) 40%, rgba(0, 0, 0, 1) 100%), url('https://images.unsplash.com/photo-1605722243979-fc08507567e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
-    background-blend-mode: multiply;
+main {
+    margin-left: 80px;
+    transition: margin-left 0.3s ease;
+}
+
+/* Floating Dock Menu (macOS Style) */
+.floating-dock {
     position: fixed;
     top: 0;
-    width: 100%;
-    z-index: 1000;
-    border-bottom: 2px solid #716d4a;
-}
-
-.logo {
+    left: 0;
+    width: 80px;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid #333;
     display: flex;
-    justify-content: center;
-    z-index: 10;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 0;
+    z-index: 2000;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.8);
+    transition: all 0.3s ease;
 }
 
-.logo-img {
-    height: 100px;
-    width: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 0 8px rgba(113, 109, 74, 0.3));
+.dock-logo {
+    margin-bottom: 2rem;
 }
 
-.logo h1 {
-    font-size: 2.6rem;
+.dock-logo img {
+    width: 50px;
+    height: auto;
+    filter: drop-shadow(0 0 5px rgba(113, 109, 74, 0.5));
+}
+
+.dock-menu {
+    list-style: none;
+    padding: 0;
     margin: 0;
-    line-height: 1;
-}
-
-.logo span {
-    color: var(--accent-color);
-}
-
-.logo .tagline {
-    font-size: 1.04rem;
-    color: var(--text-muted);
-    font-family: var(--font-heading);
-    letter-spacing: 2px;
-}
-
-.header-socials {
     display: flex;
-    gap: 1.5rem;
-    align-items: center;
-    flex: 1;
-    justify-content: flex-end;
-}
-
-.header-socials a {
-    font-size: 1.56rem;
-    color: var(--text-main);
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-
-.header-socials a:hover {
-    color: var(--accent-color);
-    transform: translateY(-2px);
-}
-
-.left-controls {
-    display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 1rem;
     flex: 1;
 }
 
-.viking-icon {
-    height: 35px;
-    width: auto;
-    object-fit: contain;
-    mix-blend-mode: screen;
-}
-
-.menu-toggle {
+.dock-item {
+    position: relative;
     display: flex;
-    flex-direction: column;
-    cursor: pointer;
-}
-
-.menu-toggle .bar {
-    width: 25px;
-    height: 3px;
-    background-color: var(--text-main);
-    margin: 4px 0;
-    transition: all 0.3s ease;
-}
-
-.menu-toggle:hover .bar {
-    background-color: var(--accent-color);
-}
-
-/* Sidebar Menu */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: -100%;
-    width: 350px;
-    max-width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(15px);
-    z-index: 2000;
-    transition: left 0.4s ease;
-    border-right: 1px solid var(--accent-color);
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar.active {
-    left: 0;
-}
-
-.sidebar-header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 3rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1rem;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: transparent;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform-origin: center left;
 }
 
-.sidebar-logo {
-    height: 40px;
-    mix-blend-mode: screen;
-}
-
-.close-btn {
-    font-size: 3.25rem;
+.dock-item a {
     color: var(--text-main);
-    cursor: pointer;
-    line-height: 1;
-    transition: color 0.3s ease;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
-.close-btn:hover {
+.dock-item a i {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    border: 1px solid rgba(113, 109, 74, 0.4);
+    border-radius: 50%;
+    filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5));
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+}
+
+.dock-item:hover a i {
+    border-color: var(--accent-color);
+    background: #000;
+}
+
+.dock-text {
+    position: absolute;
+    left: 55px;
+    background: rgba(0,0,0,0.9);
+    color: var(--accent-color);
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--accent-color);
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-10px);
+    transition: all 0.2s ease;
+}
+
+/* macOS Hover Logic */
+.dock-menu:hover .dock-item {
+    opacity: 0.6;
+}
+
+.dock-item:hover {
+    transform: scale(1.4);
+    z-index: 10;
+    opacity: 1 !important;
+}
+
+.dock-item:hover a {
     color: var(--accent-color);
 }
 
-.sidebar-links {
-    list-style: none;
+.dock-item:hover .dock-text {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.dock-item:has(+ .dock-item:hover),
+.dock-item:hover + .dock-item {
+    transform: scale(1.15);
+    opacity: 0.9 !important;
+    z-index: 5;
+}
+
+.dock-controls {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    align-items: center;
+    margin-top: auto;
 }
 
-.sidebar-links a {
-    font-family: var(--font-heading);
-    font-size: 1.95rem;
-    text-transform: uppercase;
-    color: var(--text-main);
-    transition: color 0.3s ease, padding-left 0.3s ease;
+.dock-socials {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.sidebar-links a:hover {
+.dock-socials a, .dock-auth a {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.dock-socials a:hover, .dock-auth a:hover {
     color: var(--accent-color);
-    padding-left: 10px;
+    transform: scale(1.2);
+}
+
+.dock-lang button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.3s;
+    margin-bottom: 5px;
+}
+.dock-lang button:hover {
+    transform: scale(1.2);
+}
+
+/* Mobile Media Query for Dock */
+@media (max-width: 768px) {
+    main {
+        margin-left: 0;
+        margin-bottom: 80px; /* Space for bottom dock */
+    }
+
+    .floating-dock {
+        top: auto;
+        bottom: 0;
+        width: 100%;
+        height: 60px;
+        flex-direction: row;
+        padding: 0 1rem;
+        border-right: none;
+        border-top: 1px solid #333;
+        box-shadow: 0 -2px 15px rgba(0,0,0,0.8);
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .dock-logo {
+        display: none; /* Hide logo on mobile bottom bar */
+    }
+
+    .dock-menu {
+        flex-direction: row;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .dock-item {
+        width: 40px;
+        height: 40px;
+        transform-origin: bottom center;
+    }
+
+    .dock-item:hover {
+        transform: scale(1.3) translateY(-10px);
+    }
+    
+    .dock-item:has(+ .dock-item:hover),
+    .dock-item:hover + .dock-item {
+        transform: scale(1.1) translateY(-5px);
+    }
+
+    .dock-text {
+        bottom: 50px;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+    }
+
+    .dock-item:hover .dock-text {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .dock-controls {
+        flex-direction: row;
+        margin-top: 0;
+        margin-left: auto;
+        gap: 1rem;
+    }
+
+    .dock-socials {
+        display: none; /* Hide socials to save space on mobile */
+    }
+    
+    .dock-lang {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
 }
 
 /* Hero Section */
@@ -266,7 +346,7 @@ a {
     min-height: 50vh;
     display: flex;
     align-items: center;
-    padding: 150px 5% 40px 5%; /* Top padding to prevent navbar overlap */
+    padding: 80px 5% 40px 5%; /* Adjusted padding for removed navbar */
     margin-top: 0;
     position: relative;
     overflow: hidden;

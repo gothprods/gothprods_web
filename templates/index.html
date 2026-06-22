@@ -27,7 +27,7 @@
     <!-- Favicons -->
     <link rel="icon" href="assets/viking.webp" type="image/jpeg">
     <link rel="apple-touch-icon" href="assets/viking.webp">
-    <link rel="stylesheet" href="index.css?v=10">
+    <link rel="stylesheet" href="index.css?v=13">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -37,86 +37,74 @@
 </head>
 
 <body>
-    <header class="navbar">
-        <div class="left-controls">
-            <img src="{{ settings.get('hamburger_icon', 'assets/viking.webp') }}" alt="Viking Icon" class="viking-icon">
-            {% if settings.get('hamburger_active', '1') == '1' %}
-            <div class="menu-toggle" id="mobile-menu">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
+    <nav class="floating-dock">
+        <div class="dock-logo">
+            <a href="#home"><img src="assets/dock_header_icon.png" alt="Goth Prods Logo" class="logo-img"></a>
+        </div>
+
+        <ul class="dock-menu">
+            {% if settings.get('show_banda_semana', '1') == '1' %}
+            <li class="dock-item" data-title="Bandas y Eventos Destacados">
+                <a href="#banda-eventos-semana"><img src="assets/destacados_icon.png?v=2" alt="Bandas y Eventos Destacados" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Bandas y Eventos Destacados</span></a>
+            </li>
             {% endif %}
-        </div>
-        <div class="logo logo-centered">
-            <a href="#home"><img src="{{ settings.get('header_logo', 'assets/logo-new.webp?v=2') }}" alt="Goth Prods Logo" class="logo-img"></a>
-        </div>
-        <div class="header-right-group">
-            <nav class="header-socials">
+            {% if settings.get('show_el_pit', '1') == '1' %}
+            <li class="dock-item" data-title="El Pit">
+                <a href="#highlights"><img src="assets/el_pit_icon.png?v=1" alt="El Pit" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">El Pit</span></a>
+            </li>
+            {% endif %}
+            {% if settings.get('show_galeria_nocturna', '1') == '1' %}
+            <li class="dock-item" data-title="La Galería Nocturna">
+                <a href="#shows"><img src="assets/galeria_nocturna_icon.jpg" alt="La Galería Nocturna" style="width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">La Galería Nocturna</span></a>
+            </li>
+            {% endif %}
+            {% if settings.get('show_metalpulse', '1') == '1' %}
+            <li class="dock-item" data-title="Metal Pulse">
+                <a href="#metal-pulse"><img src="assets/metal_pulse_icon.jpg" alt="Metal Pulse" style="width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Metal Pulse</span></a>
+            </li>
+            {% endif %}
+            {% if settings.get('show_reviews', '1') == '1' %}
+            <li class="dock-item" data-title="Reseñas de Conciertos">
+                <a href="#reviews"><img src="assets/resenas_icon.png?v=1" alt="Reseñas de Conciertos" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Reseñas de Conciertos</span></a>
+            </li>
+            {% endif %}
+            {% if settings.get('show_noticiero', '1') == '1' %}
+            <li class="dock-item" data-title="El Noticiero Nocturno">
+                <a href="#news"><img src="assets/noticiero_icon.png?v=1" alt="El Noticiero Nocturno" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">El Noticiero Nocturno</span></a>
+            </li>
+            {% endif %}
+            {% if settings.get('show_entrevistas', '1') == '1' %}
+            <li class="dock-item" data-title="Entrevistas Under">
+                <a href="#under-interviews"><img src="assets/entrevistas_icon.png?v=1" alt="Entrevistas Under" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Entrevistas Under</span></a>
+            </li>
+            {% endif %}
+            <li class="dock-item" data-title="Agenda Metalera">
+                <a href="#agenda"><img src="assets/agenda_icon.png?v=1" alt="Agenda Metalera" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Agenda Metalera</span></a>
+            </li>
+            <li class="dock-item" data-title="Contáctanos">
+                <a href="mailto:contacto@gothprods.com"><img src="assets/contacto_icon.png?v=1" alt="Contáctanos" style="width: 36px; height: 36px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">Contáctanos</span></a>
+            </li>
+        </ul>
+
+        <div class="dock-controls">
+            <div class="lang-controls dock-lang">
+                <button class="lang-btn-es" onclick="changeLanguage('es')" title="Español">🇲🇽</button>
+                <button class="lang-btn-en" onclick="changeLanguage('en')" title="English">🇺🇸</button>
+            </div>
+            
+            <div class="dock-socials">
                 <a href="https://www.tiktok.com/@goth_prods" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
-                <a href="https://www.facebook.com/Goth-Prods-104237088306624/" target="_blank"><i
-                        class="fa-brands fa-facebook-f"></i></a>
+                <a href="https://www.facebook.com/Goth-Prods-104237088306624/" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
                 <a href="https://www.instagram.com/goth_prods/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
                 <a href="https://www.youtube.com/@gothprods44" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-                <a href="https://podcasts.apple.com/mx/podcast/goth-prods/id1606324255?l=en" target="_blank"><i
-                        class="fa-solid fa-podcast"></i></a>
-                <a href="https://open.spotify.com/show/2hnlgkcGNl9GOAPa0WT9HW?si=7e9b95f203464fe6" target="_blank"><i
-                        class="fa-brands fa-spotify"></i></a>
-                <div class="lang-controls" style="display: flex; gap: 5px; margin-left: 10px; align-items: center; border-left: 1px solid #444; padding-left: 10px;">
-                    <i class="fa-solid fa-globe" style="font-size: 1.2rem; color: #fff; margin-right: 2px;" title="Cambiar Idioma"></i>
-                    <button class="lang-btn-es" onclick="changeLanguage('es')" style="background: var(--accent-color); color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇲🇽 ES</button>
-                    <button class="lang-btn-en" onclick="changeLanguage('en')" style="background: #333; color: #fff; border: 1px solid var(--accent-color); padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇺🇸 EN</button>
-                </div>
-            </nav>
-            <a href="mailto:contacto@gothprods.com?subject=Contacto%20con%20Goth%20Prods" class="header-email-link">
-                <i class="fa-solid fa-envelope icon"></i> <span class="text-prefix">Envíanos un email a</span> <span class="email-text">contacto@gothprods.com</span>
-            </a>
+                <a href="https://podcasts.apple.com/mx/podcast/goth-prods/id1606324255?l=en" target="_blank"><i class="fa-solid fa-podcast"></i></a>
+                <a href="https://open.spotify.com/show/2hnlgkcGNl9GOAPa0WT9HW?si=7e9b95f203464fe6" target="_blank"><i class="fa-brands fa-spotify"></i></a>
+            </div>
+      <!-- Floating dock replaces the old sidebar menu -->
         </div>
-    </header>
+    </nav>
 
-    <div id="sidebar-menu" class="sidebar">
-        <div class="sidebar-header">
-            <img src="assets/logo.webp?v=2" alt="Goth Prods Logo" class="sidebar-logo">
-            <div class="close-btn" id="close-menu">&times;</div>
-        </div>
-        <ul class="sidebar-links">
-            {% if settings.get('show_banda_semana', '1') == '1' %}
-            <li><a href="#banda-eventos-semana">Bandas y Eventos Destacados</a></li>
-            {% endif %}
-            
-            {% if settings.get('show_el_pit', '1') == '1' %}
-            <li><a href="#highlights">El Pit</a></li>
-            {% endif %}
-            
-            {% if settings.get('show_galeria_nocturna', '1') == '1' %}
-            <li><a href="#shows">La Galería Nocturna</a></li>
-            {% endif %}
-            
-            {% if settings.get('show_metalpulse', '1') == '1' %}
-            <li><a href="#metal-pulse">Metal Pulse</a></li>
-            {% endif %}
-            
-            {% if settings.get('show_reviews', '1') == '1' %}
-            <li><a href="#reviews">Reseñas de Conciertos</a></li>
-            {% endif %}
-            
-            {% if settings.get('show_news', '1') == '1' %}
-            <li><a href="#news">El Noticiero Nocturno</a></li>
-            {% endif %}
-            
-            {% if settings.get('show_interviews', '1') == '1' %}
-            <li><a href="#under-interviews">Entrevistas Under</a></li>
-            {% endif %}
-            
-            {% if settings.get('show_agenda', '1') == '1' %}
-            <li><a href="#agenda">Agenda Metalera</a></li>
-            {% endif %}
-            
-            {% if settings.get('show_contactanos', '1') == '1' %}
-            <li><a href="#contact">Contáctanos</a></li>
-            {% endif %}
-        </ul>
-    </div>
+
 
     <main>
         <section id="home" class="hero">
@@ -574,7 +562,7 @@
                     <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
                         <img loading="lazy" src="assets/banner_new.webp" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
-                            <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-color); margin-right: 8px;"></i>Agenda Metalera</h3>
+                            <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;">Agenda Metalera</h3>
                         </div>
                     </div>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
@@ -593,7 +581,7 @@
                         {% set img = noticiero_items[0].image_filename if noticiero_items else 'assets/reload_2.jpg' %}
                         <img loading="lazy" src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
-                            <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-newspaper" style="color: var(--accent-color); margin-right: 8px;"></i>El Noticiero Nocturno</h3>
+                            <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;">El Noticiero Nocturno</h3>
                         </div>
                     </div>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
@@ -623,7 +611,7 @@
                         <a href="javascript:void(0);" data-target="dynNewsModal{{ reseñas_items[0].id if reseñas_items else '' }}" class="open-review-modal" style="display: block; height: 100%;">
                             <img loading="lazy" src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; cursor: pointer; filter: brightness(0.6) contrast(1.2);">
                             <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px; pointer-events: none;">
-                                <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-pen-to-square" style="color: var(--accent-color); margin-right: 8px;"></i>Reseñas Recientes</h3>
+                                <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;">Reseñas Recientes</h3>
                             </div>
                         </a>
                     </div>
@@ -653,7 +641,7 @@
                         {% set img = entrevistas_items[0].image_filename if entrevistas_items else 'https://img.youtube.com/vi/2GDTVHHIRI8/maxresdefault.jpg' %}
                         <img loading="lazy" src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else 'assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
-                            <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-microphone" style="color: var(--accent-color); margin-right: 8px;"></i>Entrevistas Under</h3>
+                            <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;">Entrevistas Under</h3>
                         </div>
                     </div>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
@@ -672,7 +660,7 @@
                         {% set img = metalpulse_items[0].image_filename if metalpulse_items else 'assets/metal_pulse_cover.jpg' %}
                         <img loading="lazy" src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else 'assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
-                            <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;"><i class="fa-solid fa-bolt" style="color: var(--accent-color); margin-right: 8px;"></i>Los 10 Favoritos del mes</h3>
+                            <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Metal Mania', system-ui; text-transform: uppercase; letter-spacing: 2px;">Los 10 Favoritos del mes</h3>
                         </div>
                     </div>
                     
@@ -716,7 +704,7 @@
 
 
             <div class="section-header">
-                <div class="header-titles" style="display: flex; flex-direction: column; align-items: flex-start; width: 100%; gap: 2rem; text-align: left;">
+                <div class="header-titles shows-header-layout">
                     <div style="display: flex; align-items: center; gap: 1rem; justify-content: flex-start;">
                         <img loading="lazy" src="{{ settings.get('galeria_bg', 'assets/galeria-logo-new.webp') }}" alt="La Galería Nocturna Logo" class="section-logo">
                         <div class="header-text-group" style="text-align: left;">
@@ -725,7 +713,7 @@
                         </div>
                     </div>
 
-                    <div class="caos-horizontal-banner" style="margin: 0;">
+                    <div class="caos-horizontal-banner shows-header-center" style="margin: 0;">
                         <div class="caos-info">
                             <span class="live-badge" style="font-size: 0.7em; padding: 0.3em 0.6em; margin-bottom: 0.2em; display: inline-block;">Próximo En Vivo</span>
                             <h3 style="margin: 0; font-family: 'Oswald', sans-serif; font-size: 1.2rem; text-transform: uppercase;">CAOS SONORO #{{ settings.get('caos_episode', '17') }}</h3>
