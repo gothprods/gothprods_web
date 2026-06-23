@@ -2034,3 +2034,15 @@ html, body {
     border-radius: 50%;
     flex-shrink: 0;
 }
+
+/* --- OVERRIDES PARA EL EDITOR VISUAL --- */
+/* Garantiza que los colores aplicados en el editor se respeten siempre, incluso dentro de títulos h2/h3 */
+font[color="#716d4a"], font[color="#716D4A"], 
+span[style*="color: #716d4a"], span[style*="color: rgb(113, 109, 74)"], span[style*="color: #716D4A"] {
+    color: var(--accent-color) !important;
+}
+
+font[color="#ffffff"], font[color="#FFFFFF"], 
+span[style*="color: #ffffff"], span[style*="color: rgb(255, 255, 255)"], span[style*="color: #FFFFFF"] {
+    color: #ffffff !important;
+}

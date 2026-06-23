@@ -27,6 +27,28 @@
 .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
 input:checked + .slider { background-color: var(--accent-color); }
 input:checked + .slider:before { transform: translateX(20px); }
+
+/* Rich Editor Improvements */
+.rich-editor {
+    line-height: 1.6;
+}
+.rich-editor p {
+    margin: 0 0 1em 0;
+}
+.rich-editor * {
+    line-height: 1.6;
+}
+
+/* Force colors to show up even inside other elements */
+.rich-editor font[color="#716d4a"], .rich-editor font[color="#716D4A"], 
+.rich-editor span[style*="color: #716d4a"], .rich-editor span[style*="color: rgb(113, 109, 74)"], .rich-editor span[style*="color: #716D4A"] {
+    color: var(--accent-color) !important;
+}
+
+.rich-editor font[color="#ffffff"], .rich-editor font[color="#FFFFFF"], 
+.rich-editor span[style*="color: #ffffff"], .rich-editor span[style*="color: rgb(255, 255, 255)"], .rich-editor span[style*="color: #FFFFFF"] {
+    color: #ffffff !important;
+}
 </style>
 
 <div class="tab-container">
@@ -1944,20 +1966,48 @@ function formatVisual(event, action, value=null) {
     const container = btn.closest('.visual-editor-container');
     const editor = container.querySelector('.rich-editor');
     
-    // Focus the editor if it isn't already focused
-    if (document.activeElement !== editor) {
-        editor.focus();
-    }
-    
     if (action === 'foreColor') {
         document.execCommand('styleWithCSS', false, true);
         document.execCommand('foreColor', false, value);
+        
+        // Refuerzo: Si el navegador falla al aplicar el color (ej. dentro de subtítulos), forzamos la inyección.
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0 && !selection.isCollapsed) {
+            try {
+                const range = selection.getRangeAt(0);
+                const content = range.extractContents();
+                const span = document.createElement('span');
+                span.style.color = value;
+                span.appendChild(content);
+                range.insertNode(span);
+                
+                // Mantenemos la selección activa sobre el nuevo texto
+                selection.removeAllRanges();
+                const newRange = document.createRange();
+                newRange.selectNodeContents(span);
+                selection.addRange(newRange);
+            } catch (e) {
+                console.log("El refuerzo de color falló, confiando en execCommand.");
+            }
+        }
     } else {
         document.execCommand(action, false, null);
     }
     
     syncEditor(editor);
 }
+
+// Ensure paste keeps plain text with proper newlines
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.rich-editor').forEach(editor => {
+        editor.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+            const html = text.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+            document.execCommand('insertHTML', false, html);
+        });
+    });
+});
 
 function syncEditor(editorDiv) {
     const container = editorDiv.closest('.visual-editor-container');
