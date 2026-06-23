@@ -321,6 +321,15 @@ def track_view(item_id):
     conn = get_db_connection(live=not is_preview)
     cursor = conn.cursor()
     
+    if item_type == 'poster':
+        cursor.execute("SELECT value FROM settings WHERE key = 'poster_views'")
+        row = cursor.fetchone()
+        new_views = int(row['value']) + 1 if row and row['value'] else 1
+        cursor.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('poster_views', ?)", (str(new_views),))
+        conn.commit()
+        conn.close()
+        return jsonify({"success": True, "views": new_views})
+    
     if item_type == 'banda':
         table = 'banda_semana'
     elif item_type == 'evento':
@@ -411,6 +420,15 @@ def track_like(item_id):
     is_preview = request.args.get('preview') == '1' and 'user_id' in session
     conn = get_db_connection(live=not is_preview)
     cursor = conn.cursor()
+    
+    if item_type == 'poster':
+        cursor.execute("SELECT value FROM settings WHERE key = 'poster_likes'")
+        row = cursor.fetchone()
+        new_likes = int(row['value']) + 1 if row and row['value'] else 1
+        cursor.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('poster_likes', ?)", (str(new_likes),))
+        conn.commit()
+        conn.close()
+        return jsonify({"success": True, "likes": new_likes})
     
     if item_type == 'banda':
         table = 'banda_semana'

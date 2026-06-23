@@ -595,12 +595,33 @@
                     </div>
                     {% endif %}
                     {% if settings.get('agenda_poster') %}
-                    <div style="margin-bottom: 15px; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory;">
+                    {% set next_month_num = upcoming_agenda[0].author[5:7] if upcoming_agenda else current_date[5:7] %}
+                    {% set month_names = {'01':'enero', '02':'febrero', '03':'marzo', '04':'abril', '05':'mayo', '06':'junio', '07':'julio', '08':'agosto', '09':'septiembre', '10':'octubre', '11':'noviembre', '12':'diciembre'} %}
+                    {% set next_month_name = month_names[next_month_num] %}
+                    <div id="agenda-poster-carousel" style="margin-bottom: 15px; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; scroll-behavior: smooth;">
                         {% for poster in settings.get('agenda_poster').split(',') %}
-                        <img src="/{{ poster }}" alt="Agenda Metalera" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.8); flex-shrink: 0; scroll-snap-align: start; cursor: pointer;" onclick="openLightbox('/{{ poster }}')">
+                        {% set is_active_poster = (next_month_name in poster.lower() or next_month_num in poster) %}
+                        <img id="poster-{{ loop.index }}" src="/{{ poster }}" alt="Agenda Metalera" class="{% if is_active_poster %}active-poster{% endif %}" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.8); flex-shrink: 0; scroll-snap-align: start; cursor: pointer;" onclick="openLightbox('/{{ poster }}')">
                         {% endfor %}
                     </div>
-                    <a href="#agenda" class="read-more" style="color: var(--accent-color); font-weight: bold; margin-top:5px; display:inline-block; padding: 4px 10px; font-size: 0.8rem; border: 1px solid var(--accent-color); border-radius: 4px;">Ver Agenda Completa &rarr;</a>
+                    <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const carousel = document.getElementById("agenda-poster-carousel");
+                        const activePoster = carousel.querySelector(".active-poster");
+                        if (activePoster) {
+                            setTimeout(() => {
+                                carousel.scrollTo({ left: activePoster.offsetLeft - carousel.offsetLeft, behavior: 'smooth' });
+                            }, 500);
+                        }
+                    });
+                    </script>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+                        <a href="#agenda" class="read-more" style="color: var(--accent-color); font-weight: bold; padding: 4px 10px; font-size: 0.8rem; border: 1px solid var(--accent-color); border-radius: 4px; text-decoration: none;">Ver Agenda Completa &rarr;</a>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span style="font-size: 0.7rem; color: #555; white-space: nowrap;"><i class="fa-solid fa-eye"></i> <span class="view-count-0" data-type="poster">{{ settings.get('poster_views', 0) }}</span></span>
+                            <button class="like-btn" data-id="0" data-type="poster" style="background: none; border: none; color: #555; font-size: 0.7rem; cursor: pointer; padding: 0; white-space: nowrap; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-0" data-type="poster">{{ settings.get('poster_likes', 0) }}</span></button>
+                        </div>
+                    </div>
                     {% else %}
                     <ul class="highlight-list" style="padding-left: 0; font-size: 0.8rem; margin-bottom: 0; list-style: none;">
                         {% for item in upcoming_agenda[:10] %}
@@ -610,9 +631,15 @@
                             {% else %}
                             <strong>{{ item.title }}</strong>
                             {% endif %}
-                            <div style="flex: 1;">
-                                <span style="color: var(--accent-color); font-weight: bold;">({{ item.author[8:10] }}/{{ item.author[5:7] }})</span> 
-                                <span style="color: #ccc;">- {{ item.short_desc | striptags }}</span>
+                            <div style="flex: 1; display: flex; justify-content: space-between; align-items: baseline;">
+                                <div>
+                                    <span style="color: var(--accent-color); font-weight: bold;">({{ item.author[8:10] }}/{{ item.author[5:7] }})</span> 
+                                    <span style="color: #ccc;">- {{ item.short_desc[:60] | striptags }}...</span>
+                                </div>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <span style="font-size: 0.7rem; color: #555; white-space: nowrap;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}" data-type="evento">{{ item.views if item.views else 0 }}</span></span>
+                                    <button class="like-btn" data-id="{{ item.id }}" data-type="evento" style="background: none; border: none; color: #555; font-size: 0.7rem; cursor: pointer; padding: 0; white-space: nowrap; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}" data-type="evento">{{ item.likes if item.likes else 0 }}</span></button>
+                                </div>
                             </div>
                         </li>
                         {% endfor %}
@@ -634,10 +661,10 @@
                     </div>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
                         {% for item in noticiero_items[:5] %}
-                        <li style="margin-bottom: 8px; line-height: 1.3;">
+                        <li style="padding: 0.3rem 0; margin-bottom: 4px; line-height: 1.2;">
                             <div style="display: flex; justify-content: space-between; align-items: baseline;">
                                 <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="color: #716d4a; flex: 1; margin-right: 10px; display: block;">
-                                    <span><strong style="color: inherit;">{{ item.title }}:</strong> <span style="color: #ccc;">{{ item.short_desc[:40] }}...</span></span>
+                                    <span><strong style="color: inherit;">{{ item.title }}:</strong> <span style="color: #ccc;">{{ item.short_desc[:120] }}...</span></span>
                                 </a>
                                 <div style="display: flex; gap: 8px; align-items: center;">
                                     <span style="font-size: 0.7rem; color: #555; white-space: nowrap;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}" data-type="content">{{ item.views if item.views else 0 }}</span></span>
@@ -665,10 +692,10 @@
                     </div>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
                         {% for item in reseñas_items[:5] %}
-                        <li style="margin-bottom: 8px; line-height: 1.3;">
+                        <li style="padding: 0.3rem 0; margin-bottom: 4px; line-height: 1.2;">
                             <div style="display: flex; justify-content: space-between; align-items: baseline;">
                                 <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="color: #716d4a; flex: 1; margin-right: 10px; display: block;">
-                                    <span><strong style="color: inherit;">{{ item.title }}</strong> - <span style="color: #ccc;">{{ item.short_desc[:60] if item.short_desc else '' }}...</span></span>
+                                    <span><strong style="color: inherit;">{{ item.title }}</strong> - <span style="color: #ccc;">{{ item.short_desc[:120] if item.short_desc else '' }}...</span></span>
                                 </a>
                                 <div style="display: flex; gap: 8px; align-items: center;">
                                     <span style="font-size: 0.7rem; color: #555; white-space: nowrap;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}" data-type="content">{{ item.views if item.views else 0 }}</span></span>
@@ -694,7 +721,17 @@
                     </div>
                     <ul class="highlight-list" style="padding-left: 10px; font-size: 0.8rem; margin-bottom: 0;">
                         {% for item in entrevistas_items[:5] %}
-                        <li style="margin-bottom: 8px; line-height: 1.3;"><a href="{{ item.yt_link if item.yt_link else item.sp_link if item.sp_link else item.ap_link if item.ap_link else '#' }}" target="_blank" style="color: #716d4a; text-decoration: underline;"><strong style="color: inherit;">{{ item.title }}</strong></a> - <span style="color: #ccc;">{{ item.short_desc[:60] if item.short_desc else '' }}...</span></li>
+                        <li style="padding: 0.3rem 0; margin-bottom: 4px; line-height: 1.2;">
+                            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                <a href="{{ item.yt_link if item.yt_link else item.sp_link if item.sp_link else item.ap_link if item.ap_link else '#' }}" target="_blank" style="color: #716d4a; flex: 1; margin-right: 10px; display: block; text-decoration: none;">
+                                    <span><strong style="color: inherit; text-decoration: underline;">{{ item.title }}</strong> - <span style="color: #ccc; text-decoration: none;">{{ item.short_desc[:150] if item.short_desc else '' }}...</span></span>
+                                </a>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <span style="font-size: 0.7rem; color: #555; white-space: nowrap;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}" data-type="content">{{ item.views if item.views else 0 }}</span></span>
+                                    <button class="like-btn" data-id="{{ item.id }}" data-type="content" style="background: none; border: none; color: #555; font-size: 0.7rem; cursor: pointer; padding: 0; white-space: nowrap; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}" data-type="content">{{ item.likes if item.likes else 0 }}</span></button>
+                                </div>
+                            </div>
+                        </li>
                         {% endfor %}
                     </ul>
                     <a href="#under-interviews" class="read-more" style="color: var(--accent-color); font-weight: bold; margin-top:10px; display:inline-block; padding: 4px 10px; font-size: 0.8rem; border: 1px solid var(--accent-color); border-radius: 4px;">Ver Entrevistas &rarr;</a>
@@ -961,7 +998,7 @@
             
             <div class="agenda-tabs" id="agendaTabs">
                 {% for month_name, items in agenda_grouped.items() %}
-                {% set is_past_month = items[-1].author[:7] < current_date[:7] %}
+                {% set is_past_month = items[-1].author < current_date %}
                 <button class="agenda-tab-btn {% if is_past_month %}past-month{% endif %}" data-month="{{ month_name }}" onclick="openAgendaTab('{{ month_name }}')">{{ month_name }}</button>
                 {% endfor %}
             </div>
@@ -1227,6 +1264,18 @@
             alert('Enlace copiado al portapapeles');
         };
         document.getElementById('poster-lightbox').style.display = 'flex';
+        
+        // Track poster view
+        fetch('/api/track_view/0?type=poster', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelectorAll('.view-count-0[data-type="poster"]').forEach(el => {
+                        el.innerText = data.views;
+                    });
+                }
+            })
+            .catch(err => console.error('Error tracking poster view:', err));
     }
     function closeLightbox() {
         document.getElementById('poster-lightbox').style.display = 'none';
