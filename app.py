@@ -832,6 +832,7 @@ def update_settings():
     title_interviews = request.form.get('title_interviews')
     title_agenda = request.form.get('title_agenda')
     title_contacto = request.form.get('title_contacto')
+    agenda_desc = request.form.get('agenda_desc')
     
     conn = get_db_connection()
     queries = [
@@ -846,7 +847,8 @@ def update_settings():
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_el_pit', ?)", (show_el_pit,)),
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_galeria_nocturna', ?)", (show_galeria_nocturna,)),
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_contactanos', ?)", (show_contactanos,)),
-        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_medios_aliados', ?)", (show_medios_aliados,))
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_medios_aliados', ?)", (show_medios_aliados,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('agenda_desc', ?)", (agenda_desc,))
     ]
     
     titles_dict = {
@@ -882,6 +884,19 @@ def update_settings():
 
     for q, params in queries:
         conn.execute(q, params)
+        
+    posters = request.files.getlist('agenda_posters')
+    poster_paths = []
+    for file in posters:
+        if file and file.filename != '':
+            filename = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="agenda_poster_")
+            poster_paths.append(f"updates/{filename}")
+            
+    if poster_paths:
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", ('agenda_poster', ','.join(poster_paths)))
+        
+    if request.form.get('remove_agenda_poster') == '1':
+        conn.execute("DELETE FROM settings WHERE key='agenda_poster'")
         
     conn.commit()
     conn.close()

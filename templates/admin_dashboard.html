@@ -706,6 +706,42 @@ input:checked + .slider:before { transform: translateX(20px); }
             Agenda Metalera
         </label>
     </div>
+    <div style="margin-top: 15px; margin-bottom: 25px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px dashed #555;">
+        <label style="display: block; font-size: 0.9rem; color: #ccc; margin-bottom: 8px;">
+            <i class="fa-solid fa-image" style="margin-right: 5px;"></i>Póster(s) de Agenda Metalera (Sube 1 o varios. Reemplazará la lista de eventos)
+        </label>
+        <input type="file" name="agenda_posters" accept="image/*" multiple style="background: #222; padding: 6px; border-radius: 4px; border: 1px solid #444; width: 100%; color: #fff; font-size: 0.8rem;">
+        {% if settings.get('agenda_poster') %}
+        <div style="margin-top: 15px; text-align: center; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;">
+            {% for poster in settings.get('agenda_poster').split(',') %}
+            <img src="/{{ poster }}" style="max-height: 150px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex-shrink: 0;">
+            {% endfor %}
+        </div>
+        <div style="text-align: center;">
+            <label style="font-size: 0.8rem; color: #ff5555; display: inline-flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; margin-top: 5px;">
+                <input type="checkbox" name="remove_agenda_poster" value="1"> Eliminar todos los pósters (Volver a la lista de bandas)
+            </label>
+        </div>
+        {% endif %}
+    </div>
+    <div style="margin-top: 15px; margin-bottom: 15px;">
+        <label style="font-size: 0.8rem; color: #aaa; margin-bottom: 5px; display: block;">Descripción Corta (Aparece junto al póster)</label>
+        <div class="visual-editor-container" data-target="agenda_desc">
+            <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
+                <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+                <div style="width: 1px; background: #444; margin: 0 5px;"></div>
+                <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+                <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+                <div style="width: 1px; background: #444; margin: 0 5px;"></div>
+                <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+                <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+                <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+                <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
+            </div>
+            <div class="rich-editor" contenteditable="true" style="min-height: 100px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)">{{ settings.get('agenda_desc', '') | safe }}</div>
+            <textarea name="agenda_desc" rows="5" style="display: none;">{{ settings.get('agenda_desc', '') }}</textarea>
+        </div>
+    </div>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
         <div>
             <label style="font-size: 0.8rem; color: #aaa;">Título en el Menú</label>
