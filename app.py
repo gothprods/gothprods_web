@@ -893,8 +893,73 @@ import shutil
 @app.route('/admin/go_live', methods=['POST'])
 def go_live():
     if 'user_id' not in session: return redirect(url_for('admin_login'))
+    
+    live_data = {
+        'content_items': {},
+        'banda_semana': {},
+        'eventos_semana': {},
+        'comments': [],
+        'performance_analytics': []
+    }
+    
+    if os.path.exists(DB_LIVE_FILE):
+        try:
+            live_conn = sqlite3.connect(DB_LIVE_FILE)
+            live_conn.row_factory = sqlite3.Row
+            
+            for table in ['content_items', 'banda_semana', 'eventos_semana']:
+                rows = live_conn.execute(f"SELECT id, likes, views FROM {table}").fetchall()
+                for r in rows:
+                    live_data[table][r['id']] = {'likes': r['likes'], 'views': r['views']}
+                    
+            comments_rows = live_conn.execute("SELECT * FROM comments").fetchall()
+            if comments_rows:
+                live_data['comments'] = [dict(r) for r in comments_rows]
+                
+            perf_rows = live_conn.execute("SELECT * FROM performance_analytics").fetchall()
+            if perf_rows:
+                live_data['performance_analytics'] = [dict(r) for r in perf_rows]
+                
+            live_conn.close()
+        except Exception as e:
+            print(f"Error extrayendo datos en vivo: {e}")
+            
     shutil.copyfile(DB_FILE, DB_LIVE_FILE)
-    flash("¡El sitio ha sido actualizado! Los cambios están en vivo.", "success")
+    
+    try:
+        new_live_conn = sqlite3.connect(DB_LIVE_FILE)
+        
+        for table in ['content_items', 'banda_semana', 'eventos_semana']:
+            for item_id, stats in live_data[table].items():
+                new_live_conn.execute(
+                    f"UPDATE {table} SET likes = ?, views = ? WHERE id = ?",
+                    (stats['likes'], stats['views'], item_id)
+                )
+                
+        new_live_conn.execute("DELETE FROM comments")
+        for comment in live_data['comments']:
+            cols = ', '.join(comment.keys())
+            placeholders = ', '.join(['?' for _ in comment.values()])
+            new_live_conn.execute(
+                f"INSERT INTO comments ({cols}) VALUES ({placeholders})",
+                tuple(comment.values())
+            )
+            
+        new_live_conn.execute("DELETE FROM performance_analytics")
+        for perf in live_data['performance_analytics']:
+            cols = ', '.join(perf.keys())
+            placeholders = ', '.join(['?' for _ in perf.values()])
+            new_live_conn.execute(
+                f"INSERT INTO performance_analytics ({cols}) VALUES ({placeholders})",
+                tuple(perf.values())
+            )
+            
+        new_live_conn.commit()
+        new_live_conn.close()
+    except Exception as e:
+        print(f"Error restaurando datos en vivo: {e}")
+
+    flash("¡El sitio ha sido actualizado! Los cambios están en vivo y la interacción de usuarios fue preservada.", "success")
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/discard_drafts', methods=['POST'])

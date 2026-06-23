@@ -3,7 +3,6 @@
 <div class="navbar">
     <div class="logo-text">EDITOR <span>GOTH PRODS</span></div>
     <div style="display: flex; gap: 15px; align-items: center;">
-        <button onclick="window.location.reload()" style="background: var(--accent-color); color: #000; border: none; padding: 4px 10px; font-size: 0.8rem; font-weight: bold; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-arrows-rotate"></i> Actualizar</button>
         <div class="lang-switch" style="display: flex; gap: 5px;">
             <button id="btn-es" onclick="setLanguage('es')" style="background: #222; border: 1px solid var(--accent-color); color: white; padding: 3px 8px; font-size: 0.8rem; cursor: pointer; border-radius: 4px;">ES</button>
             <button id="btn-en" onclick="setLanguage('en')" style="background: #222; border: 1px solid #555; color: white; padding: 3px 8px; font-size: 0.8rem; cursor: pointer; border-radius: 4px;">EN</button>
@@ -783,7 +782,10 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     <!-- TAB: PERFORMANCE -->
     <div id="tab-performance" class="tab-content">
-        <h3><i class="fa-solid fa-chart-line"></i> Performance gothprods.com</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0;"><i class="fa-solid fa-chart-line"></i> Performance gothprods.com</h3>
+            <button onclick="window.location.reload()" style="background: var(--accent-color); color: #000; border: none; padding: 6px 12px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 5px; width: auto; margin-top: 0;"><i class="fa-solid fa-arrows-rotate"></i> Actualizar</button>
+        </div>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Métricas de rendimiento, tráfico y comportamiento de los usuarios en tiempo real.</p>
         
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
