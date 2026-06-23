@@ -12,17 +12,17 @@
 
     <!-- Open Graph / Redes Sociales (Facebook, LinkedIn, etc.) -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://gothprods.com/">
-    <meta property="og:title" content="Goth Prods | Tu portal de Cultura Metalera">
-    <meta property="og:description" content="Goth Prods es la productora de contenidos de Metal más imponente. Encuentra noticias, reseñas exclusivas y el podcast Metal Pulse.">
-    <meta property="og:image" content="https://gothprods.com/assets/viking.jpg">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:title" content="{% if request.args.get('poster') %}Agenda Metalera | Goth Prods{% else %}Goth Prods | Tu portal de Cultura Metalera{% endif %}">
+    <meta property="og:description" content="{% if request.args.get('poster') %}¡Revisa los próximos eventos en nuestra Agenda Metalera!{% else %}Goth Prods es la productora de contenidos de Metal más imponente. Encuentra noticias, reseñas exclusivas y el podcast Metal Pulse.{% endif %}">
+    <meta property="og:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/assets/viking.jpg{% endif %}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://gothprods.com/">
-    <meta property="twitter:title" content="Goth Prods | Tu portal de Cultura Metalera">
-    <meta property="twitter:description" content="Goth Prods es la productora de contenidos de Metal más imponente. Encuentra noticias, reseñas exclusivas y el podcast Metal Pulse.">
-    <meta property="twitter:image" content="https://gothprods.com/assets/viking.jpg">
+    <meta property="twitter:url" content="{{ request.url }}">
+    <meta property="twitter:title" content="{% if request.args.get('poster') %}Agenda Metalera | Goth Prods{% else %}Goth Prods | Tu portal de Cultura Metalera{% endif %}">
+    <meta property="twitter:description" content="{% if request.args.get('poster') %}¡Revisa los próximos eventos en nuestra Agenda Metalera!{% else %}Goth Prods es la productora de contenidos de Metal más imponente. Encuentra noticias, reseñas exclusivas y el podcast Metal Pulse.{% endif %}">
+    <meta property="twitter:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/assets/viking.jpg{% endif %}">
 
     <!-- Favicons -->
     <link rel="icon" href="assets/viking.webp" type="image/jpeg">
@@ -1216,11 +1216,14 @@
     <script>
     function openLightbox(src) {
         document.getElementById('lightbox-img').src = src;
-        // Adjust the share links to point to the actual image
-        const imgUrl = "https://gothprods.com" + src;
-        document.getElementById('lightbox-share-fb').href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(imgUrl);
+        
+        // Generate a shareable URL that will trigger the Open Graph tags on the main page
+        let posterPath = src.startsWith('/') ? src.substring(1) : src;
+        const shareUrl = "https://gothprods.com/?poster=" + encodeURIComponent(posterPath);
+        
+        document.getElementById('lightbox-share-fb').href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(shareUrl);
         document.getElementById('lightbox-copy-link').onclick = function() {
-            navigator.clipboard.writeText(imgUrl);
+            navigator.clipboard.writeText(shareUrl);
             alert('Enlace copiado al portapapeles');
         };
         document.getElementById('poster-lightbox').style.display = 'flex';
@@ -1230,8 +1233,15 @@
         document.getElementById('lightbox-img').src = '';
     }
     document.getElementById('poster-lightbox').addEventListener('click', function(e) {
-        if(e.target === this) closeLightbox();
+        if(e.target === this || e.target.classList.contains('modal-content')) closeLightbox();
     });
+
+    // Auto-open lightbox if the page was loaded from a shared poster link
+    {% if request.args.get('poster') %}
+    document.addEventListener("DOMContentLoaded", function() {
+        openLightbox('/{{ request.args.get("poster") }}');
+    });
+    {% endif %}
     </script>
 </body>
 </html>
