@@ -932,7 +932,8 @@ def go_live():
         'banda_semana': {},
         'eventos_semana': {},
         'comments': [],
-        'performance_analytics': []
+        'performance_analytics': [],
+        'settings': {}
     }
     
     if os.path.exists(DB_LIVE_FILE):
@@ -953,6 +954,14 @@ def go_live():
             if perf_rows:
                 live_data['performance_analytics'] = [dict(r) for r in perf_rows]
                 
+            # Preserve poster_likes and poster_views
+            try:
+                settings_rows = live_conn.execute("SELECT key, value FROM settings WHERE key IN ('poster_likes', 'poster_views')").fetchall()
+                for r in settings_rows:
+                    live_data['settings'][r['key']] = r['value']
+            except Exception:
+                pass
+                
             live_conn.close()
         except Exception as e:
             print(f"Error extrayendo datos en vivo: {e}")
@@ -961,34 +970,39 @@ def go_live():
     
     try:
         new_live_conn = sqlite3.connect(DB_LIVE_FILE)
+        new_preview_conn = sqlite3.connect(DB_FILE)
         
-        for table in ['content_items', 'banda_semana', 'eventos_semana']:
-            for item_id, stats in live_data[table].items():
-                new_live_conn.execute(
-                    f"UPDATE {table} SET likes = ?, views = ? WHERE id = ?",
-                    (stats['likes'], stats['views'], item_id)
+        for conn_obj in [new_live_conn, new_preview_conn]:
+            for table in ['content_items', 'banda_semana', 'eventos_semana']:
+                for item_id, stats in live_data[table].items():
+                    conn_obj.execute(
+                        f"UPDATE {table} SET likes = ?, views = ? WHERE id = ?",
+                        (stats['likes'], stats['views'], item_id)
+                    )
+                    
+            conn_obj.execute("DELETE FROM comments")
+            for comment in live_data['comments']:
+                cols = ', '.join(comment.keys())
+                placeholders = ', '.join(['?' for _ in comment.values()])
+                conn_obj.execute(
+                    f"INSERT INTO comments ({cols}) VALUES ({placeholders})",
+                    tuple(comment.values())
                 )
                 
-        new_live_conn.execute("DELETE FROM comments")
-        for comment in live_data['comments']:
-            cols = ', '.join(comment.keys())
-            placeholders = ', '.join(['?' for _ in comment.values()])
-            new_live_conn.execute(
-                f"INSERT INTO comments ({cols}) VALUES ({placeholders})",
-                tuple(comment.values())
-            )
-            
-        new_live_conn.execute("DELETE FROM performance_analytics")
-        for perf in live_data['performance_analytics']:
-            cols = ', '.join(perf.keys())
-            placeholders = ', '.join(['?' for _ in perf.values()])
-            new_live_conn.execute(
-                f"INSERT INTO performance_analytics ({cols}) VALUES ({placeholders})",
-                tuple(perf.values())
-            )
-            
-        new_live_conn.commit()
-        new_live_conn.close()
+            conn_obj.execute("DELETE FROM performance_analytics")
+            for perf in live_data['performance_analytics']:
+                cols = ', '.join(perf.keys())
+                placeholders = ', '.join(['?' for _ in perf.values()])
+                conn_obj.execute(
+                    f"INSERT INTO performance_analytics ({cols}) VALUES ({placeholders})",
+                    tuple(perf.values())
+                )
+                
+            for k, v in live_data['settings'].items():
+                conn_obj.execute("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (k, v))
+                
+            conn_obj.commit()
+            conn_obj.close()
     except Exception as e:
         print(f"Error restaurando datos en vivo: {e}")
 
@@ -1427,11 +1441,16 @@ def sync_agenda():
         months_map = {'mayo': 5, 'junio': 6, 'julio': 7, 'agosto': 8, 'septiembre': 9, 'octubre': 10, 'noviembre': 11, 'diciembre': 12, 'enero': 1, 'febrero': 2, 'marzo': 3, 'abril': 4}
         
         conn = get_db_connection()
-        conn.execute("DELETE FROM content_items WHERE section = 'Agenda Metalera'")
+        
+        # Fetch existing agenda items to know which to keep and preserve their IDs
+        existing_rows = conn.execute("SELECT id, title FROM content_items WHERE section = 'Agenda Metalera'").fetchall()
+        existing_agenda = {r['title'].lower(): r['id'] for r in existing_rows}
+        seen_ids = set()
         
         for row in reader:
             if 'Evento' not in row or not row['Evento'].strip(): continue
             evento = row['Evento'].strip()
+            evento_lower = evento.lower()
             ciudad = row.get('Ciudad', '').strip()
             venue = row.get('Venue', '').strip()
             fecha_raw = row.get('Fecha', '').strip()
@@ -1448,10 +1467,23 @@ def sync_agenda():
             sort_date = f"2026-{month:02d}-{day:02d}"
             logo_filename = f"assets/logos/{evento.lower().replace(' ', '').replace('/', '')}.png"
             
-            conn.execute('''
-                INSERT INTO content_items (section, title, short_desc, full_desc, image_filename, yt_link, author)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', ("Agenda Metalera", evento, f"{venue} | {ciudad}", fecha_raw, logo_filename, gp, sort_date))
+            if evento_lower in existing_agenda:
+                item_id = existing_agenda[evento_lower]
+                seen_ids.add(item_id)
+                conn.execute('''
+                    UPDATE content_items SET title=?, short_desc=?, full_desc=?, image_filename=?, yt_link=?, author=? WHERE id=?
+                ''', (evento, f"{venue} | {ciudad}", fecha_raw, logo_filename, gp, sort_date, item_id))
+            else:
+                cursor = conn.execute('''
+                    INSERT INTO content_items (section, title, short_desc, full_desc, image_filename, yt_link, author)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', ("Agenda Metalera", evento, f"{venue} | {ciudad}", fecha_raw, logo_filename, gp, sort_date))
+                seen_ids.add(cursor.lastrowid)
+                
+        # Delete any items that were removed from the Google Sheet
+        for title_lower, item_id in existing_agenda.items():
+            if item_id not in seen_ids:
+                conn.execute("DELETE FROM content_items WHERE id=?", (item_id,))
         
         conn.commit()
         conn.close()
