@@ -1305,6 +1305,7 @@ def edit_record(id):
     conn = get_db_connection()
     if request.method == 'POST':
         title = request.form.get('title')
+        section = request.form.get('section')
         short_desc = request.form.get('short_desc')
         full_desc = request.form.get('full_desc')
         yt_link = request.form.get('yt_link', '')
@@ -1318,12 +1319,12 @@ def edit_record(id):
         if image and image.filename:
             image_filename = optimize_and_save_image(image, app.config['UPLOAD_FOLDER'], prefix="content_")
             conn.execute('''
-                UPDATE content_items SET title=?, short_desc=?, full_desc=?, image_filename=?, yt_link=?, sp_link=?, ap_link=?, created_at=?, author=? WHERE id=?
-            ''', (title, short_desc, full_desc, image_filename, yt_link, sp_link, ap_link, pub_date, author, id))
+                UPDATE content_items SET section=?, title=?, short_desc=?, full_desc=?, image_filename=?, yt_link=?, sp_link=?, ap_link=?, created_at=?, author=? WHERE id=?
+            ''', (section, title, short_desc, full_desc, image_filename, yt_link, sp_link, ap_link, pub_date, author, id))
         else:
             conn.execute('''
-                UPDATE content_items SET title=?, short_desc=?, full_desc=?, yt_link=?, sp_link=?, ap_link=?, created_at=?, author=? WHERE id=?
-            ''', (title, short_desc, full_desc, yt_link, sp_link, ap_link, pub_date, author, id))
+                UPDATE content_items SET section=?, title=?, short_desc=?, full_desc=?, yt_link=?, sp_link=?, ap_link=?, created_at=?, author=? WHERE id=?
+            ''', (section, title, short_desc, full_desc, yt_link, sp_link, ap_link, pub_date, author, id))
         
         conn.commit()
         conn.close()

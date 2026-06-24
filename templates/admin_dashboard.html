@@ -127,8 +127,8 @@ input:checked + .slider:before { transform: translateX(20px); }
  rows="5" placeholder="Toda la información del evento, noticia o episodio..." required style="display: none;"></textarea>
 </div>
     
-    <label><i class="fa-regular fa-image"></i> Imagen de Portada</label>
-    <input type="file" name="image" accept="image/*" required>
+    <label><i class="fa-regular fa-image"></i> Imagen de Portada <small id="image-hint" style="color: #888; font-weight: normal; display: none; margin-left: 5px;">(Opcional al editar. Deja vacío para conservar la imagen actual)</small></label>
+    <input type="file" name="image" id="image-input" accept="image/*" required>
     
     <label><i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Link YouTube (Opcional)</label>
     <input type="url" name="yt_link" placeholder="https://youtube.com/...">
@@ -1609,14 +1609,21 @@ function editRecord(btn) {
     document.querySelector('#main-form select[name="section"]').value = btn.getAttribute('data-section') || '';
     document.querySelector('#main-form input[name="pub_date"]').value = btn.getAttribute('data-pub') || '';
     document.querySelector('#main-form input[name="title"]').value = btn.getAttribute('data-title') || '';
-    document.querySelector('#main-form input[name="author"]').value = btn.getAttribute('data-author') || '';
+    
+    // Handle author properly (don't set to empty if it's missing, keep what's there or use a fallback)
+    var authorData = btn.getAttribute('data-author');
+    if (authorData && authorData !== 'None' && authorData.trim() !== '') {
+        document.querySelector('#main-form input[name="author"]').value = authorData;
+    }
+    
     document.querySelector('#main-form input[name="short_desc"]').value = btn.getAttribute('data-short') || '';
     document.querySelector('#main-form textarea[name="full_desc"]').value = btn.getAttribute('data-full') || '';
     document.querySelector('#main-form input[name="yt_link"]').value = btn.getAttribute('data-yt') || '';
     document.querySelector('#main-form input[name="sp_link"]').value = btn.getAttribute('data-sp') || '';
     document.querySelector('#main-form input[name="ap_link"]').value = btn.getAttribute('data-ap') || '';
     
-    document.querySelector('#main-form input[name="image"]').required = false;
+    document.getElementById('image-input').required = false;
+    document.getElementById('image-hint').style.display = 'inline';
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
     syncAllVisualsToEditors();
@@ -1628,6 +1635,8 @@ function cancelEdit() {
     document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-bolt"></i> Actualizar Web y Generar Redes Sociales';
     document.getElementById('cancel-btn').style.display = 'none';
     
+    document.getElementById('image-input').required = true;
+    document.getElementById('image-hint').style.display = 'none';
     document.getElementById('main-form').reset();
     document.querySelector('input[name="image"]').required = true;
     syncAllVisualsToEditors();
