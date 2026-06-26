@@ -840,6 +840,7 @@ def update_settings():
     show_galeria_nocturna = request.form.get('show_galeria_nocturna', '0')
     show_contactanos = request.form.get('show_contactanos', '0')
     show_medios_aliados = request.form.get('show_medios_aliados', '0')
+    show_el_equipo = request.form.get('show_el_equipo', '0')
     
     title_destacados = request.form.get('title_destacados')
     title_el_pit = request.form.get('title_el_pit')
@@ -851,6 +852,9 @@ def update_settings():
     title_agenda = request.form.get('title_agenda')
     title_contacto = request.form.get('title_contacto')
     agenda_desc = request.form.get('agenda_desc')
+    
+    title_equipo = request.form.get('title_equipo')
+    show_equipo_menu = request.form.get('show_equipo_menu', '0')
     
     conn = get_db_connection()
     queries = [
@@ -866,6 +870,8 @@ def update_settings():
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_galeria_nocturna', ?)", (show_galeria_nocturna,)),
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_contactanos', ?)", (show_contactanos,)),
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_medios_aliados', ?)", (show_medios_aliados,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_el_equipo', ?)", (show_el_equipo,)),
+        ("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_equipo_menu', ?)", (show_equipo_menu,)),
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('agenda_desc', ?)", (agenda_desc,))
     ]
     
@@ -878,7 +884,8 @@ def update_settings():
         'title_news': title_news,
         'title_interviews': title_interviews,
         'title_agenda': title_agenda,
-        'title_contacto': title_contacto
+        'title_contacto': title_contacto,
+        'title_equipo': title_equipo
     }
     for k, v in titles_dict.items():
         if v is not None:
@@ -886,9 +893,10 @@ def update_settings():
     
     file_keys = ['hero_bg', 'header_logo', 'galeria_bg', 'metalpulse_bg', 
                  'icon_destacados', 'icon_el_pit', 'icon_galeria', 'icon_metalpulse',
-                 'icon_reviews', 'icon_news', 'icon_interviews', 'icon_agenda', 'icon_contacto',
+                 'icon_reviews', 'icon_news', 'icon_interviews', 'icon_agenda', 'icon_contacto', 'icon_equipo',
                  'logo_aliado_1', 'logo_aliado_2', 'logo_aliado_3', 'logo_aliado_4', 'logo_aliado_5',
-                 'logo_aliado_6', 'logo_aliado_7', 'logo_aliado_8', 'logo_aliado_9', 'logo_aliado_10']
+                 'logo_aliado_6', 'logo_aliado_7', 'logo_aliado_8', 'logo_aliado_9', 'logo_aliado_10',
+                 'team_img_1', 'team_img_2', 'team_img_3', 'team_img_4', 'team_img_5']
     for fk in file_keys:
         file = request.files.get(fk)
         if file and file.filename != '':
@@ -899,6 +907,11 @@ def update_settings():
             else:
                 filename = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix=f"{fk}_")
             queries.append(("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (fk, f"updates/{filename}")))
+
+    # Extraer campos dinámicos de equipo e historia
+    for key in request.form.keys():
+        if key.startswith('team_name_') or key.startswith('team_role_') or key.startswith('team_bio_') or key.startswith('team_history_'):
+            queries.append(("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (key, request.form[key])))
 
     for q, params in queries:
         conn.execute(q, params)

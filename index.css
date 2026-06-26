@@ -120,6 +120,9 @@ main {
     box-shadow: 2px 0 15px rgba(0,0,0,0.8);
     transition: all 0.3s ease;
 }
+.floating-dock::-webkit-scrollbar {
+    display: none;
+}
 
 .dock-logo {
     margin-bottom: 0.5rem;
@@ -268,7 +271,7 @@ main {
     font-size: 1.2rem;
     cursor: pointer;
     transition: transform 0.3s;
-    margin-bottom: 5px;
+    margin: 0;
 }
 .dock-lang button:hover {
     transform: scale(1.2);
@@ -276,9 +279,10 @@ main {
 
 .dock-lang {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    gap: 8px;
 }
 
 /* Mobile Media Query for Dock */
@@ -2045,4 +2049,179 @@ span[style*="color: #716d4a"], span[style*="color: rgb(113, 109, 74)"], span[sty
 font[color="#ffffff"], font[color="#FFFFFF"], 
 span[style*="color: #ffffff"], span[style*="color: rgb(255, 255, 255)"], span[style*="color: #FFFFFF"] {
     color: #ffffff !important;
+}
+
+/* --- EL EQUIPO SECTION --- */
+.equipo-section {
+    position: relative;
+    z-index: 5;
+    padding: 60px 20px 0 20px;
+    background: radial-gradient(circle at center, rgba(113, 109, 74, 0.05) 0%, transparent 60%);
+}
+
+.equipo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+    margin: 40px auto;
+    max-width: 1200px;
+}
+
+.equipo-card {
+    flex: 0 1 300px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.equipo-card:hover {
+    transform: translateY(-5px);
+}
+
+.equipo-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 10px rgba(113, 109, 74, 0.3);
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.equipo-card:hover .equipo-img {
+    transform: scale(1.05);
+}
+
+.equipo-name {
+    font-family: var(--font-heading);
+    color: var(--accent-color);
+    font-size: 2rem;
+    text-transform: uppercase;
+    margin: 0 0 5px 0;
+    line-height: 1.1;
+}
+
+.equipo-role {
+    font-family: var(--font-body);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+}
+
+.equipo-bio {
+    font-family: var(--font-body);
+    color: #ccc;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    text-align: justify;
+}
+
+/* --- TIMELINE (HISTORIA) --- */
+.timeline-section {
+    max-width: 1000px;
+    margin: 60px auto 40px auto;
+    position: relative;
+    padding: 0 20px;
+}
+
+.timeline-container {
+    position: relative;
+}
+
+/* Linea vertical */
+.timeline-container::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    background-color: rgba(113, 109, 74, 0.3);
+    top: 0;
+    bottom: 0;
+    left: 20px;
+    margin-left: -2px;
+}
+
+.timeline-item {
+    padding: 20px 0 30px 60px;
+    position: relative;
+}
+
+/* El circulo/punto en la linea */
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    right: auto;
+    background-color: #111;
+    border: 4px solid var(--accent-color);
+    border-radius: 50%;
+    top: 25px;
+    left: 20px;
+    margin-left: -10px;
+    z-index: 1;
+    box-shadow: 0 0 10px rgba(113, 109, 74, 0.8);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.timeline-item:hover::after {
+    background-color: var(--accent-color);
+    transform: scale(1.2);
+}
+
+.timeline-content {
+    background: rgba(17, 17, 17, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(113, 109, 74, 0.3);
+    border-radius: 8px;
+    padding: 20px 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.timeline-item:hover .timeline-content {
+    transform: translateX(5px);
+    border-color: rgba(113, 109, 74, 0.6);
+    box-shadow: 0 5px 15px rgba(113, 109, 74, 0.15);
+}
+
+.timeline-year {
+    font-family: var(--font-heading);
+    color: #716d4a !important;
+    font-size: 2.2rem;
+    margin: 0 0 10px 0;
+    line-height: 1;
+}
+
+.timeline-text {
+    font-family: var(--font-body);
+    color: #ddd;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+@media (max-width: 600px) {
+    .timeline-container::after {
+        left: 15px;
+    }
+    .timeline-item {
+        padding-left: 45px;
+    }
+    .timeline-item::after {
+        left: 15px;
+        width: 16px;
+        height: 16px;
+        margin-left: -8px;
+        top: 30px;
+    }
+    .timeline-year {
+        font-size: 1.8rem;
+    }
 }
