@@ -29,13 +29,6 @@ input:checked + .slider { background-color: var(--accent-color); }
 input:checked + .slider:before { transform: translateX(20px); }
 
 /* Rich Editor Improvements */
-.textarea-toolbar button {
-    user-select: none;
-    -webkit-user-select: none;
-}
-.textarea-toolbar button i {
-    pointer-events: none;
-}
 .rich-editor {
     line-height: 1.6;
 }
@@ -119,15 +112,15 @@ input:checked + .slider:before { transform: translateX(20px); }
     
 <div class="visual-editor-container" data-target="full_desc">
     <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
-    <button type="button" onpointerdown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
     <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-    <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-    <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
     <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
 </div>
     <div class="rich-editor" contenteditable="true" style="min-height: 120px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)"></div>
     <textarea name="full_desc"
@@ -736,15 +729,15 @@ input:checked + .slider:before { transform: translateX(20px); }
         <label style="font-size: 0.8rem; color: #aaa; margin-bottom: 5px; display: block;">Descripción Corta (Aparece junto al póster)</label>
         <div class="visual-editor-container" data-target="agenda_desc">
             <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
-                <button type="button" onpointerdown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+                <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
                 <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-                <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-                <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+                <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+                <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
                 <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-                <button type="button" onpointerdown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
-                <button type="button" onpointerdown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
-                <button type="button" onpointerdown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
-                <button type="button" onpointerdown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
+                <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+                <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+                <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+                <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
             </div>
             <div class="rich-editor" contenteditable="true" style="min-height: 100px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)">{{ settings.get('agenda_desc', '') | safe }}</div>
             <textarea name="agenda_desc" rows="5" style="display: none;">{{ settings.get('agenda_desc', '') }}</textarea>
@@ -921,15 +914,15 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <div style="flex: 1;">
                     <div class="visual-editor-container" data-target="team_history_{{ year }}">
                         <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
-                            <button type="button" onpointerdown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+                            <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
                             <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-                            <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-                            <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+                            <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+                            <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
                             <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-                            <button type="button" onpointerdown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
-                            <button type="button" onpointerdown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
-                            <button type="button" onpointerdown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
-                            <button type="button" onpointerdown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
+                            <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+                            <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+                            <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+                            <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
                         </div>
                         <div class="rich-editor" contenteditable="true" style="min-height: 100px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)">{{ settings.get('team_history_' ~ year, '') | safe }}</div>
                         <textarea name="team_history_{{ year }}" rows="3" style="display: none;">{{ settings.get('team_history_' ~ year, '') }}</textarea>
@@ -947,15 +940,15 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <div style="flex: 1;">
                     <div class="visual-editor-container" data-target="team_history_{{ year }}">
                         <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
-                            <button type="button" onpointerdown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+                            <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
                             <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-                            <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-                            <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+                            <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+                            <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
                             <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-                            <button type="button" onpointerdown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
-                            <button type="button" onpointerdown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
-                            <button type="button" onpointerdown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
-                            <button type="button" onpointerdown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
+                            <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+                            <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+                            <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+                            <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
                         </div>
                         <div class="rich-editor" contenteditable="true" style="min-height: 100px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)"></div>
                         <textarea name="team_history_{{ year }}" rows="3" style="display: none;"></textarea>
@@ -1241,15 +1234,15 @@ input:checked + .slider:before { transform: translateX(20px); }
             
 <div class="visual-editor-container" data-target="bio_corta">
     <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
-    <button type="button" onpointerdown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
     <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-    <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-    <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
     <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
 </div>
     <div class="rich-editor" contenteditable="true" style="min-height: 120px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)"></div>
     <textarea name="bio_corta"
@@ -1260,15 +1253,15 @@ input:checked + .slider:before { transform: translateX(20px); }
             
 <div class="visual-editor-container" data-target="texto_resena">
     <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
-    <button type="button" onpointerdown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
     <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-    <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-    <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
     <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
 </div>
     <div class="rich-editor" contenteditable="true" style="min-height: 120px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)"></div>
     <textarea name="texto_resena"
@@ -1279,15 +1272,15 @@ input:checked + .slider:before { transform: translateX(20px); }
             
 <div class="visual-editor-container" data-target="discografia">
     <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
-    <button type="button" onpointerdown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
     <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-    <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-    <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
     <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
 </div>
     <div class="rich-editor" contenteditable="true" style="min-height: 120px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)"></div>
     <textarea name="discografia"
@@ -1455,15 +1448,15 @@ input:checked + .slider:before { transform: translateX(20px); }
             
 <div class="visual-editor-container" data-target="bio_corta">
     <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
-    <button type="button" onpointerdown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
     <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-    <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-    <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
     <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
-    <button type="button" onpointerdown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+    <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
 </div>
     <div class="rich-editor" contenteditable="true" style="min-height: 120px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)"></div>
     <textarea name="bio_corta"
@@ -2140,50 +2133,68 @@ function setLanguage(lang) {
 
 
 
+let savedEditorRange = null;
+let lastActiveEditor = null;
+
+document.addEventListener('selectionchange', () => {
+    const activeEl = document.activeElement;
+    if (activeEl && activeEl.classList.contains('rich-editor')) {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            savedEditorRange = selection.getRangeAt(0).cloneRange();
+            lastActiveEditor = activeEl;
+        }
+    }
+});
+
 function formatVisual(event, action, value=null) {
-    try {
-        event.preventDefault(); // Keep focus on editor by preventing default click behavior
-        const btn = event.currentTarget;
-        const container = btn.closest('.visual-editor-container');
-        if (!container) throw new Error("No se encontró el contenedor visual-editor-container");
-        
-        const editor = container.querySelector('.rich-editor');
-        if (!editor) throw new Error("No se encontró el rich-editor");
-        
-        // TEMPORARY DEBUG
-        console.log("formatVisual triggered for", action);
-        
-        if (action === 'foreColor') {
+    event.preventDefault(); // Keep focus on editor by preventing default click behavior
+    const btn = event.currentTarget;
+    const container = btn.closest('.visual-editor-container');
+    const editor = container.querySelector('.rich-editor');
+    
+    // Force focus
+    if (document.activeElement !== editor) {
+        editor.focus();
+    }
+    
+    let currentRange = null;
+    const selection = window.getSelection();
+    
+    if (selection.rangeCount > 0 && !selection.isCollapsed) {
+        currentRange = selection.getRangeAt(0);
+    } else if (savedEditorRange && lastActiveEditor === editor) {
+        // Restore if lost
+        selection.removeAllRanges();
+        selection.addRange(savedEditorRange);
+        currentRange = savedEditorRange;
+    }
+    
+    if (action === 'bold') {
+        if (currentRange && !currentRange.collapsed) {
+            const b = document.createElement('b');
+            b.appendChild(currentRange.extractContents());
+            currentRange.insertNode(b);
+        } else {
+            document.execCommand('bold', false, null);
+        }
+    } else if (action === 'foreColor') {
+        if (currentRange && !currentRange.collapsed) {
+            const span = document.createElement('span');
+            span.style.color = value;
+            span.appendChild(currentRange.extractContents());
+            currentRange.insertNode(span);
+        } else {
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('foreColor', false, value);
-            
-            // Refuerzo
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0 && !selection.isCollapsed) {
-                try {
-                    const range = selection.getRangeAt(0);
-                    const content = range.extractContents();
-                    const span = document.createElement('span');
-                    span.style.color = value;
-                    span.appendChild(content);
-                    range.insertNode(span);
-                    
-                    selection.removeAllRanges();
-                    const newRange = document.createRange();
-                    newRange.selectNodeContents(span);
-                    selection.addRange(newRange);
-                } catch (e) {
-                    console.log("El refuerzo de color falló, confiando en execCommand.");
-                }
-            }
-        } else {
-            document.execCommand(action, false, null);
         }
-        
-        syncEditor(editor);
-    } catch (error) {
-        alert("Error en formatVisual: " + error.message);
+    } else {
+        document.execCommand(action, false, null);
     }
+    
+    // Clear selection so the user sees the format change
+    selection.removeAllRanges();
+    syncEditor(editor);
 }
 
 // Ensure paste keeps plain text with proper newlines
@@ -2256,15 +2267,15 @@ function addHistoryYear() {
             <label style="font-size: 0.8rem; color: #aaa;">Historia</label>
             <div class="visual-editor-container" data-target="team_history_${newYear}">
                 <div class="textarea-toolbar" style="display: flex; gap: 5px; background: #222; padding: 5px; border: 1px solid #444; border-bottom: none; border-radius: 4px 4px 0 0; position: sticky; top: 0; z-index: 100;">
-                    <button type="button" onpointerdown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+                    <button type="button" onmousedown="formatVisual(event, 'bold')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Negrita"><i class="fa-solid fa-bold"></i></button>
                     <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-                    <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
-                    <button type="button" onpointerdown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
+                    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#ffffff')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Blanco"><i class="fa-solid fa-droplet"></i> Blanco</button>
+                    <button type="button" onmousedown="formatVisual(event, 'foreColor', '#716d4a')" style="background: #333; color: var(--accent-color); border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Texto Dorado"><i class="fa-solid fa-droplet"></i> Dorado</button>
                     <div style="width: 1px; background: #444; margin: 0 5px;"></div>
-                    <button type="button" onpointerdown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
-                    <button type="button" onpointerdown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
-                    <button type="button" onpointerdown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
-                    <button type="button" onpointerdown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
+                    <button type="button" onmousedown="formatVisual(event, 'justifyLeft')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+                    <button type="button" onmousedown="formatVisual(event, 'justifyCenter')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+                    <button type="button" onmousedown="formatVisual(event, 'justifyRight')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+                    <button type="button" onmousedown="formatVisual(event, 'justifyFull')" style="background: #333; color: #fff; border: 1px solid #555; padding: 2px 6px; font-size: 0.85rem; border-radius: 3px; cursor: pointer;" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
                 </div>
                 <div class="rich-editor" contenteditable="true" style="min-height: 100px; background: #111; color: #fff; border: 1px solid #333; border-radius: 0 0 4px 4px; padding: 10px; outline: none; overflow-y: auto; white-space: pre-wrap;" oninput="syncEditor(this)"></div>
                 <textarea name="team_history_${newYear}" rows="3" style="display: none;"></textarea>
