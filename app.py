@@ -909,6 +909,9 @@ def update_settings():
             queries.append(("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (fk, f"updates/{filename}")))
 
     # Extraer campos dinámicos de equipo e historia
+    print("====== FORM SUBMITTED ======")
+    print(request.form)
+    print("============================")
     for key in request.form.keys():
         if key.startswith('team_name_') or key.startswith('team_role_') or key.startswith('team_bio_') or key.startswith('team_history_'):
             queries.append(("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (key, request.form[key])))
