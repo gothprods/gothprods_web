@@ -1071,15 +1071,17 @@
             </div>
             
             <div class="timeline-section" style="max-width: 95%; margin: 60px auto 40px auto;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
                     {% set sorted_years = history_keys|sort %}
                     {% for year in sorted_years %}
                     {% set full_text = settings.get('team_history_' ~ year) %}
-                    <div class="timeline-content" style="padding: 25px; text-align: left; position: relative;">
-                        <h4 class="timeline-year">{{ year }}</h4>
-                        <p class="timeline-text">{{ full_text | truncate(380, true, '...') | replace('\n', '<br>') | safe }}</p>
-                        {% if full_text|length > 380 %}
-                        <a href="javascript:void(0);" data-target="histModal{{ year }}" class="open-review-modal" style="color: var(--accent-color); font-weight: bold; font-size: 0.85rem; display: inline-block; margin-top: 15px;">Leer más &rarr;</a>
+                    <div class="timeline-content" style="padding: 25px; text-align: left; position: relative; background: #1a1a1a; border-radius: 8px; border: 1px solid #333;">
+                        <h4 class="timeline-year" style="color: var(--accent-color); font-size: 2rem; margin-bottom: 15px; font-family: 'Oswald', sans-serif;">{{ year }}</h4>
+                        <div class="timeline-text" style="display: -webkit-box; -webkit-line-clamp: 10; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; margin-bottom: 15px; line-height: 1.6; color: #ddd; font-size: 1rem;">
+                            {{ full_text | safe }}
+                        </div>
+                        {% if full_text|striptags|length > 300 %}
+                        <a href="javascript:void(0);" data-target="histModal{{ year }}" class="open-review-modal" style="color: var(--accent-color); font-weight: bold; font-size: 0.9rem; display: inline-block;">Leer más &rarr;</a>
                         {% endif %}
                     </div>
                     {% endfor %}

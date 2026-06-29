@@ -86,7 +86,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <h3 id="form-title"><i class="fa-solid fa-pen-nib"></i> Crear Nuevo Registro</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">Llena este formulario para actualizar la web y generar automáticamente tus copys e imágenes para redes sociales.</p>
         
-        <form id="main-form" method="POST" action="/admin/dashboard" enctype="multipart/form-data" onsubmit="syncAllEditorsToTextareas()">
+        <form id="main-form" method="POST" action="/admin/dashboard" enctype="multipart/form-data" onsubmit="syncAllEditorsToTextareas()" novalidate>
     <label><i class="fa-solid fa-layer-group"></i> Sección de la Página</label>
     <select name="section" required>
         <option value="Reseñas de Conciertos">Reseñas de Conciertos</option>
@@ -524,7 +524,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <h3><i class="fa-solid fa-paint-roller"></i> Personalización (Look & Feel)</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Personaliza los textos principales, menús y activa/desactiva secciones completas de la página.</p>
         
-        <form method="POST" action="/admin/settings" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()">
+        <form method="POST" action="/admin/settings" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()" novalidate>
             <h4 style="color: var(--accent-color); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px;"><i class="fa-solid fa-image"></i> Imágenes</h4>
             <label>Fondo Principal (Hero Video/Imagen)</label>
             <input type="file" name="hero_bg" accept="video/*, image/*" style="background: #222; padding: 10px; border-radius: 4px; border: 1px solid #444; width: 100%; margin-bottom: 20px; color: #fff;">
@@ -1181,7 +1181,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <h3 id="form-banda-title"><i class="fa-solid fa-star"></i> Gestión Banda de la Semana</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Agrega la banda destacada que aparecerá en el sitio.</p>
         
-        <form id="banda-form" method="POST" action="/admin/banda" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()">
+        <form id="banda-form" method="POST" action="/admin/banda" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()" novalidate>
             <label>Título de la Reseña</label>
             <input type="text" name="titulo_resena" placeholder="Ej. Una obra maestra del Death Metal" required style="margin-bottom: 15px;">
 
@@ -1354,7 +1354,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                 data-fechafin="{{ b.fecha_fin | default('', true) }}"
                                 data-pais="{{ b.pais | default('', true) }}"
                                 data-ciudad="{{ b.ciudad | default('', true) }}"
-                                data-biocorta="{{ b.bio_corta | default('', true) }}"
+                                data-biocorta="{{ b.bio_corta | default('', true) | e }}"
                                 data-ano="{{ b.ano_formacion | default('', true) }}"
                                 data-lineup="{{ b.line_up | default('', true) }}"
                                 data-ig="{{ b.ig_link | default('', true) }}"
@@ -1363,9 +1363,9 @@ input:checked + .slider:before { transform: translateX(20px); }
                                 data-sp="{{ b.sp_link | default('', true) }}"
                                 data-ap="{{ b.ap_link | default('', true) }}"
                                 data-yt="{{ b.yt_link | default('', true) }}"
-                                data-titulores="{{ b.titulo_resena | default('', true) }}"
-                                data-textores="{{ b.texto_resena | default('', true) }}"
-                                data-disco="{{ b.discografia | default('', true) }}"
+                                data-titulores="{{ b.titulo_resena | default('', true) | e }}"
+                                data-textores="{{ b.texto_resena | default('', true) | e }}"
+                                data-disco="{{ b.discografia | default('', true) | e }}"
                                 data-ulttit="{{ b.ultimo_lanzamiento_titulo | default('', true) }}"
                                 data-ulttipo="{{ b.ultimo_lanzamiento_tipo | default('Album', true) }}"
                                 data-ultsp="{{ b.ultimo_lanzamiento_sp_link | default('', true) }}"
@@ -1392,7 +1392,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <h3 id="form-eventos-title"><i class="fa-solid fa-calendar-star"></i> Gestión Eventos Destacados</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Agrega los eventos relevantes a los cuales daremos difusión.</p>
         
-        <form id="eventos-form" method="POST" action="/admin/eventos" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()">
+        <form id="eventos-form" method="POST" action="/admin/eventos" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()" novalidate>
             <label>Título del Artículo</label>
             <input type="text" name="titulo_articulo" placeholder="Ej. El Festival de Metal Más Esperado" required style="margin-bottom: 15px;">
 
@@ -1516,7 +1516,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                 data-promotor="{{ e.promotor | default('', true) }}"
                                 data-pais="{{ e.pais | default('', true) }}"
                                 data-ciudad="{{ e.ciudad | default('', true) }}"
-                                data-biocorta="{{ e.bio_corta | default('', true) }}"
+                                data-biocorta="{{ e.bio_corta | default('', true) | e }}"
                                 data-texto="{{ e.texto_articulo | default('', true) }}"
                                 data-ig="{{ e.ig_link | default('', true) }}"
                                 data-fb="{{ e.fb_link | default('', true) }}"
@@ -2134,11 +2134,59 @@ function formatVisual(event, action, value=null) {
     const container = btn.closest('.visual-editor-container');
     const editor = container.querySelector('.rich-editor');
     
-    if (action === 'foreColor') {
-        document.execCommand('styleWithCSS', false, true);
-        document.execCommand('foreColor', false, value);
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+        // Fallback for typing new text
+        if (action === 'foreColor') {
+            document.execCommand('styleWithCSS', false, true);
+            document.execCommand('foreColor', false, value);
+        } else {
+            document.execCommand(action, false, null);
+        }
+        syncEditor(editor);
+        return;
+    }
+
+    const range = selection.getRangeAt(0);
+    
+    // Ensure the selection is actually inside our editor
+    if (!editor.contains(range.commonAncestorContainer)) {
+        return;
+    }
+
+    if (action === 'bold') {
+        const b = document.createElement('b');
+        b.appendChild(range.extractContents());
+        range.insertNode(b);
+        selection.removeAllRanges();
+    } else if (action === 'foreColor') {
+        const span = document.createElement('span');
+        span.style.color = value;
+        span.appendChild(range.extractContents());
+        range.insertNode(span);
+        selection.removeAllRanges();
+    } else if (action.startsWith('justify')) {
+        let align = action.replace('justify', '').toLowerCase();
+        if (align === 'full') align = 'justify';
+        
+        let node = range.commonAncestorContainer;
+        if (node.nodeType === 3) node = node.parentNode;
+        
+        while (node && node !== editor && !['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(node.tagName)) {
+            node = node.parentNode;
+        }
+        
+        if (node && node !== editor) {
+            node.style.textAlign = align;
+        } else {
+            const div = document.createElement('div');
+            div.style.textAlign = align;
+            div.appendChild(range.extractContents());
+            range.insertNode(div);
+        }
+        selection.removeAllRanges();
     } else {
-        document.execCommand(action, false, null);
+        document.execCommand(action, false, value);
     }
     
     syncEditor(editor);
@@ -2164,13 +2212,17 @@ function syncEditor(editorDiv) {
 
 
 function syncAllEditorsToTextareas() {
-    document.querySelectorAll('.visual-editor-container').forEach(container => {
-        const textarea = container.querySelector('textarea');
-        const editor = container.querySelector('.rich-editor');
-        if(textarea && editor) {
-            textarea.value = editor.innerHTML;
-        }
-    });
+    try {
+        document.querySelectorAll('.visual-editor-container').forEach(container => {
+            const textarea = container.querySelector('textarea');
+            const editor = container.querySelector('.rich-editor');
+            if(textarea && editor) {
+                textarea.value = editor.innerHTML;
+            }
+        });
+    } catch(e) {
+        alert("Error in syncAllEditorsToTextareas: " + e.message);
+    }
 }
 
 function syncAllVisualsToEditors() {
@@ -2228,7 +2280,7 @@ function addHistoryYear() {
                 <textarea name="team_history_${newYear}" rows="3" style="display: none;"></textarea>
             </div>
         </div>
-    </div>\`;
+    </div>`;
     
     container.insertAdjacentHTML('beforeend', html);
 }
