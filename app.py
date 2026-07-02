@@ -812,7 +812,27 @@ def admin_dashboard():
     todos_eventos = conn.execute("SELECT * FROM eventos_semana ORDER BY id DESC").fetchall()
     all_users = conn.execute('SELECT id, nombre, username, email, role, is_active FROM users ORDER BY id DESC').fetchall() if session.get('role') in ['admin', 'root'] else []
     conn_live = get_db_connection(live=True)
-    analytics_rows = conn_live.execute('SELECT * FROM performance_analytics ORDER BY id DESC').fetchall()
+    
+    perf_range = request.args.get('range', 'all')
+    perf_start = request.args.get('start', '')
+    perf_end = request.args.get('end', '')
+    
+    perf_query = 'SELECT * FROM performance_analytics'
+    perf_params = []
+    
+    if perf_range == '7':
+        perf_query += " WHERE created_at >= date('now', '-7 days')"
+    elif perf_range == '30':
+        perf_query += " WHERE created_at >= date('now', '-30 days')"
+    elif perf_range == '90':
+        perf_query += " WHERE created_at >= date('now', '-90 days')"
+    elif perf_range == 'custom' and perf_start and perf_end:
+        perf_query += " WHERE created_at >= ? AND created_at <= ?"
+        perf_params = [perf_start + ' 00:00:00', perf_end + ' 23:59:59']
+        
+    perf_query += " ORDER BY id DESC"
+    
+    analytics_rows = conn_live.execute(perf_query, perf_params).fetchall()
     conn_live.close()
     
     analytics_data = [dict(row) for row in analytics_rows]
