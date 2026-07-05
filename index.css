@@ -45,7 +45,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h2 {
-    font-family: 'Metal Mania', system-ui;
+    font-family: 'Creepster', system-ui;
     font-size: 3.25rem;
     margin-bottom: 1rem;
     letter-spacing: 2px;
@@ -498,6 +498,8 @@ main {
 }
 
 .section-header h2 {
+    font-family: 'Creepster', cursive;
+    font-weight: 400;
 }
 
 .metal-pulse-text {

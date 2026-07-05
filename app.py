@@ -14,6 +14,8 @@ from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 import uuid
 from PIL import Image
+import json
+import re
 
 load_dotenv('config.env')
 
@@ -22,6 +24,98 @@ app.secret_key = os.getenv('SECRET_KEY', 'super_secret_goth_key')
 app.config['UPLOAD_FOLDER'] = 'updates'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 2592000
 app.permanent_session_lifetime = timedelta(minutes=30)
+
+@app.template_filter('fromjson')
+def fromjson_filter(value):
+    if value:
+        try:
+            return json.loads(value)
+        except:
+            return []
+    return []
+
+@app.template_filter('process_images')
+def process_images_filter(text, images_json):
+    if not text: return {"text": "", "unused": []}
+    if not images_json: return {"text": text, "unused": []}
+    
+    try:
+        images = json.loads(images_json)
+    except:
+        images = []
+        
+    used_indices = set()
+    
+    def replace_match(match):
+        idx = int(match.group(1)) - 1
+        if 0 <= idx < len(images):
+            used_indices.add(idx)
+            img_path = images[idx] if images[idx].startswith('http') or images[idx].startswith('assets') else 'updates/' + images[idx]
+            return f'<div style="text-align: center; margin: 30px 0;"><img loading="lazy" src="{img_path}" style="width: 100%; max-width: 800px; height: auto; border-radius: 8px; border: 1px solid #333;" alt="Imagen intercalada"></div>'
+        return match.group(0) # Keep [IMG_X] if not found
+        
+    processed_text = re.sub(r'\[IMG_(\d+)\]', replace_match, text)
+    
+    # Auto-interleave if there are still unused images
+    unused_list = [img for i, img in enumerate(images) if i not in used_indices]
+    
+    if len(unused_list) > 0:
+        # Since text is HTML, split by </p> to find logical paragraph breaks
+        raw_splits = re.split(r'(</p>)', processed_text, flags=re.IGNORECASE)
+        paragraphs = []
+        temp = ""
+        for chunk in raw_splits:
+            temp += chunk
+            if chunk.lower() == '</p>':
+                if temp.strip():
+                    paragraphs.append(temp)
+                temp = ""
+        if temp.strip():
+            paragraphs.append(temp)
+            
+        # If no <p> tags, try splitting by <br> tags
+        if len(paragraphs) < 2:
+            raw_splits = re.split(r'(<br\s*/?>\s*<br\s*/?>)', processed_text, flags=re.IGNORECASE)
+            paragraphs = []
+            temp = ""
+            for chunk in raw_splits:
+                temp += chunk
+                if '<br' in chunk.lower():
+                    if temp.strip():
+                        paragraphs.append(temp)
+                    temp = ""
+            if temp.strip():
+                paragraphs.append(temp)
+                
+        if len(paragraphs) > 1:
+            new_paragraphs = []
+            img_idx = 0
+            
+            gap_count = len(paragraphs) - 1
+            gap_step = max(1, gap_count // len(unused_list))
+            
+            for i, p in enumerate(paragraphs):
+                new_paragraphs.append(p)
+                if i < len(paragraphs) - 1 and img_idx < len(unused_list) and (i + 1) % gap_step == 0:
+                    img = unused_list[img_idx]
+                    img_path = img if img.startswith('http') or img.startswith('assets') else 'updates/' + img
+                    
+                    float_dir = "right" if img_idx % 2 == 0 else "left"
+                    margin_dir = "margin: 10px 0px 10px 20px;" if float_dir == "right" else "margin: 10px 20px 10px 0px;"
+                    
+                    img_html = f'<img loading="lazy" src="{img_path}" style="float: {float_dir}; width: 45%; max-width: 350px; {margin_dir} border-radius: 8px; border: 1px solid #333;" alt="Imagen de artículo">'
+                    new_paragraphs.append(img_html)
+                    
+                    original_idx = images.index(img)
+                    used_indices.add(original_idx)
+                    img_idx += 1
+                    
+            processed_text = ''.join(new_paragraphs)
+            processed_text += '<div style="clear: both;"></div>'
+            
+    unused_images = [img for i, img in enumerate(images) if i not in used_indices]
+    
+    return {"text": processed_text, "unused": unused_images}
 
 def optimize_and_save_image(file_obj, save_dir, prefix=""):
     """
@@ -296,6 +390,7 @@ def update_analytics():
     record_id = data.get('record_id')
     scroll_depth = data.get('scroll_depth', 0)
     time_on_page = data.get('time_on_page', 0)
+    section_times = data.get('section_times', {})
     
     if not record_id:
         return jsonify({"success": False}), 400
@@ -303,12 +398,15 @@ def update_analytics():
     conn = get_db_connection(live=True)
     cursor = conn.cursor()
     
+    import json
+    section_times_str = json.dumps(section_times)
+    
     # Only update if the new values are greater (e.g., they scrolled further or spent more time)
     cursor.execute('''
         UPDATE performance_analytics 
-        SET scroll_depth = MAX(scroll_depth, ?), time_on_page = MAX(time_on_page, ?)
+        SET scroll_depth = MAX(scroll_depth, ?), time_on_page = MAX(time_on_page, ?), section_times = ?
         WHERE id = ?
-    ''', (scroll_depth, time_on_page, record_id))
+    ''', (scroll_depth, time_on_page, section_times_str, record_id))
     
     conn.commit()
     conn.close()
@@ -772,6 +870,15 @@ def admin_dashboard():
         if image and image.filename:
             image_filename = optimize_and_save_image(image, app.config['UPLOAD_FOLDER'], prefix="content_")
             
+        additional_images = request.files.getlist('additional_images')
+        additional_filenames = []
+        for extra_img in additional_images:
+            if extra_img and extra_img.filename:
+                extra_filename = optimize_and_save_image(extra_img, app.config['UPLOAD_FOLDER'], prefix="extra_")
+                additional_filenames.append(extra_filename)
+        import json
+        additional_images_json = json.dumps(additional_filenames)
+            
         copy_text = f"🔥 ¡NUEVO CONTENIDO EN GOTH PRODS! 🔥\n\n"
         copy_text += f"SECCIÓN: {section}\n"
         copy_text += f"TÍTULO: {title}\n\n"
@@ -797,9 +904,9 @@ def admin_dashboard():
         conn = get_db_connection()
         conn.execute('''
             INSERT INTO content_items 
-            (section, title, short_desc, full_desc, image_filename, yt_link, sp_link, ap_link, author, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (section, title, short_desc, full_desc, image_filename, yt_link, sp_link, ap_link, author, pub_date))
+            (section, title, short_desc, full_desc, image_filename, yt_link, sp_link, ap_link, author, created_at, additional_images)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (section, title, short_desc, full_desc, image_filename, yt_link, sp_link, ap_link, author, pub_date, additional_images_json))
         conn.commit()
         conn.close()
             
@@ -807,7 +914,7 @@ def admin_dashboard():
         return redirect(url_for('admin_dashboard'))
 
     conn = get_db_connection()
-    all_items = conn.execute("SELECT id, section, title, short_desc, full_desc, yt_link, sp_link, ap_link, created_at FROM content_items WHERE section IN ('El Noticiero Nocturno', 'Reseñas de Conciertos', 'Metal Pulse Tracks') ORDER BY id DESC LIMIT 100").fetchall()
+    all_items = conn.execute("SELECT id, section, title, short_desc, full_desc, yt_link, sp_link, ap_link, created_at, additional_images FROM content_items WHERE section IN ('El Noticiero Nocturno', 'Reseñas de Conciertos', 'Metal Pulse Tracks') ORDER BY id DESC LIMIT 100").fetchall()
     todas_bandas = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC").fetchall()
     todos_eventos = conn.execute("SELECT * FROM eventos_semana ORDER BY id DESC").fetchall()
     all_users = conn.execute('SELECT id, nombre, username, email, role, is_active FROM users ORDER BY id DESC').fetchall() if session.get('role') in ['admin', 'root'] else []
@@ -817,29 +924,55 @@ def admin_dashboard():
     perf_start = request.args.get('start', '')
     perf_end = request.args.get('end', '')
     
-    perf_query = 'SELECT * FROM performance_analytics'
+    perf_query = "SELECT * FROM performance_analytics WHERE page_url NOT LIKE '%localhost%' AND page_url NOT LIKE '%127.0.0.1%'"
     perf_params = []
     
     if perf_range == '7':
-        perf_query += " WHERE created_at >= date('now', '-7 days')"
+        perf_query += " AND created_at >= date('now', '-7 days')"
     elif perf_range == '30':
-        perf_query += " WHERE created_at >= date('now', '-30 days')"
+        perf_query += " AND created_at >= date('now', '-30 days')"
     elif perf_range == '90':
-        perf_query += " WHERE created_at >= date('now', '-90 days')"
+        perf_query += " AND created_at >= date('now', '-90 days')"
     elif perf_range == 'custom' and perf_start and perf_end:
-        perf_query += " WHERE created_at >= ? AND created_at <= ?"
+        perf_query += " AND created_at >= ? AND created_at <= ?"
         perf_params = [perf_start + ' 00:00:00', perf_end + ' 23:59:59']
         
     perf_query += " ORDER BY id DESC"
     
     analytics_rows = conn_live.execute(perf_query, perf_params).fetchall()
+    
+    interactions_query = '''
+    SELECT section, title, views, likes, 
+           (SELECT COUNT(*) FROM comments WHERE item_id = content_items.id AND item_type = 'content') as comments_count
+    FROM content_items 
+    WHERE views > 0 OR likes > 0 OR (SELECT COUNT(*) FROM comments WHERE item_id = content_items.id AND item_type = 'content') > 0
+    
+    UNION ALL
+    
+    SELECT 'Banda de la Semana' as section, nombre as title, views, likes,
+           (SELECT COUNT(*) FROM comments WHERE item_id = banda_semana.id AND item_type = 'banda') as comments_count
+    FROM banda_semana
+    WHERE views > 0 OR likes > 0 OR (SELECT COUNT(*) FROM comments WHERE item_id = banda_semana.id AND item_type = 'banda') > 0
+    
+    UNION ALL
+    
+    SELECT 'Agenda Metalera' as section, titulo_articulo as title, views, likes,
+           (SELECT COUNT(*) FROM comments WHERE item_id = eventos_semana.id AND item_type = 'evento') as comments_count
+    FROM eventos_semana
+    WHERE views > 0 OR likes > 0 OR (SELECT COUNT(*) FROM comments WHERE item_id = eventos_semana.id AND item_type = 'evento') > 0
+    
+    ORDER BY views DESC, likes DESC
+    '''
+    interactions_rows = conn_live.execute(interactions_query).fetchall()
+    
     conn_live.close()
     
     analytics_data = [dict(row) for row in analytics_rows]
+    interactions_data = [dict(row) for row in interactions_rows]
     
     conn.close()
 
-    return render_template('admin_dashboard.html', all_items=all_items, settings=get_settings(), todas_bandas=todas_bandas, todos_eventos=todos_eventos, all_users=all_users, analytics_data=analytics_data)
+    return render_template('admin_dashboard.html', all_items=all_items, settings=get_settings(), todas_bandas=todas_bandas, todos_eventos=todos_eventos, all_users=all_users, analytics_data=analytics_data, interactions_data=interactions_data)
 
 @app.route('/admin/settings', methods=['POST'])
 def update_settings():

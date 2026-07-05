@@ -36,6 +36,36 @@
     let maxScrollDepth = 0;
     let startTime = Date.now();
     let timeOnPage = 0;
+    
+    // Section Time Tracking
+    let sectionTimes = {};
+    let currentVisibleSections = new Set();
+    
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    currentVisibleSections.add(entry.target.id);
+                } else {
+                    currentVisibleSections.delete(entry.target.id);
+                }
+            });
+        }, { threshold: 0.3 });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('section').forEach(sec => {
+                if (sec.id) observer.observe(sec);
+            });
+        });
+    }
+
+    setInterval(() => {
+        if (document.visibilityState !== 'hidden') {
+            currentVisibleSections.forEach(id => {
+                sectionTimes[id] = (sectionTimes[id] || 0) + 1;
+            });
+        }
+    }, 1000);
 
     // Track scroll
     window.addEventListener('scroll', () => {
@@ -60,7 +90,8 @@
         const payload = JSON.stringify({
             record_id: recordId,
             scroll_depth: maxScrollDepth,
-            time_on_page: timeOnPage
+            time_on_page: timeOnPage,
+            section_times: sectionTimes
         });
 
         if (isFinal && navigator.sendBeacon) {
@@ -100,10 +131,10 @@
     }
 
     // Fetch country and init
-    fetch('https://ipapi.co/json/')
+    fetch('https://get.geojs.io/v1/ip/geo.json')
         .then(res => res.json())
         .then(data => {
-            initAnalytics(data.country_name || data.country || "Unknown");
+            initAnalytics(data.country || "Unknown");
         })
         .catch(() => {
             // Fallback if IP API fails
