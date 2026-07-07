@@ -114,7 +114,7 @@
             body: JSON.stringify({
                 session_id: sessionId,
                 user_id: userId,
-                page_url: window.location.pathname + window.location.hash,
+                page_url: window.location.href,
                 device_type: deviceType,
                 country: country,
                 referrer: referrer,
@@ -134,11 +134,22 @@
     fetch('https://get.geojs.io/v1/ip/geo.json')
         .then(res => res.json())
         .then(data => {
-            initAnalytics(data.country || "Unknown");
+            if (data.country) {
+                initAnalytics(data.country);
+            } else {
+                throw new Error("No country");
+            }
         })
         .catch(() => {
-            // Fallback if IP API fails
-            initAnalytics("Unknown");
+            // Fallback to ipapi
+            fetch('https://ipapi.co/json/')
+                .then(res => res.json())
+                .then(data => {
+                    initAnalytics(data.country_name || "Unknown");
+                })
+                .catch(() => {
+                    initAnalytics("Unknown");
+                });
         });
 
     // Periodically update (every 15 seconds)
