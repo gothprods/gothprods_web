@@ -38,9 +38,23 @@ def fromjson_filter(value):
 @app.template_filter('slugify')
 def slugify(value):
     if not value: return ''
+    
+    # Split by common separators to get the main title part
+    for sep in [' - ', ' – ', ' : ', ' | ']:
+        if sep in str(value):
+            value = str(value).split(sep)[0]
+            break
+            
     value = unicodedata.normalize('NFKD', str(value)).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
-    return re.sub(r'[-\s]+', '-', value)
+    value = re.sub(r'[-\s]+', '-', value)
+    
+    # Limit to first 5 words if it's still very long
+    words = value.split('-')
+    if len(words) > 5:
+        value = '-'.join(words[:5])
+        
+    return value
 
 @app.template_filter('process_images')
 def process_images_filter(text, images_json):
