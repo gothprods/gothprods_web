@@ -189,14 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-window.copyShareLink = function(itemId) {
-    const link = window.location.origin + window.location.pathname + '?item=' + itemId;
-    navigator.clipboard.writeText(link).then(() => {
-        alert('¡Enlace copiado al portapapeles!\n' + link);
-    }).catch(err => {
-        prompt('Copia este enlace para compartir:', link);
-    });
-};
+
 
 // Agenda Metalera Tabs Logic
 function openAgendaTab(monthName) {

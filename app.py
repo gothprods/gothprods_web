@@ -16,6 +16,7 @@ import uuid
 from PIL import Image
 import json
 import re
+import unicodedata
 
 load_dotenv('config.env')
 
@@ -33,6 +34,13 @@ def fromjson_filter(value):
         except:
             return []
     return []
+
+@app.template_filter('slugify')
+def slugify(value):
+    if not value: return ''
+    value = unicodedata.normalize('NFKD', str(value)).encode('ascii', 'ignore').decode('ascii')
+    value = re.sub(r'[^\w\s-]', '', value).strip().lower()
+    return re.sub(r'[-\s]+', '-', value)
 
 @app.template_filter('process_images')
 def process_images_filter(text, images_json):
@@ -650,7 +658,8 @@ def index():
                            eventos_semana=eventos_semana, is_preview=is_preview)
 
 @app.route('/banda/<int:id>')
-def view_banda(id):
+@app.route('/banda/<int:id>-<string:slug>')
+def view_banda(id, slug=None):
     is_preview = request.args.get('preview') == '1'
     conn = get_db_connection(live=not is_preview)
     banda = conn.execute("SELECT * FROM banda_semana WHERE id = ?", (id,)).fetchone()
@@ -663,7 +672,8 @@ def view_banda(id):
     return render_template('banda.html', banda=banda, settings=settings, is_preview=is_preview)
 
 @app.route('/evento/<int:id>')
-def view_evento(id):
+@app.route('/evento/<int:id>-<string:slug>')
+def view_evento(id, slug=None):
     is_preview = request.args.get('preview') == '1'
     conn = get_db_connection(live=not is_preview)
     evento = conn.execute("SELECT * FROM eventos_semana WHERE id = ?", (id,)).fetchone()
@@ -676,7 +686,8 @@ def view_evento(id):
     return render_template('evento.html', evento=evento, settings=settings, is_preview=is_preview)
 
 @app.route('/articulo/<int:id>')
-def view_articulo(id):
+@app.route('/articulo/<int:id>-<string:slug>')
+def view_articulo(id, slug=None):
     is_preview = request.args.get('preview') == '1'
     conn = get_db_connection(live=not is_preview)
     item = conn.execute("SELECT * FROM content_items WHERE id = ?", (id,)).fetchone()
