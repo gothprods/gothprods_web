@@ -246,12 +246,14 @@ if __name__ == "__main__":
         target = sys.argv[1]
         if target == "galeria":
             sync_youtube("La Galería Nocturna")
+            sync_youtube_playlist("PLd5jsuXDl0KA", "Colaboraciones")
         elif target == "metal_pulse":
             sync_ivoox("https://feeds.ivoox.com/feed_fg_f12064367_filtro_1.xml", "Metal Pulse")
         elif target == "entrevistas":
             sync_youtube_playlist("PLvx0zBV_ivqAdRE2WhzwUscz1RfR4W9US", "Entrevistas Under")
     else:
         sync_youtube("La Galería Nocturna")
+        sync_youtube_playlist("PLd5jsuXDl0KA", "Colaboraciones")
         sync_ivoox("https://feeds.ivoox.com/feed_fg_f12064367_filtro_1.xml", "Metal Pulse")
         sync_youtube_playlist("PLvx0zBV_ivqAdRE2WhzwUscz1RfR4W9US", "Entrevistas Under")
     print("Sync complete!")
