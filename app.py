@@ -389,9 +389,24 @@ def init_analytics():
     user_id = data.get('user_id')
     page_url = data.get('page_url')
     device_type = data.get('device_type')
-    country = data.get('country')
+    country = data.get('country', 'Unknown')
     referrer = data.get('referrer')
     is_new_user = 1 if data.get('is_new_user') else 0
+    
+    if not country or country == 'Unknown':
+        client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        if client_ip:
+            client_ip = client_ip.split(',')[0].strip()
+            if client_ip not in ('127.0.0.1', '::1', 'localhost'):
+                try:
+                    import urllib.request, json
+                    req = urllib.request.Request(f'http://ip-api.com/json/{client_ip}', headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(req, timeout=2) as response:
+                        ip_data = json.loads(response.read().decode())
+                        if ip_data.get('status') == 'success':
+                            country = ip_data.get('country', 'Unknown')
+                except Exception:
+                    pass
     
     conn = get_db_connection(live=True)
     cursor = conn.cursor()

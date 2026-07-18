@@ -52,11 +52,17 @@
             });
         }, { threshold: 0.3 });
         
-        document.addEventListener('DOMContentLoaded', () => {
+        function observeSections() {
             document.querySelectorAll('section').forEach(sec => {
                 if (sec.id) observer.observe(sec);
             });
-        });
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', observeSections);
+        } else {
+            observeSections();
+        }
     }
 
     setInterval(() => {
