@@ -1020,6 +1020,21 @@
                     <p style="color: var(--accent-color); font-weight: bold; font-size: 0.9rem; margin: 5px 0;">{{ item.author[8:10] }}/{{ item.author[5:7] }}</p>
                     <p>{{ item.short_desc | striptags }}</p>
                     <div style="margin-top: 5px; font-weight: bold;">{{ item.full_desc | safe }}</div>
+                    {% if item.sp_link %}
+                        <div style="margin-top: auto; padding-top: 15px; width: 100%;">
+                        {% if item.sp_link.startswith('http') %}
+                            <a href="{{ item.sp_link }}" target="_blank" style="display: inline-block; padding: 4px 11px; background: var(--accent-color); color: #000; text-decoration: none; font-weight: bold; border-radius: 3px; font-size: 0.65rem; text-transform: uppercase;">Boletos</a>
+                        {% else %}
+                            {% set badge_color = "var(--accent-color)" %}
+                            {% if item.sp_link.lower() == 'entrada libre' %}
+                                {% set badge_color = "#4CAF50" %}
+                            {% elif item.sp_link.lower() == 'sold out' %}
+                                {% set badge_color = "#F44336" %}
+                            {% endif %}
+                            <span style="display: inline-block; padding: 4px 11px; background: #222; color: {{ badge_color }}; font-weight: bold; border-radius: 3px; font-size: 0.65rem; text-transform: uppercase; border: 1px solid {{ badge_color }};">{{ item.sp_link }}</span>
+                        {% endif %}
+                        </div>
+                    {% endif %}
                     {% if item.yt_link == 'Y' %}
                     <img loading="lazy" src="assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
                     {% endif %}
