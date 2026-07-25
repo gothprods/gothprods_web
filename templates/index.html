@@ -1026,7 +1026,7 @@
                         <h3>{{ item.title }}</h3>
                         <p style="color: var(--accent-color); font-weight: bold; font-size: 0.9rem; margin: 5px 0;">{{ item.author[8:10] }}/{{ item.author[5:7] }}</p>
                         <p>{{ item.short_desc | striptags }}</p>
-                        <div style="margin-top: 5px; font-weight: bold;">{{ item.full_desc | safe }}</div>
+                        <div style="margin-top: 5px; font-weight: bold; font-size: 0.8rem; font-family: var(--font-body);">{{ item.full_desc | striptags }}</div>
                         {% if item.sp_link %}
                             <div style="margin-top: auto; padding-top: 15px; width: 100%;">
                             {% if item.sp_link.startswith('http') %}
@@ -1071,7 +1071,7 @@
                         <h3>{{ item.title }}</h3>
                         <p style="color: var(--accent-color); font-weight: bold; font-size: 0.9rem; margin: 5px 0;">{{ item.author[8:10] }}/{{ item.author[5:7] }}</p>
                         <p>{{ item.short_desc | striptags }}</p>
-                        <div style="margin-top: 5px; font-weight: bold;">{{ item.full_desc | safe }}</div>
+                        <div style="margin-top: 5px; font-weight: bold; font-size: 0.8rem; font-family: var(--font-body);">{{ item.full_desc | striptags }}</div>
                         {% if item.sp_link %}
                             <div style="margin-top: auto; padding-top: 15px; width: 100%;">
                             {% if item.sp_link.startswith('http') %}
