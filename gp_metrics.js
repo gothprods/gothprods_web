@@ -101,7 +101,8 @@
         });
 
         if (isFinal && navigator.sendBeacon) {
-            navigator.sendBeacon('/api/analytics/update', payload);
+            const blob = new Blob([payload], { type: 'application/json' });
+            navigator.sendBeacon('/api/analytics/update', blob);
         } else {
             fetch('/api/analytics/update', {
                 method: 'POST',

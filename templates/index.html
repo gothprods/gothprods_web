@@ -987,6 +987,7 @@
                 </div>
                 {% endfor %}
             </div>
+            </div>
         </section>
         {% endif %}
 
@@ -1011,7 +1012,7 @@
                 <div class="agenda-tabs">
                     {% for month_name, items in agenda_grouped_2026.items() %}
                     {% set is_past_month = items[-1].author < current_date %}
-                    <button class="agenda-tab-btn agenda-tab-btn-2026 {% if is_past_month %}past-month{% endif %}" data-month="2026-{{ month_name }}" onclick="openAgendaTab('2026-{{ month_name }}')">{{ month_name }}</button>
+                    <button class="agenda-tab-btn agenda-tab-btn-2026 {% if is_past_month %}past-month{% endif %}" data-month="2026-{{ month_name }}" onclick="openAgendaTab('2026-{{ month_name }}')">{{ month_name[:3] }}</button>
                     {% endfor %}
                 </div>
 
@@ -1024,13 +1025,12 @@
                         <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #888; padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #555; font-weight: bold; letter-spacing: 1px;">FINALIZADO</div>
                         {% endif %}
                         <h3>{{ item.title }}</h3>
-                        <p style="color: var(--accent-color); font-weight: bold; font-size: 0.9rem; margin: 5px 0;">{{ item.author[8:10] }}/{{ item.author[5:7] }}</p>
+                        <div style="margin: 5px 0; font-weight: bold; font-size: 0.95rem; font-family: var(--font-body); color: var(--accent-color);">{{ item.full_desc | striptags }}</div>
                         <p>{{ item.short_desc | striptags }}</p>
-                        <div style="margin-top: 5px; font-weight: bold; font-size: 0.8rem; font-family: var(--font-body);">{{ item.full_desc | striptags }}</div>
                         {% if item.sp_link %}
-                            <div style="margin-top: auto; padding-top: 15px; width: 100%;">
+                            <div style="margin-top: auto; padding-top: 15px; width: 100%; display: flex; justify-content: center; align-items: flex-end;">
                             {% if item.sp_link.startswith('http') %}
-                                <a href="{{ item.sp_link }}" target="_blank" style="display: inline-block; padding: 4px 11px; background: var(--accent-color); color: #000; text-decoration: none; font-weight: bold; border-radius: 3px; font-size: 0.65rem; text-transform: uppercase;">Boletos</a>
+                                <a href="{{ item.sp_link }}" target="_blank" style="display: inline-block; padding: 3px 8px; background: var(--accent-color); color: #000; text-decoration: none; font-weight: bold; border-radius: 3px; font-size: 0.5rem; text-transform: uppercase;">Boletos</a>
                             {% else %}
                                 {% set badge_color = "var(--accent-color)" %}
                                 {% if item.sp_link.lower() == 'entrada libre' %}
@@ -1038,7 +1038,7 @@
                                 {% elif item.sp_link.lower() == 'sold out' %}
                                     {% set badge_color = "#F44336" %}
                                 {% endif %}
-                                <span style="display: inline-block; padding: 4px 11px; background: #222; color: {{ badge_color }}; font-weight: bold; border-radius: 3px; font-size: 0.65rem; text-transform: uppercase; border: 1px solid {{ badge_color }};">{{ item.sp_link }}</span>
+                                <span style="display: inline-block; padding: 3px 8px; background: #222; color: {{ badge_color }}; font-weight: bold; border-radius: 3px; font-size: 0.5rem; text-transform: uppercase; border: 1px solid {{ badge_color }};">{{ item.sp_link }}</span>
                             {% endif %}
                             </div>
                         {% endif %}
@@ -1056,7 +1056,7 @@
                 <div class="agenda-tabs">
                     {% for month_name, items in agenda_grouped_2027.items() %}
                     {% set is_past_month = items[-1].author < current_date %}
-                    <button class="agenda-tab-btn agenda-tab-btn-2027 {% if is_past_month %}past-month{% endif %}" data-month="2027-{{ month_name }}" onclick="openAgendaTab('2027-{{ month_name }}')">{{ month_name }}</button>
+                    <button class="agenda-tab-btn agenda-tab-btn-2027 {% if is_past_month %}past-month{% endif %}" data-month="2027-{{ month_name }}" onclick="openAgendaTab('2027-{{ month_name }}')">{{ month_name[:3] }}</button>
                     {% endfor %}
                 </div>
 
@@ -1069,13 +1069,12 @@
                         <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #888; padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #555; font-weight: bold; letter-spacing: 1px;">FINALIZADO</div>
                         {% endif %}
                         <h3>{{ item.title }}</h3>
-                        <p style="color: var(--accent-color); font-weight: bold; font-size: 0.9rem; margin: 5px 0;">{{ item.author[8:10] }}/{{ item.author[5:7] }}</p>
+                        <div style="margin: 5px 0; font-weight: bold; font-size: 0.95rem; font-family: var(--font-body); color: var(--accent-color);">{{ item.full_desc | striptags }}</div>
                         <p>{{ item.short_desc | striptags }}</p>
-                        <div style="margin-top: 5px; font-weight: bold; font-size: 0.8rem; font-family: var(--font-body);">{{ item.full_desc | striptags }}</div>
                         {% if item.sp_link %}
-                            <div style="margin-top: auto; padding-top: 15px; width: 100%;">
+                            <div style="margin-top: auto; padding-top: 15px; width: 100%; display: flex; justify-content: center; align-items: flex-end;">
                             {% if item.sp_link.startswith('http') %}
-                                <a href="{{ item.sp_link }}" target="_blank" style="display: inline-block; padding: 4px 11px; background: var(--accent-color); color: #000; text-decoration: none; font-weight: bold; border-radius: 3px; font-size: 0.65rem; text-transform: uppercase;">Boletos</a>
+                                <a href="{{ item.sp_link }}" target="_blank" style="display: inline-block; padding: 3px 8px; background: var(--accent-color); color: #000; text-decoration: none; font-weight: bold; border-radius: 3px; font-size: 0.5rem; text-transform: uppercase;">Boletos</a>
                             {% else %}
                                 {% set badge_color = "var(--accent-color)" %}
                                 {% if item.sp_link.lower() == 'entrada libre' %}
@@ -1083,7 +1082,7 @@
                                 {% elif item.sp_link.lower() == 'sold out' %}
                                     {% set badge_color = "#F44336" %}
                                 {% endif %}
-                                <span style="display: inline-block; padding: 4px 11px; background: #222; color: {{ badge_color }}; font-weight: bold; border-radius: 3px; font-size: 0.65rem; text-transform: uppercase; border: 1px solid {{ badge_color }};">{{ item.sp_link }}</span>
+                                <span style="display: inline-block; padding: 3px 8px; background: #222; color: {{ badge_color }}; font-weight: bold; border-radius: 3px; font-size: 0.5rem; text-transform: uppercase; border: 1px solid {{ badge_color }};">{{ item.sp_link }}</span>
                             {% endif %}
                             </div>
                         {% endif %}
@@ -1379,7 +1378,7 @@
     </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <script src="app.js?v=7"></script>
-    <script src="gp_metrics.js?v=3"></script>
+    <script src="gp_metrics.js?v=4"></script>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <script>

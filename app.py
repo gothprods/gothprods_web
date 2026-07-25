@@ -394,7 +394,9 @@ def init_analytics():
     is_new_user = 1 if data.get('is_new_user') else 0
     
     if not country or country == 'Unknown':
-        client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        client_ip = request.headers.get('CF-Connecting-IP') or \
+                    request.headers.get('X-Real-IP') or \
+                    request.headers.get('X-Forwarded-For', request.remote_addr)
         if client_ip:
             client_ip = client_ip.split(',')[0].strip()
             if client_ip not in ('127.0.0.1', '::1', 'localhost'):
@@ -423,7 +425,7 @@ def init_analytics():
 
 @app.route('/api/analytics/update', methods=['POST'])
 def update_analytics():
-    data = request.json
+    data = request.json or {}
     record_id = data.get('record_id')
     scroll_depth = data.get('scroll_depth', 0)
     time_on_page = data.get('time_on_page', 0)
