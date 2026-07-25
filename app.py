@@ -646,7 +646,7 @@ def index():
     metalpulse_tracks = conn.execute("SELECT * FROM content_items WHERE section = 'Metal Pulse Tracks' ORDER BY id DESC").fetchall()
     conn.close()
     
-    # Group agenda items by month
+    # Group agenda items by month and year
     from collections import OrderedDict
     import datetime
     
@@ -657,16 +657,21 @@ def index():
         '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dic'
     }
     
-    agenda_grouped = OrderedDict()
+    agenda_grouped_2026 = OrderedDict()
+    agenda_grouped_2027 = OrderedDict()
     current_date = (datetime.datetime.utcnow() - datetime.timedelta(hours=6)).strftime("%Y-%m-%d")
     
     for item in agenda_items:
         # author has 'YYYY-MM-DD'
-        month_num = item['author'].split('-')[1] if item['author'] else '05'
+        parts = item['author'].split('-') if item['author'] else ['2026', '05']
+        year = parts[0] if len(parts) > 0 else '2026'
+        month_num = parts[1] if len(parts) > 1 else '05'
         month_name = spanish_months.get(month_num, 'Mayo')
-        if month_name not in agenda_grouped:
-            agenda_grouped[month_name] = []
-        agenda_grouped[month_name].append(item)
+        
+        target_group = agenda_grouped_2027 if year == '2027' else agenda_grouped_2026
+        if month_name not in target_group:
+            target_group[month_name] = []
+        target_group[month_name].append(item)
 
     upcoming_agenda = [item for item in agenda_items if item['author'] >= current_date]
 
@@ -678,7 +683,8 @@ def index():
                            metalpulse_items=metalpulse_items,
                            metalpulse_tracks=metalpulse_tracks,
                            caossonoro_items=caossonoro_items,
-                           agenda_grouped=agenda_grouped,
+                           agenda_grouped_2026=agenda_grouped_2026,
+                           agenda_grouped_2027=agenda_grouped_2027,
                            agenda_items=agenda_items,
                            upcoming_agenda=upcoming_agenda,
                            current_date=current_date,
@@ -1637,61 +1643,76 @@ def sync_agenda():
     import io
     import re
     
-    sheet_url = "https://docs.google.com/spreadsheets/d/1FTb-EzMtCGoxb0tAjoVQtTTeGJFd6qCP/export?format=csv"
     try:
-        req = urllib.request.Request(sheet_url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req) as response:
-            csv_data = response.read().decode('utf-8')
-            
-        if "html" in csv_data[:100].lower() or "google" in csv_data[:100].lower():
-            flash('Error: El Google Sheet es PRIVADO. Debes cambiar los permisos del archivo a "Cualquier persona con el enlace puede leer".', 'error')
-            return redirect(url_for('admin_dashboard'))
-            
-        reader = csv.DictReader(io.StringIO(csv_data))
-        months_map = {'mayo': 5, 'junio': 6, 'julio': 7, 'agosto': 8, 'septiembre': 9, 'octubre': 10, 'noviembre': 11, 'diciembre': 12, 'enero': 1, 'febrero': 2, 'marzo': 3, 'abril': 4}
-        
         conn = get_db_connection()
-        
         # Fetch existing agenda items to know which to keep and preserve their IDs
-        existing_rows = conn.execute("SELECT id, title FROM content_items WHERE section = 'Agenda Metalera'").fetchall()
-        existing_agenda = {r['title'].lower(): r['id'] for r in existing_rows}
+        # Key should include city to avoid overwriting duplicates like Megadeth CDMX vs Monterrey
+        existing_rows = conn.execute("SELECT id, title, short_desc FROM content_items WHERE section = 'Agenda Metalera'").fetchall()
+        existing_agenda = {f"{r['title'].lower()}|{r['short_desc'].split('|')[-1].strip().lower()}": r['id'] for r in existing_rows}
         seen_ids = set()
-        
-        for row in reader:
-            if 'Evento' not in row or not row['Evento'].strip(): continue
-            evento = row['Evento'].strip()
-            evento_lower = evento.lower()
-            ciudad = row.get('Ciudad', '').strip()
-            venue = row.get('Venue', '').strip()
-            fecha_raw = row.get('Fecha', '').strip()
-            gp = row.get('GP', 'N').strip()
-            
-            month = 12
-            for m_name, m_num in months_map.items():
-                if m_name in fecha_raw.lower():
-                    month = m_num
-                    break
+
+        def process_sheet(url, year):
+            try:
+                req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                with urllib.request.urlopen(req) as response:
+                    csv_data = response.read().decode('utf-8')
                     
-            day_match = re.search(r'\d+', fecha_raw)
-            day = int(day_match.group(0)) if day_match else 1
-            sort_date = f"2026-{month:02d}-{day:02d}"
-            logo_filename = f"assets/logos/{evento.lower().replace(' ', '').replace('/', '')}.png"
-            
-            if evento_lower in existing_agenda:
-                item_id = existing_agenda[evento_lower]
-                seen_ids.add(item_id)
-                conn.execute('''
-                    UPDATE content_items SET title=?, short_desc=?, full_desc=?, image_filename=?, yt_link=?, author=? WHERE id=?
-                ''', (evento, f"{venue} | {ciudad}", fecha_raw, logo_filename, gp, sort_date, item_id))
-            else:
-                cursor = conn.execute('''
-                    INSERT INTO content_items (section, title, short_desc, full_desc, image_filename, yt_link, author)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                ''', ("Agenda Metalera", evento, f"{venue} | {ciudad}", fecha_raw, logo_filename, gp, sort_date))
-                seen_ids.add(cursor.lastrowid)
+                if "html" in csv_data[:100].lower() or "google" in csv_data[:100].lower():
+                    return False
+                    
+                reader = csv.DictReader(io.StringIO(csv_data))
+                months_map = {'mayo': 5, 'junio': 6, 'julio': 7, 'agosto': 8, 'septiembre': 9, 'octubre': 10, 'noviembre': 11, 'diciembre': 12, 'enero': 1, 'febrero': 2, 'marzo': 3, 'abril': 4}
                 
-        # Delete any items that were removed from the Google Sheet
-        for title_lower, item_id in existing_agenda.items():
+                for row in reader:
+                    if 'Evento' not in row or not row['Evento'].strip(): continue
+                    evento = row['Evento'].strip()
+                    evento_lower = evento.lower()
+                    ciudad = row.get('Ciudad', '').strip()
+                    venue = row.get('Venue', '').strip()
+                    fecha_raw = row.get('Fecha', '').strip()
+                    gp = row.get('GP', 'N').strip()
+                    tickets = row.get('Tickets', '').strip()
+                    
+                    month = 12
+                    for m_name, m_num in months_map.items():
+                        if m_name in fecha_raw.lower():
+                            month = m_num
+                            break
+                            
+                    day_match = re.search(r'\d+', fecha_raw)
+                    day = int(day_match.group(0)) if day_match else 1
+                    sort_date = f"{year}-{month:02d}-{day:02d}"
+                    logo_filename = f"assets/logos/{evento.lower().replace(' ', '').replace('/', '')}.png"
+                    
+                    key = f"{evento_lower}|{ciudad.lower()}"
+                    
+                    if key in existing_agenda:
+                        item_id = existing_agenda[key]
+                        seen_ids.add(item_id)
+                        conn.execute('''
+                            UPDATE content_items SET title=?, short_desc=?, full_desc=?, image_filename=?, yt_link=?, sp_link=?, author=? WHERE id=?
+                        ''', (evento, f"{venue} | {ciudad}", fecha_raw, logo_filename, gp, tickets, sort_date, item_id))
+                    else:
+                        cursor = conn.execute('''
+                            INSERT INTO content_items (section, title, short_desc, full_desc, image_filename, yt_link, sp_link, author)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        ''', ("Agenda Metalera", evento, f"{venue} | {ciudad}", fecha_raw, logo_filename, gp, tickets, sort_date))
+                        seen_ids.add(cursor.lastrowid)
+                return True
+            except Exception as e:
+                print(f"Error processing sheet {year}:", e)
+                return False
+
+        success_2026 = process_sheet("https://docs.google.com/spreadsheets/d/1FTb-EzMtCGoxb0tAjoVQtTTeGJFd6qCP/export?format=csv&gid=2129987380", 2026)
+        success_2027 = process_sheet("https://docs.google.com/spreadsheets/d/1FTb-EzMtCGoxb0tAjoVQtTTeGJFd6qCP/export?format=csv&gid=1993250078", 2027)
+        
+        if not success_2026 and not success_2027:
+            flash('Error: El Google Sheet es PRIVADO o hubo un error de conexión.', 'error')
+            conn.close()
+            return redirect(url_for('admin_dashboard'))
+
+        # Delete any items that were removed from BOTH Google Sheets
+        for key, item_id in existing_agenda.items():
             if item_id not in seen_ids:
                 conn.execute("DELETE FROM content_items WHERE id=?", (item_id,))
         

@@ -992,56 +992,109 @@
 
         {% if settings.get('show_agenda', '1') == '1' %}
                 <section id="agenda" class="section agenda-section">
-            <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
-                    {% set icon_path = settings.get('icon_agenda', 'assets/agenda_icon.png') %}
-                    <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal">
-                    <div class="header-text-group" style="text-align: left; margin: 0;">
-                        <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">Agenda <span>Metalera 2026</span></h2>
+            <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start; flex-wrap: wrap;">
+                {% set icon_path = settings.get('icon_agenda', 'assets/agenda_icon.png') %}
+                <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal">
+                <div class="header-text-group" style="text-align: left; margin: 0; display: flex; align-items: center; gap: 15px;">
+                    <h2 style="font-family: 'Creepster', cursive; font-weight: 400; margin: 0;">Agenda <span>Metalera</span></h2>
+                    
+                    <!-- Year Switcher -->
+                    <div class="year-switcher" style="display: flex; gap: 10px;">
+                        <button class="year-tab-btn active" data-year="2026" onclick="openAgendaYear('2026')" style="background: var(--accent-color); color: #000; border: none; padding: 5px 15px; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Oswald', sans-serif;">2026</button>
+                        <button class="year-tab-btn" data-year="2027" onclick="openAgendaYear('2027')" style="background: #333; color: #fff; border: 1px solid var(--accent-color); padding: 5px 15px; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Oswald', sans-serif;">2027</button>
                     </div>
                 </div>
             </div>
-            
-            <div class="agenda-tabs" id="agendaTabs">
-                {% for month_name, items in agenda_grouped.items() %}
-                {% set is_past_month = items[-1].author < current_date %}
-                <button class="agenda-tab-btn {% if is_past_month %}past-month{% endif %}" data-month="{{ month_name }}" onclick="openAgendaTab('{{ month_name }}')">{{ month_name }}</button>
-                {% endfor %}
-            </div>
 
-            {% for month_name, items in agenda_grouped.items() %}
-            <div id="tab-{{ month_name|replace(' ', '-') }}" class="agenda-month-panel news-rail">
-                {% for item in items %}
-                <div class="agenda-card {% if item.author < current_date %}past-event{% endif %}">
-                    <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" onerror="this.src='assets/logo.png';" alt="Logo" class="agenda-logo">
-                    {% if item.author < current_date %}
-                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #888; padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #555; font-weight: bold; letter-spacing: 1px;">FINALIZADO</div>
-                    {% endif %}
-                    <h3>{{ item.title }}</h3>
-                    <p style="color: var(--accent-color); font-weight: bold; font-size: 0.9rem; margin: 5px 0;">{{ item.author[8:10] }}/{{ item.author[5:7] }}</p>
-                    <p>{{ item.short_desc | striptags }}</p>
-                    <div style="margin-top: 5px; font-weight: bold;">{{ item.full_desc | safe }}</div>
-                    {% if item.sp_link %}
-                        <div style="margin-top: auto; padding-top: 15px; width: 100%;">
-                        {% if item.sp_link.startswith('http') %}
-                            <a href="{{ item.sp_link }}" target="_blank" style="display: inline-block; padding: 4px 11px; background: var(--accent-color); color: #000; text-decoration: none; font-weight: bold; border-radius: 3px; font-size: 0.65rem; text-transform: uppercase;">Boletos</a>
-                        {% else %}
-                            {% set badge_color = "var(--accent-color)" %}
-                            {% if item.sp_link.lower() == 'entrada libre' %}
-                                {% set badge_color = "#4CAF50" %}
-                            {% elif item.sp_link.lower() == 'sold out' %}
-                                {% set badge_color = "#F44336" %}
-                            {% endif %}
-                            <span style="display: inline-block; padding: 4px 11px; background: #222; color: {{ badge_color }}; font-weight: bold; border-radius: 3px; font-size: 0.65rem; text-transform: uppercase; border: 1px solid {{ badge_color }};">{{ item.sp_link }}</span>
+            <!-- CONTAINER 2026 -->
+            <div id="agenda-container-2026" class="agenda-year-container">
+                <div class="agenda-tabs">
+                    {% for month_name, items in agenda_grouped_2026.items() %}
+                    {% set is_past_month = items[-1].author < current_date %}
+                    <button class="agenda-tab-btn agenda-tab-btn-2026 {% if is_past_month %}past-month{% endif %}" data-month="2026-{{ month_name }}" onclick="openAgendaTab('2026-{{ month_name }}')">{{ month_name }}</button>
+                    {% endfor %}
+                </div>
+
+                {% for month_name, items in agenda_grouped_2026.items() %}
+                <div id="tab-2026-{{ month_name|replace(' ', '-') }}" class="agenda-month-panel news-rail">
+                    {% for item in items %}
+                    <div class="agenda-card {% if item.author < current_date %}past-event{% endif %}">
+                        <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" onerror="this.src='assets/logo.png';" alt="Logo" class="agenda-logo">
+                        {% if item.author < current_date %}
+                        <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #888; padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #555; font-weight: bold; letter-spacing: 1px;">FINALIZADO</div>
                         {% endif %}
-                        </div>
-                    {% endif %}
-                    {% if item.yt_link == 'Y' %}
-                    <img loading="lazy" src="assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
-                    {% endif %}
+                        <h3>{{ item.title }}</h3>
+                        <p style="color: var(--accent-color); font-weight: bold; font-size: 0.9rem; margin: 5px 0;">{{ item.author[8:10] }}/{{ item.author[5:7] }}</p>
+                        <p>{{ item.short_desc | striptags }}</p>
+                        <div style="margin-top: 5px; font-weight: bold;">{{ item.full_desc | safe }}</div>
+                        {% if item.sp_link %}
+                            <div style="margin-top: auto; padding-top: 15px; width: 100%;">
+                            {% if item.sp_link.startswith('http') %}
+                                <a href="{{ item.sp_link }}" target="_blank" style="display: inline-block; padding: 4px 11px; background: var(--accent-color); color: #000; text-decoration: none; font-weight: bold; border-radius: 3px; font-size: 0.65rem; text-transform: uppercase;">Boletos</a>
+                            {% else %}
+                                {% set badge_color = "var(--accent-color)" %}
+                                {% if item.sp_link.lower() == 'entrada libre' %}
+                                    {% set badge_color = "#4CAF50" %}
+                                {% elif item.sp_link.lower() == 'sold out' %}
+                                    {% set badge_color = "#F44336" %}
+                                {% endif %}
+                                <span style="display: inline-block; padding: 4px 11px; background: #222; color: {{ badge_color }}; font-weight: bold; border-radius: 3px; font-size: 0.65rem; text-transform: uppercase; border: 1px solid {{ badge_color }};">{{ item.sp_link }}</span>
+                            {% endif %}
+                            </div>
+                        {% endif %}
+                        {% if item.yt_link == 'Y' %}
+                        <img loading="lazy" src="assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                 </div>
                 {% endfor %}
             </div>
-            {% endfor %}
+
+            <!-- CONTAINER 2027 -->
+            <div id="agenda-container-2027" class="agenda-year-container" style="display: none;">
+                <div class="agenda-tabs">
+                    {% for month_name, items in agenda_grouped_2027.items() %}
+                    {% set is_past_month = items[-1].author < current_date %}
+                    <button class="agenda-tab-btn agenda-tab-btn-2027 {% if is_past_month %}past-month{% endif %}" data-month="2027-{{ month_name }}" onclick="openAgendaTab('2027-{{ month_name }}')">{{ month_name }}</button>
+                    {% endfor %}
+                </div>
+
+                {% for month_name, items in agenda_grouped_2027.items() %}
+                <div id="tab-2027-{{ month_name|replace(' ', '-') }}" class="agenda-month-panel news-rail">
+                    {% for item in items %}
+                    <div class="agenda-card {% if item.author < current_date %}past-event{% endif %}">
+                        <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" onerror="this.src='assets/logo.png';" alt="Logo" class="agenda-logo">
+                        {% if item.author < current_date %}
+                        <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #888; padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #555; font-weight: bold; letter-spacing: 1px;">FINALIZADO</div>
+                        {% endif %}
+                        <h3>{{ item.title }}</h3>
+                        <p style="color: var(--accent-color); font-weight: bold; font-size: 0.9rem; margin: 5px 0;">{{ item.author[8:10] }}/{{ item.author[5:7] }}</p>
+                        <p>{{ item.short_desc | striptags }}</p>
+                        <div style="margin-top: 5px; font-weight: bold;">{{ item.full_desc | safe }}</div>
+                        {% if item.sp_link %}
+                            <div style="margin-top: auto; padding-top: 15px; width: 100%;">
+                            {% if item.sp_link.startswith('http') %}
+                                <a href="{{ item.sp_link }}" target="_blank" style="display: inline-block; padding: 4px 11px; background: var(--accent-color); color: #000; text-decoration: none; font-weight: bold; border-radius: 3px; font-size: 0.65rem; text-transform: uppercase;">Boletos</a>
+                            {% else %}
+                                {% set badge_color = "var(--accent-color)" %}
+                                {% if item.sp_link.lower() == 'entrada libre' %}
+                                    {% set badge_color = "#4CAF50" %}
+                                {% elif item.sp_link.lower() == 'sold out' %}
+                                    {% set badge_color = "#F44336" %}
+                                {% endif %}
+                                <span style="display: inline-block; padding: 4px 11px; background: #222; color: {{ badge_color }}; font-weight: bold; border-radius: 3px; font-size: 0.65rem; text-transform: uppercase; border: 1px solid {{ badge_color }};">{{ item.sp_link }}</span>
+                            {% endif %}
+                            </div>
+                        {% endif %}
+                        {% if item.yt_link == 'Y' %}
+                        <img loading="lazy" src="assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
         </section>
         {% endif %}
 
@@ -1325,7 +1378,7 @@
     observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
     </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    <script src="app.js?v=6"></script>
+    <script src="app.js?v=7"></script>
     <script src="gp_metrics.js?v=3"></script>
     {% with messages = get_flashed_messages() %}
       {% if messages %}

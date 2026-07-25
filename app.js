@@ -192,6 +192,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // Agenda Metalera Tabs Logic
+function openAgendaYear(year) {
+    // Hide all year containers
+    const containers = document.querySelectorAll('.agenda-year-container');
+    containers.forEach(container => container.style.display = 'none');
+    
+    // Show the selected year container
+    const targetContainer = document.getElementById('agenda-container-' + year);
+    if (targetContainer) {
+        targetContainer.style.display = 'block';
+    }
+    
+    // Update year buttons style
+    const yearBtns = document.querySelectorAll('.year-tab-btn');
+    yearBtns.forEach(btn => {
+        if(btn.getAttribute('data-year') === year) {
+            btn.classList.add('active');
+            btn.style.background = 'var(--accent-color)';
+            btn.style.color = '#000';
+            btn.style.border = 'none';
+        } else {
+            btn.classList.remove('active');
+            btn.style.background = '#333';
+            btn.style.color = '#fff';
+            btn.style.border = '1px solid var(--accent-color)';
+        }
+    });
+    
+    // Open the first valid month tab for this year
+    let targetTabBtn = document.querySelector('.agenda-tab-btn-' + year + ':not(.past-month)');
+    if (!targetTabBtn) {
+        const allBtns = document.querySelectorAll('.agenda-tab-btn-' + year);
+        if (allBtns.length > 0) {
+            targetTabBtn = allBtns[allBtns.length - 1]; // last past month
+        }
+    }
+    
+    if (targetTabBtn) {
+        const monthName = targetTabBtn.getAttribute('data-month');
+        if (monthName) {
+            openAgendaTab(monthName);
+        }
+    }
+}
+
 function openAgendaTab(monthName) {
     // Hide all panels
     const panels = document.querySelectorAll('.agenda-month-panel');
@@ -214,25 +258,9 @@ function openAgendaTab(monthName) {
     }
 }
 
-// Initialize the first valid tab on load
+// Initialize the first valid tab on load for default year (2026)
 document.addEventListener('DOMContentLoaded', () => {
-    // Try to find the first month that is NOT past
-    let targetTabBtn = document.querySelector('.agenda-tab-btn:not(.past-month)');
-    
-    // If all are past, pick the last past month
-    if (!targetTabBtn) {
-        const allBtns = document.querySelectorAll('.agenda-tab-btn');
-        if (allBtns.length > 0) {
-            targetTabBtn = allBtns[allBtns.length - 1];
-        }
-    }
-    
-    if (targetTabBtn) {
-        const monthName = targetTabBtn.getAttribute('data-month');
-        if (monthName) {
-            openAgendaTab(monthName);
-        }
-    }
+    openAgendaYear('2026');
 });
 
 // --- Comments Logic ---
