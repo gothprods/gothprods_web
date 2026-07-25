@@ -87,9 +87,11 @@ def sync_youtube(target_section):
             section = "Metal Pulse"
         elif "colaboraci" in title_lower or "collab" in title_lower:
             section = "Colaboraciones"
+        elif "entrevista" in title_lower:
+            section = "Entrevistas Under"
 
         if target_section == "La Galería Nocturna":
-            if section not in ("La Galería Nocturna", "Caos Sonoro", "Colaboraciones"):
+            if section not in ("La Galería Nocturna", "Caos Sonoro", "Colaboraciones", "Entrevistas Under"):
                 continue
         else:
             if section != target_section:
@@ -135,7 +137,7 @@ def sync_youtube(target_section):
     conn.commit()
     
     if target_section == "La Galería Nocturna":
-        cleanup_dead_links(conn, ("La Galería Nocturna", "Caos Sonoro", "Colaboraciones"))
+        cleanup_dead_links(conn, ("La Galería Nocturna", "Caos Sonoro", "Colaboraciones", "Entrevistas Under"))
     else:
         cleanup_dead_links(conn, (target_section,))
         
