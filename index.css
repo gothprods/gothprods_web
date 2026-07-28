@@ -123,6 +123,7 @@ main {
 
 .dock-logo {
     margin-bottom: 0.5rem;
+    flex-shrink: 0;
 }
 
 .dock-divider {
@@ -130,6 +131,7 @@ main {
     border: 0;
     border-top: 1px solid rgba(113, 109, 74, 0.4);
     margin: 0.5rem 0;
+    flex-shrink: 0;
 }
 
 .dock-logo img {
@@ -165,6 +167,7 @@ main {
     background: transparent;
     transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
     transform-origin: center left;
+    flex-shrink: 0;
 }
 
 .dock-item a {
@@ -249,6 +252,8 @@ main {
     gap: 0.8rem;
     align-items: center;
     margin-top: auto;
+    flex-shrink: 0;
+    padding-bottom: 1rem;
 }
 
 .dock-socials {
