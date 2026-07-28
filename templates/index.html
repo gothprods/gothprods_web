@@ -46,8 +46,8 @@
 
         <ul class="dock-menu">
             {% if settings.get('show_banda_semana', '1') == '1' %}
-            <li class="dock-item" data-title="{{ settings.get('title_destacados', 'Bandas y Eventos Destacados') }}">
-                <a href="#banda-eventos-semana"><img src="{{ settings.get('icon_destacados', 'assets/destacados_icon.png') }}" alt="{{ settings.get('title_destacados', 'Bandas y Eventos Destacados') }}" style="width: 32px; height: 32px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_destacados', 'Bandas y Eventos Destacados') }}</span></a>
+            <li class="dock-item" data-title="{{ settings.get('title_destacados', 'Radar del Caos') }}">
+                <a href="#radar-del-caos"><img src="{{ settings.get('icon_destacados', 'assets/destacados_icon.png') }}" alt="{{ settings.get('title_destacados', 'Radar del Caos') }}" style="width: 32px; height: 32px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_destacados', 'Radar del Caos') }}</span></a>
             </li>
             {% endif %}
 

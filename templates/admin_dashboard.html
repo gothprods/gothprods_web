@@ -63,9 +63,9 @@ input:checked + .slider:before { transform: translateX(20px); }
         <button class="tab-btn" onclick="openTab(event, 'tab-metalpulse')"><i class="fa-solid fa-headphones"></i> Metal Pulse</button>
         {% endif %}
         {% if session.get('role') in ['admin', 'root'] %}
-        <button class="tab-btn" onclick="openTab(event, 'tab-banda')"><i class="fa-solid fa-star"></i> Banda de la Semana</button>
-        <button class="tab-btn" onclick="openTab(event, 'tab-eventos')"><i class="fa-solid fa-calendar-star"></i> Eventos Destacados</button>
-        <button class="tab-btn" onclick="openTab(event, 'tab-mexapedia')"><i class="fa-solid fa-users-viewfinder"></i> Colectivo Mexapedia</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-banda')"><i class="fa-solid fa-star"></i> Radar del Caos: Bandas</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-eventos')"><i class="fa-solid fa-calendar-star"></i> Radar del Caos: Eventos</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-mexapedia')"><i class="fa-solid fa-users-viewfinder"></i> Radar del Caos: Mexapedia</button>
         {% endif %}
         {% if session.get('role') in ['admin', 'root'] %}
         <button class="tab-btn" onclick="openTab(event, 'tab-caos')"><i class="fa-solid fa-microphone"></i> Caos Sonoro</button>
@@ -1351,7 +1351,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     <!-- TAB: BANDA DE LA SEMANA -->
     <div id="tab-banda" class="tab-content">
-        <h3 id="form-banda-title"><i class="fa-solid fa-star"></i> Gestión Banda de la Semana</h3>
+        <h3 id="form-banda-title"><i class="fa-solid fa-star"></i> Gestión Radar del Caos: Bandas</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Agrega la banda destacada que aparecerá en el sitio.</p>
         
         <form id="banda-form" method="POST" action="/admin/banda" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()" novalidate>
@@ -1479,7 +1479,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 30px;">
-                <button type="submit" id="banda-submit-btn"><i class="fa-solid fa-plus"></i> Agregar Banda de la Semana</button>
+                <button type="submit" id="banda-submit-btn"><i class="fa-solid fa-plus"></i> Agregar al Radar del Caos: Bandas</button>
                 <button type="button" id="banda-cancel-btn" onclick="cancelBandaEdit()" style="display: none; background: #555; color: white;"><i class="fa-solid fa-xmark"></i> Cancelar</button>
             </div>
         </form>
@@ -1562,7 +1562,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     <!-- TAB: EVENTOS DE LA SEMANA -->
     <div id="tab-eventos" class="tab-content">
-        <h3 id="form-eventos-title"><i class="fa-solid fa-calendar-star"></i> Gestión Eventos Destacados</h3>
+        <h3 id="form-eventos-title"><i class="fa-solid fa-calendar-star"></i> Gestión Radar del Caos: Eventos</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Agrega los eventos relevantes a los cuales daremos difusión.</p>
         
         <form id="eventos-form" method="POST" action="/admin/eventos" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()" novalidate>
@@ -2100,9 +2100,9 @@ function editBandaRecord(btn) {
 }
 
 function cancelBandaEdit() {
-    document.getElementById('form-banda-title').innerHTML = '<i class="fa-solid fa-star"></i> Configurar Banda de la Semana';
+    document.getElementById('form-banda-title').innerHTML = '<i class="fa-solid fa-star"></i> Configurar Radar del Caos: Bandas';
     document.getElementById('banda-form').action = '/admin/banda';
-    document.getElementById('banda-submit-btn').innerHTML = '<i class="fa-solid fa-plus"></i> Agregar Banda de la Semana';
+    document.getElementById('banda-submit-btn').innerHTML = '<i class="fa-solid fa-plus"></i> Agregar al Radar del Caos: Bandas';
     document.getElementById('banda-cancel-btn').style.display = 'none';
     
     document.getElementById('banda-form').reset();
@@ -2202,9 +2202,9 @@ function editEventoRecord(btn) {
 }
 
 function cancelEventoEdit() {
-    document.getElementById('form-eventos-title').innerHTML = '<i class="fa-solid fa-calendar-star"></i> Gestión Eventos Destacados';
+    document.getElementById('form-eventos-title').innerHTML = '<i class="fa-solid fa-calendar-star"></i> Gestión Radar del Caos: Eventos';
     document.getElementById('eventos-form').action = '/admin/eventos';
-    document.getElementById('eventos-submit-btn').innerHTML = '<i class="fa-solid fa-plus"></i> Agregar Evento de la Semana';
+    document.getElementById('eventos-submit-btn').innerHTML = '<i class="fa-solid fa-plus"></i> Agregar al Radar del Caos: Eventos';
     document.getElementById('eventos-cancel-btn').style.display = 'none';
     
     document.getElementById('eventos-form').reset();
