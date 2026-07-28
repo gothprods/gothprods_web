@@ -150,15 +150,15 @@
             </div>
 
             <!-- Carousel Container -->
-            <div class="radar-carousel" style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; width: fit-content; margin: 0 auto; max-width: 100%;">
+            <div class="radar-carousel" style="display: flex; justify-content: center; gap: 20px; overflow-x: auto; padding-bottom: 20px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; width: 100%; max-width: 100%;">
                 
                 <!-- BANDAS -->
                 {% for banda_semana in bandas_semana %}
-                <div class="radar-card" style="scroll-snap-align: start; flex: 0 0 calc(20% - 16px); min-width: 280px; max-width: 350px; display: flex; flex-direction: column;">
+                <div class="radar-card" style="scroll-snap-align: start; display: flex; flex-direction: column;">
                     <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--accent-color); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.8); display: flex; flex-direction: column; height: 100%; position: relative;">
                         {% if is_preview %}<a href="/admin/dashboard?edit_type=banda&edit_id={{ banda_semana.id }}" target="_parent" class="preview-edit-btn" style="z-index: 10;"><i class="fa-solid fa-pen"></i> Corregir Banda</a>{% endif %}
                         
-                        <img loading="lazy" src="{{ banda_semana.img_video_path }}" alt="{{ banda_semana.nombre }}" style="width: 100%; height: 250px; object-fit: cover; object-position: center top; display: block; margin: 0;">
+                        <img loading="lazy" src="{{ banda_semana.img_video_path }}" alt="{{ banda_semana.nombre }}" style="width: 100%; height: 160px; object-fit: cover; object-position: center top; display: block; margin: 0;">
                         
                         <div style="padding: 20px; flex: 1; display: flex; flex-direction: column; color: #ddd;">
                             <div style="background: rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; align-self: flex-start; margin-bottom: 10px; font-family: 'Oswald', sans-serif;">Banda de la semana</div>
@@ -180,11 +180,11 @@
 
                 <!-- EVENTOS -->
                 {% for evento in eventos_semana %}
-                <div class="radar-card" style="scroll-snap-align: start; flex: 0 0 calc(20% - 16px); min-width: 280px; max-width: 350px; display: flex; flex-direction: column;">
+                <div class="radar-card" style="scroll-snap-align: start; display: flex; flex-direction: column;">
                     <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--accent-color); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.8); display: flex; flex-direction: column; height: 100%; position: relative;">
                         {% if is_preview %}<a href="/admin/dashboard?edit_type=evento&edit_id={{ evento.id }}" target="_parent" class="preview-edit-btn" style="z-index: 10;"><i class="fa-solid fa-pen"></i> Corregir Evento</a>{% endif %}
                         
-                        <img loading="lazy" src="{{ evento.img_video_path }}" alt="{{ evento.nombre_evento }}" style="width: 100%; height: 250px; object-fit: cover; object-position: center top; display: block; margin: 0;">
+                        <img loading="lazy" src="{{ evento.img_video_path }}" alt="{{ evento.nombre_evento }}" style="width: 100%; height: 160px; object-fit: cover; object-position: center top; display: block; margin: 0;">
                         
                         <div style="padding: 20px; flex: 1; display: flex; flex-direction: column; color: #ddd;">
                             <div style="background: rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; align-self: flex-start; margin-bottom: 10px; font-family: 'Oswald', sans-serif;">Evento Destacado</div>
@@ -207,10 +207,10 @@
 
                 <!-- MEXAPEDIA -->
                 {% if settings.get('show_mexapedia', '0') == '1' and mexapedia_record %}
-                <div class="radar-card" style="scroll-snap-align: start; flex: 0 0 calc(20% - 16px); min-width: 280px; max-width: 350px; display: flex; flex-direction: column;">
+                <div class="radar-card" style="scroll-snap-align: start; display: flex; flex-direction: column;">
                     <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--accent-color); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.8); display: flex; flex-direction: column; height: 100%;">
                         {% if mexapedia_record.img_path %}
-                            <img loading="lazy" src="/static/{{ mexapedia_record.img_path }}" style="width: 100%; height: 250px; object-fit: cover; object-position: center top; display: block; margin: 0;">
+                            <img loading="lazy" src="{{ mexapedia_record.img_path if mexapedia_record.img_path.startswith('http') else '/static/' ~ mexapedia_record.img_path }}" style="width: 100%; height: 160px; object-fit: cover; object-position: center top; display: block; margin: 0;">
                         {% endif %}
                         
                         <div style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
@@ -1457,6 +1457,30 @@
             setTimeout(function(){ x.style.visibility = "hidden"; }, 500);
         }, 3000);
     }
+    </script>
+    <script>
+        function syncCardWidths() {
+            // Find a card in El Pit to copy its exact computed width
+            const elPitCard = document.querySelector('#highlights .card');
+            const radarCards = document.querySelectorAll('.radar-card');
+            
+            if (elPitCard && radarCards.length > 0) {
+                const targetWidth = elPitCard.getBoundingClientRect().width;
+                if(targetWidth > 0) {
+                    radarCards.forEach(card => {
+                        card.style.flex = `0 0 ${targetWidth}px`;
+                        card.style.minWidth = `${targetWidth}px`;
+                        card.style.maxWidth = `${targetWidth}px`;
+                    });
+                }
+            }
+        }
+        
+        // Sync on load and resize to maintain perfect alignment
+        window.addEventListener('load', syncCardWidths);
+        window.addEventListener('resize', syncCardWidths);
+        // Also run immediately just in case
+        syncCardWidths();
     </script>
 </body>
 </html>

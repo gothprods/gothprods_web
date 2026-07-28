@@ -545,6 +545,26 @@ main {
     gap: 1.5rem;
 }
 
+.radar-card {
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 100%;
+    min-width: 300px;
+}
+@media (min-width: 650px) {
+    .radar-card { flex: 0 0 calc(50% - 10px); }
+}
+@media (min-width: 950px) {
+    .radar-card { flex: 0 0 calc(33.333% - 13.33px); }
+}
+@media (min-width: 1250px) {
+    .radar-card { flex: 0 0 calc(25% - 15px); }
+}
+@media (min-width: 1550px) {
+    .radar-card { flex: 0 0 calc(20% - 16px); }
+}
+
 .card {
     background-color: var(--card-bg);
     border-radius: 8px;
