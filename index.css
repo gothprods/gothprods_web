@@ -109,7 +109,6 @@ main {
     left: 0;
     width: 80px;
     height: 100vh;
-    overflow-y: auto;
     background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(10px);
     border-right: 1px solid #333;
@@ -120,9 +119,6 @@ main {
     z-index: 2000;
     box-shadow: 2px 0 15px rgba(0,0,0,0.8);
     transition: all 0.3s ease;
-}
-.floating-dock::-webkit-scrollbar {
-    display: none;
 }
 
 .dock-logo {
@@ -150,6 +146,12 @@ main {
     flex-direction: column;
     gap: 0.5rem;
     flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    width: 100%;
+}
+.dock-menu::-webkit-scrollbar {
+    display: none;
 }
 
 .dock-item {

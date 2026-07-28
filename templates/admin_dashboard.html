@@ -2637,7 +2637,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const savedDraft = localStorage.getItem(draftKey);
         if (savedDraft) {
             try {
-                const data = JSON.parse(savedDraft);
+                const draftObj = JSON.parse(savedDraft);
+                const data = draftObj.data || draftObj; // Handle old format and new format
+                const timestamp = draftObj.timestamp;
+                
                 for (const [name, value] of Object.entries(data)) {
                     const input = form.elements[name];
                     if (input) {
@@ -2652,7 +2655,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const title = form.previousElementSibling;
                 if(title) {
                     const notice = document.createElement('span');
-                    notice.innerHTML = ' <small style="color: #1DB954;">(Borrador Restaurado)</small>';
+                    let timeStr = "";
+                    if(timestamp) {
+                        const date = new Date(timestamp);
+                        timeStr = " a las " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+                    }
+                    notice.innerHTML = ` <small style="color: #1DB954; font-size: 0.8rem; font-weight: normal;">(Borrador recuperado${timeStr})</small>`;
                     title.appendChild(notice);
                 }
             } catch (e) {
@@ -2672,7 +2680,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     data[key] = value;
                 }
             }
-            localStorage.setItem(draftKey, JSON.stringify(data));
+            const draftObj = {
+                data: data,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem(draftKey, JSON.stringify(draftObj));
         };
         
         // Attach listeners to standard inputs

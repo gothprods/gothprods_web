@@ -728,6 +728,20 @@ def view_evento(id, slug=None):
     settings = get_settings(live=not is_preview)
     return render_template('evento.html', evento=evento, settings=settings, is_preview=is_preview)
 
+@app.route('/mexapedia/<int:id>')
+@app.route('/mexapedia/<int:id>-<string:slug>')
+def view_mexapedia(id, slug=None):
+    is_preview = request.args.get('preview') == '1'
+    conn = get_db_connection(live=not is_preview)
+    mexapedia_record = conn.execute("SELECT * FROM colectivo_mexapedia WHERE id = ?", (id,)).fetchone()
+    conn.close()
+    
+    if not mexapedia_record:
+        return "Registro no encontrado", 404
+        
+    settings = get_settings(live=not is_preview)
+    return render_template('mexapedia.html', mexapedia_record=mexapedia_record, settings=settings, is_preview=is_preview)
+
 @app.route('/articulo/<int:id>')
 @app.route('/articulo/<int:id>-<string:slug>')
 def view_articulo(id, slug=None):
