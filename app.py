@@ -471,6 +471,8 @@ def track_view(item_id):
         table = 'banda_semana'
     elif item_type == 'evento':
         table = 'eventos_semana'
+    elif item_type == 'mexapedia':
+        return jsonify({"success": True, "views": 0})
     else:
         table = 'content_items'
         
@@ -637,6 +639,9 @@ def index():
         if is_active == 1 and in_date_range:
             eventos_semana.append(e)
     
+    # Query for Colectivo Mexapedia (Latest active)
+    mexapedia_record = conn.execute("SELECT * FROM colectivo_mexapedia WHERE is_active = 1 ORDER BY id DESC LIMIT 1").fetchone()
+    
     # Existing content queries
     noticiero_items = conn.execute("SELECT * FROM content_items WHERE section = 'El Noticiero Nocturno' ORDER BY created_at DESC").fetchall()
     reseñas_items = conn.execute("SELECT * FROM content_items WHERE section = 'Reseñas de Conciertos' ORDER BY created_at DESC, id DESC").fetchall()
@@ -692,7 +697,8 @@ def index():
                            current_date=current_date,
                            settings=get_settings(live=not is_preview),
                            bandas_semana=bandas_semana,
-                           eventos_semana=eventos_semana, is_preview=is_preview)
+                           eventos_semana=eventos_semana,
+                           mexapedia_record=mexapedia_record, is_preview=is_preview)
 
 @app.route('/banda/<int:id>')
 @app.route('/banda/<int:id>-<string:slug>')
@@ -965,6 +971,7 @@ def admin_dashboard():
     all_items = conn.execute("SELECT id, section, title, short_desc, full_desc, yt_link, sp_link, ap_link, created_at, additional_images FROM content_items WHERE section IN ('El Noticiero Nocturno', 'Reseñas de Conciertos', 'Metal Pulse Tracks') ORDER BY id DESC LIMIT 100").fetchall()
     todas_bandas = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC").fetchall()
     todos_eventos = conn.execute("SELECT * FROM eventos_semana ORDER BY id DESC").fetchall()
+    todos_mexapedia = conn.execute("SELECT * FROM colectivo_mexapedia ORDER BY id DESC").fetchall()
     all_users = conn.execute('SELECT id, nombre, username, email, role, is_active FROM users ORDER BY id DESC').fetchall() if session.get('role') in ['admin', 'root'] else []
     conn_live = get_db_connection(live=True)
     
@@ -1020,7 +1027,7 @@ def admin_dashboard():
     
     conn.close()
 
-    return render_template('admin_dashboard.html', all_items=all_items, settings=get_settings(), todas_bandas=todas_bandas, todos_eventos=todos_eventos, all_users=all_users, analytics_data=analytics_data, interactions_data=interactions_data)
+    return render_template('admin_dashboard.html', all_items=all_items, settings=get_settings(), todas_bandas=todas_bandas, todos_eventos=todos_eventos, todos_mexapedia=todos_mexapedia, all_users=all_users, analytics_data=analytics_data, interactions_data=interactions_data)
 
 @app.route('/admin/settings', methods=['POST'])
 def update_settings():
@@ -1269,6 +1276,110 @@ def parse_embed_url(url, plataforma):
     elif plataforma == 'Apple Music' and 'embed.music.apple.com' not in url:
         return url.replace('music.apple.com', 'embed.music.apple.com')
     return url
+
+@app.route('/admin/mexapedia/settings', methods=['POST'])
+def update_mexapedia_settings():
+    if 'user_id' not in session: return redirect(url_for('admin_login'))
+    if session.get('role') not in ['admin', 'root']:
+        return "Acceso denegado", 403
+
+    show_mexapedia = request.form.get('show_mexapedia', '0')
+    title_mexapedia = request.form.get('title_mexapedia')
+
+    conn = get_db_connection()
+    if title_mexapedia is not None:
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('title_mexapedia', ?)", (title_mexapedia,))
+    conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('show_mexapedia', ?)", (show_mexapedia,))
+
+    file = request.files.get('icon_mexapedia')
+    if file and file.filename != '':
+        filename = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="icon_mexapedia_")
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", ('icon_mexapedia', f"updates/{filename}"))
+
+    conn.commit()
+    conn.close()
+    flash("Configuración del menú de Mexapedia guardada.")
+    return redirect(url_for('admin_dashboard') + '#tab-mexapedia')
+
+@app.route('/admin/mexapedia/add', methods=['POST'])
+def add_mexapedia():
+    if 'user_id' not in session: return redirect(url_for('admin_login'))
+    
+    titulo = request.form.get('titulo')
+    descripcion = request.form.get('descripcion')
+    is_active = request.form.get('is_active', '0')
+    
+    img_path = None
+    file = request.files.get('mexapedia_art')
+    if file and file.filename != '':
+        if file.filename.lower().endswith(('.mp4', '.webm', '.gif')):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            img_path = f"updates/{filename}"
+        else:
+            filename = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="mexapedia_")
+            img_path = f"updates/{filename}"
+
+    conn = get_db_connection()
+    conn.execute('''
+        INSERT INTO colectivo_mexapedia (titulo, descripcion, img_path, is_active)
+        VALUES (?, ?, ?, ?)
+    ''', (titulo, descripcion, img_path, is_active))
+    conn.commit()
+    conn.close()
+    flash("Registro de Mexapedia añadido exitosamente.")
+    return redirect(url_for('admin_dashboard') + '#tab-mexapedia')
+
+@app.route('/admin/mexapedia/edit/<int:id>', methods=['POST'])
+def edit_mexapedia(id):
+    if 'user_id' not in session: return redirect(url_for('admin_login'))
+    
+    titulo = request.form.get('titulo')
+    descripcion = request.form.get('descripcion')
+    is_active = request.form.get('is_active', '0')
+    
+    conn = get_db_connection()
+    
+    file = request.files.get('mexapedia_art')
+    if file and file.filename != '':
+        if file.filename.lower().endswith(('.mp4', '.webm', '.gif')):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            img_path = f"updates/{filename}"
+        else:
+            filename = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="mexapedia_")
+            img_path = f"updates/{filename}"
+            
+        conn.execute('''
+            UPDATE colectivo_mexapedia 
+            SET titulo = ?, descripcion = ?, img_path = ?, is_active = ?
+            WHERE id = ?
+        ''', (titulo, descripcion, img_path, is_active, id))
+    else:
+        conn.execute('''
+            UPDATE colectivo_mexapedia 
+            SET titulo = ?, descripcion = ?, is_active = ?
+            WHERE id = ?
+        ''', (titulo, descripcion, is_active, id))
+        
+    conn.commit()
+    conn.close()
+    flash("Registro de Mexapedia editado exitosamente.")
+    return redirect(url_for('admin_dashboard') + '#tab-mexapedia')
+
+@app.route('/admin/mexapedia/delete/<int:id>', methods=['POST'])
+def delete_mexapedia(id):
+    if 'user_id' not in session: return redirect(url_for('admin_login'))
+    if session.get('role') not in ['admin', 'root']: return "Acceso denegado", 403
+
+    conn = get_db_connection()
+    conn.execute('DELETE FROM colectivo_mexapedia WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    flash("Registro de Mexapedia eliminado.")
+    return redirect(url_for('admin_dashboard') + '#tab-mexapedia')
 
 @app.route('/admin/banda', methods=['POST'])
 def add_banda():
