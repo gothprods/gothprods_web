@@ -147,9 +147,9 @@ main {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    align-items: center;
+    justify-content: space-evenly;
     flex: 1;
-    overflow-y: auto;
-    min-height: 0;
     width: 100%;
 }
 .dock-menu::-webkit-scrollbar {
@@ -291,6 +291,20 @@ main {
     align-items: center;
     justify-content: center;
     gap: 8px;
+}
+
+/* Reduce sizes for short screens to prevent cutting off social icons */
+@media (max-height: 800px) {
+    .dock-menu { gap: 0.2rem; }
+    .dock-item { width: 34px; height: 34px; }
+    .dock-item a img { width: 26px; height: 26px; }
+    .dock-controls { gap: 0.4rem; padding-bottom: 0.3rem; }
+    .dock-socials { gap: 0.2rem; }
+    .dock-socials a, .dock-auth a { font-size: 1rem; }
+    .dock-logo img { width: 40px; }
+    .floating-dock { padding: 0.5rem 0; }
+    .dock-divider { margin: 0.3rem 0; }
+    .dock-text { font-size: 0.75rem; padding: 2px 8px; left: 45px; }
 }
 
 /* Mobile Media Query for Dock */
