@@ -27,7 +27,7 @@
     <!-- Favicons -->
     <link rel="icon" href="assets/viking.webp" type="image/jpeg">
     <link rel="apple-touch-icon" href="assets/viking.webp">
-    <link rel="stylesheet" href="index.css?v=35">
+    <link rel="stylesheet" href="index.css?v=36">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -978,13 +978,18 @@
             <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start; flex-wrap: wrap;">
                 {% set icon_path = settings.get('icon_agenda', 'assets/agenda_icon.png') %}
                 <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal">
-                <div class="header-text-group" style="text-align: left; margin: 0; display: flex; align-items: center; gap: 15px;">
+                <div class="header-text-group" style="text-align: left; margin: 0; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                     <h2 style="font-family: 'Creepster', cursive; font-weight: 400; margin: 0;">Agenda <span>Metalera</span></h2>
                     
                     <!-- Year Switcher -->
                     <div class="year-switcher" style="display: flex; gap: 10px;">
                         <button class="year-tab-btn active" data-year="2026" onclick="openAgendaYear('2026')" style="background: var(--accent-color); color: #000; border: none; padding: 5px 15px; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Oswald', sans-serif;">2026</button>
                         <button class="year-tab-btn" data-year="2027" onclick="openAgendaYear('2027')" style="background: #333; color: #fff; border: 1px solid var(--accent-color); padding: 5px 15px; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Oswald', sans-serif;">2027</button>
+                    </div>
+                    
+                    <div class="agenda-legend" style="display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: #aaa; margin-left: auto;">
+                        <img src="assets/viking.webp" style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--accent-color);" alt="Viking">
+                        <span>GothProds estará presente</span>
                     </div>
                 </div>
             </div>
@@ -1024,7 +1029,7 @@
                             {% endif %}
                             </div>
                         {% endif %}
-                        {% if item.yt_link == 'Y' %}
+                        {% if item['yt_link'] and item['yt_link']|string|trim|upper == 'Y' %}
                         <img loading="lazy" src="assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
                         {% endif %}
                     </div>
@@ -1068,7 +1073,7 @@
                             {% endif %}
                             </div>
                         {% endif %}
-                        {% if item.yt_link == 'Y' %}
+                        {% if item['yt_link'] and item['yt_link']|string|trim|upper == 'Y' %}
                         <img loading="lazy" src="assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
                         {% endif %}
                     </div>
