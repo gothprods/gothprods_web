@@ -78,6 +78,9 @@ input:checked + .slider:before { transform: translateX(20px); }
         <button class="tab-btn" onclick="openTab(event, 'tab-performance')"><i class="fa-solid fa-chart-line"></i> Performance</button>
         {% endif %}
         {% if session.get('role') in ['admin', 'root'] %}
+        <button class="tab-btn" onclick="openTab(event, 'tab-newsletter')"><i class="fa-solid fa-envelope-open-text"></i> Newsletter</button>
+        {% endif %}
+        {% if session.get('role') in ['admin', 'root'] %}
         <button class="tab-btn" onclick="openTab(event, 'tab-lookfeel')"><i class="fa-solid fa-paint-roller"></i> Look & Feel</button>
         {% endif %}
     </div>
