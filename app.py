@@ -1076,10 +1076,12 @@ def admin_dashboard():
     
     analytics_data = [dict(row) for row in analytics_rows]
     interactions_data = [dict(row) for row in interactions_rows]
-    
+    # Cargar suscriptores de Newsletter
+    suscriptores = conn.execute("SELECT * FROM newsletter_subscribers WHERE is_active = 1 ORDER BY id DESC").fetchall()
+
     conn.close()
 
-    return render_template('admin_dashboard.html', all_items=all_items, settings=get_settings(), todas_bandas=todas_bandas, todos_eventos=todos_eventos, todos_mexapedia=todos_mexapedia, all_users=all_users, analytics_data=analytics_data, interactions_data=interactions_data)
+    return render_template('admin_dashboard.html', all_items=all_items, settings=get_settings(), todas_bandas=todas_bandas, todos_eventos=todos_eventos, todos_mexapedia=todos_mexapedia, all_users=all_users, analytics_data=analytics_data, interactions_data=interactions_data, suscriptores=suscriptores)
 
 @app.route('/admin/settings', methods=['POST'])
 def update_settings():
@@ -1965,6 +1967,309 @@ def toggle_user(id):
 def admin_logout():
     session.clear()
     return redirect(url_for('admin_login'))
+
+# --- RUTAS DE NEWSLETTER ---
+
+@app.route('/subscribe_newsletter', methods=['POST'])
+def subscribe_newsletter():
+    data = request.get_json() or {}
+    nombre = data.get('nombre', '').strip()
+    email = data.get('email', '').strip().lower()
+
+    if not email or '@' not in email:
+        return jsonify({'success': False, 'message': 'Por favor ingresa un correo electrónico válido.'})
+
+    conn = get_db_connection()
+    try:
+        cur = conn.execute("SELECT id, is_active FROM newsletter_subscribers WHERE email = ?", (email,))
+        existing = cur.fetchone()
+        if existing:
+            if existing['is_active'] == 1:
+                conn.close()
+                return jsonify({'success': True, 'message': '¡Ya formas parte de la Horda Metalera! Gracias por seguir conectados.'})
+            else:
+                conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (nombre, existing['id']))
+                conn.commit()
+                conn.close()
+                return jsonify({'success': True, 'message': '¡Tu suscripción ha sido reactivada exitosamente!'})
+        
+        conn.execute("INSERT INTO newsletter_subscribers (nombre, email) VALUES (?, ?)", (nombre, email))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'message': '¡Bienvenido a la Horda! Te has suscrito exitosamente al newsletter oficial de GothProds.'})
+    except Exception as e:
+        conn.close()
+        return jsonify({'success': False, 'message': 'Hubo un inconveniente al procesar tu registro. Por favor intenta más tarde.'})
+
+def build_newsletter_html(asunto, mensaje_intro, live=False):
+    conn = get_db_connection(live=live)
+    import datetime
+    mexico_tz = datetime.timezone(datetime.timedelta(hours=-6))
+    now_mx = datetime.datetime.now(mexico_tz)
+    base_url = "https://gothprods.com"
+    
+    bandas = conn.execute("SELECT * FROM banda_semana WHERE is_active = 1 ORDER BY id DESC LIMIT 2").fetchall()
+    eventos = conn.execute("SELECT * FROM eventos_semana WHERE is_active = 1 ORDER BY id DESC LIMIT 2").fetchall()
+    
+    # Filter Metal Pulse Tracks
+    all_tracks = conn.execute("SELECT * FROM content_items WHERE section = 'Metal Pulse Tracks' AND full_desc != '.' ORDER BY id DESC").fetchall()
+    settings = get_settings(live=live)
+    hide_past_mp = settings.get('hide_past_metalpulse', '0') == '1'
+    if hide_past_mp and all_tracks:
+        months_es = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+        cur_year = now_mx.year
+        cur_month_idx = now_mx.month - 1
+        valid_months = set()
+        for i in range(24):
+            m_idx = (cur_month_idx + i) % 12
+            y = cur_year + (cur_month_idx + i) // 12
+            valid_months.add(f"{months_es[m_idx]} {y}")
+        filtered = [t for t in all_tracks if t['full_desc'] in valid_months]
+        metalpulse_tracks = filtered if filtered else [t for t in all_tracks if t['full_desc'] == all_tracks[0]['full_desc']]
+    else:
+        metalpulse_tracks = all_tracks
+
+    galeria = conn.execute("SELECT * FROM content_items WHERE section IN ('La Galería Nocturna', 'Caos Sonoro') ORDER BY id DESC LIMIT 2").fetchall()
+    noticiero = conn.execute("SELECT * FROM content_items WHERE section = 'El Noticiero Nocturno' ORDER BY created_at DESC, id DESC LIMIT 2").fetchall()
+    reseñas = conn.execute("SELECT * FROM content_items WHERE section = 'Reseñas de Conciertos' ORDER BY created_at DESC, id DESC LIMIT 2").fetchall()
+
+    # Agenda Metalera: Filtrar por mes corriente YYYY-MM o meses posteriores más cercanos
+    current_year_month = now_mx.strftime("%Y-%m")
+    all_agenda = conn.execute("SELECT * FROM content_items WHERE section = 'Agenda Metalera' ORDER BY author ASC").fetchall()
+    
+    agenda_current = [a for a in all_agenda if a['author'] and a['author'].startswith(current_year_month)]
+    if agenda_current:
+        agenda = agenda_current[:4]
+    else:
+        # Fallback: proximos eventos ordenados por fecha a partir de hoy
+        today_str = now_mx.strftime("%Y-%m-%d")
+        agenda_future = [a for a in all_agenda if a['author'] and a['author'] >= today_str]
+        agenda = agenda_future[:4] if agenda_future else all_agenda[:4]
+
+    conn.close()
+
+    def get_full_img_url(path):
+        if not path:
+            return f"{base_url}/assets/logo.png"
+        if path.startswith('http'):
+            return path
+        if path.startswith('assets/'):
+            return f"{base_url}/{path}"
+        return f"{base_url}/updates/{path}"
+
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            body {{ font-family: 'Oswald', 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #080808; color: #e0e0e0; margin: 0; padding: 0; }}
+            .container {{ max-width: 650px; margin: 20px auto; background: #121212; border: 1px solid #716d4a; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }}
+            .header {{ background: #000; padding: 25px; text-align: center; border-bottom: 2px solid #716d4a; position: relative; }}
+            .header img {{ width: 140px; height: auto; margin-bottom: 10px; }}
+            .header h1 {{ color: #716d4a; margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 2px; }}
+            .intro {{ padding: 20px 25px; background: #181818; border-bottom: 1px solid #2a2a2a; font-size: 15px; line-height: 1.6; color: #ccc; }}
+            .section {{ padding: 20px 25px; border-bottom: 1px solid #222; }}
+            .section-header-box {{ display: flex; align-items: center; gap: 12px; margin-bottom: 15px; border-bottom: 1px solid #716d4a; padding-bottom: 8px; }}
+            .section-icon {{ width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 8px; object-fit: cover; background: #000; }}
+            .section-title {{ color: #716d4a; font-size: 20px; text-transform: uppercase; margin: 0; display: inline-block; vertical-align: middle; }}
+            .card {{ background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #282828; border-left: 4px solid #716d4a; }}
+            .card-img {{ width: 100%; height: 160px; object-fit: cover; border-radius: 6px; margin-bottom: 12px; border: 1px solid #333; }}
+            .card h3 {{ margin: 0 0 6px 0; color: #fff; font-size: 17px; }}
+            .card p {{ margin: 0; color: #bbb; font-size: 13px; line-height: 1.5; }}
+            .track-item {{ padding: 10px 14px; background: #181818; margin-bottom: 8px; border-radius: 6px; font-size: 14px; border: 1px solid #282828; display: flex; justify-content: space-between; align-items: center; }}
+            .btn {{ display: inline-block; padding: 10px 20px; background: #716d4a; color: #000; text-decoration: none; font-weight: bold; border-radius: 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }}
+            .footer {{ background: #050505; padding: 25px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #222; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <img src="{base_url}/assets/logo.png" alt="Goth Prods Logo">
+                <h1>GOTH PRODUCTIONS</h1>
+                <p style="color: #888; margin: 5px 0 0 0; font-size: 13px;">Boletín Oficial de la Horda Metalera</p>
+            </div>
+            {'<div class="intro">' + mensaje_intro + '</div>' if mensaje_intro else ''}
+            
+            <!-- RADAR DEL CAOS (BANDAS Y EVENTOS) -->
+            <div class="section">
+                <div class="section-header-box">
+                    <img src="{base_url}/assets/destacados_icon.png" class="section-icon">
+                    <h2 class="section-title">Radar del Caos & El Pit</h2>
+                </div>
+                {''.join([f'<div class="card"><img src="{get_full_img_url(b["imagen"] or b["ultimo_lanzamiento_url"])}" class="card-img"><h3>{b["nombre"]} ({b["pais"] or "Banda"})</h3><p>{(b["texto_resena"] or b["bio_larga"] or "")[:180]}...</p></div>' for b in bandas])}
+                {''.join([f'<div class="card"><img src="{get_full_img_url(e["img_video_path"])}" class="card-img"><h3>{e["nombre_evento"]}</h3><p>📍 {e["ciudad"]}, {e["pais"]} | 📅 {e["fecha_evento"]}</p></div>' for e in eventos])}
+            </div>
+
+            <!-- EL NOTICIERO NOCTURNO -->
+            <div class="section">
+                <div class="section-header-box">
+                    <img src="{base_url}/assets/noticiero_icon.png" class="section-icon">
+                    <h2 class="section-title">El Noticiero Nocturno</h2>
+                </div>
+                {''.join([f'<div class="card"><img src="{get_full_img_url(n["image_filename"])}" class="card-img"><h3>{n["title"]}</h3><p>{(n["short_desc"] or "")[:180]}...</p></div>' for n in noticiero])}
+            </div>
+
+            <!-- RESEÑAS DE CONCIERTOS -->
+            <div class="section">
+                <div class="section-header-box">
+                    <img src="{base_url}/assets/resenas_icon.png" class="section-icon">
+                    <h2 class="section-title">Reseñas de Conciertos</h2>
+                </div>
+                {''.join([f'<div class="card"><img src="{get_full_img_url(r["image_filename"])}" class="card-img"><h3>{r["title"]}</h3><p>{(r["short_desc"] or "")[:180]}...</p></div>' for r in reseñas])}
+            </div>
+
+            <!-- TOP 10 METAL PULSE -->
+            <div class="section">
+                <div class="section-header-box">
+                    <img src="{base_url}/assets/metal_pulse_icon.jpg" class="section-icon">
+                    <h2 class="section-title">Metal Pulse - Los 10 Favoritos del Mes</h2>
+                </div>
+                <div class="track-list">
+                    {''.join([f'<div class="track-item"><div><strong style="color:#fff;">{t["title"]}</strong> <span style="color:#aaa;">- {t["short_desc"]}</span></div><span style="color:#716d4a; font-weight:bold; font-size:12px;">{t["full_desc"]}</span></div>' for t in metalpulse_tracks[:10]])}
+                </div>
+            </div>
+
+            <!-- LA GALERÍA NOCTURNA -->
+            <div class="section">
+                <div class="section-header-box">
+                    <img src="{base_url}/assets/galeria_nocturna_icon.jpg" class="section-icon">
+                    <h2 class="section-title">La Galería Nocturna & Caos Sonoro</h2>
+                </div>
+                {''.join([f'<div class="card"><img src="{get_full_img_url(g["image_filename"])}" class="card-img"><h3>{g["title"]}</h3><p>{(g["short_desc"] or "")[:150]}...</p></div>' for g in galeria])}
+            </div>
+
+            <!-- AGENDA METALERA -->
+            <div class="section">
+                <div class="section-header-box">
+                    <img src="{base_url}/assets/agenda_icon.png" class="section-icon">
+                    <h2 class="section-title">Agenda Metalera</h2>
+                </div>
+                {''.join([f'<div class="card"><h3>{a["title"]}</h3><p>📅 Fecha: {a["author"]}</p><p style="color:#716d4a; font-weight:bold; margin-top:4px;">📍 {a["short_desc"]}</p></div>' for a in agenda])}
+            </div>
+
+            <div style="text-align: center; padding: 25px;">
+                <a href="https://gothprods.com" class="btn">Visitar GothProds.com &rarr;</a>
+            </div>
+
+            <div class="footer">
+                <img src="{base_url}/assets/logo.png" style="width: 50px; height: auto; margin-bottom: 10px; opacity: 0.7;">
+                <p>&copy; 2026 Goth Productions. Todos los derechos reservados.</p>
+                <p>Estás recibiendo este correo porque te suscribiste en gothprods.com</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return html
+
+@app.route('/admin/newsletter/preview', methods=['POST'])
+def admin_newsletter_preview():
+    if session.get('role') not in ['admin', 'root']:
+        return jsonify({'error': 'Unauthorized'}), 403
+    data = request.get_json() or {}
+    asunto = data.get('asunto', 'GothProds Newsletter')
+    intro = data.get('intro', '')
+    html = build_newsletter_html(asunto, intro)
+    return html
+
+@app.route('/admin/newsletter/send', methods=['POST'])
+def admin_newsletter_send():
+    if session.get('role') not in ['admin', 'root']:
+        flash('Acceso denegado', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    asunto = request.form.get('asunto', 'GothProds Newsletter')
+    mensaje_intro = request.form.get('mensaje_intro', '')
+
+    conn = get_db_connection()
+    subs = conn.execute("SELECT email, nombre FROM newsletter_subscribers WHERE is_active = 1").fetchall()
+    conn.close()
+
+    if not subs:
+        flash('No hay suscriptores activos registrados para enviar el boletín.', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    html_content = build_newsletter_html(asunto, mensaje_intro)
+    
+    # Simulación/Envío por SMTP configurado
+    import os, smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
+    smtp_server = os.getenv('MAIL_SERVER', 'smtp.hostinger.com')
+    smtp_port = int(os.getenv('MAIL_PORT', 465))
+    smtp_user = os.getenv('MAIL_USERNAME', 'contacto@gothprods.com')
+    smtp_password = os.getenv('MAIL_PASSWORD', '')
+
+    sent_count = 0
+    try:
+        if smtp_password:
+            if smtp_port == 465:
+                server = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=10)
+            else:
+                server = smtplib.SMTP(smtp_server, smtp_port, timeout=10)
+                server.starttls()
+            server.login(smtp_user, smtp_password)
+
+            for sub in subs:
+                msg = MIMEMultipart('alternative')
+                msg['Subject'] = asunto
+                msg['From'] = f"GothProds <{smtp_user}>"
+                msg['To'] = sub['email']
+                msg.attach(MIMEText(html_content, 'html', 'utf-8'))
+                try:
+                    server.sendmail(smtp_user, sub['email'], msg.as_string())
+                    sent_count += 1
+                except Exception as ex:
+                    print(f"Error enviando correo a {sub['email']}: {ex}")
+            server.quit()
+            flash(f'¡Boletín enviado exitosamente a {sent_count} suscriptores a través de {smtp_user}!', 'success')
+        else:
+            # Si no hay contraseña SMTP configurada en env, simular envío registrado
+            flash(f'Boletín generado correctamente para {len(subs)} suscriptores. Configura MAIL_PASSWORD en config.env para activar el envío masivo real por SMTP de Hostinger.', 'success')
+    except Exception as e:
+        flash(f'El boletín se procesó pero hubo un error de conexión SMTP: {str(e)}', 'error')
+
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/newsletter/export_csv')
+def admin_newsletter_export_csv():
+    if session.get('role') not in ['admin', 'root']:
+        return redirect(url_for('admin_dashboard'))
+
+    conn = get_db_connection()
+    subs = conn.execute("SELECT id, nombre, email, created_at FROM newsletter_subscribers WHERE is_active = 1 ORDER BY id DESC").fetchall()
+    conn.close()
+
+    import io, csv
+    from flask import Response
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Nombre', 'Email', 'Fecha Registro'])
+    for s in subs:
+        writer.writerow([s['id'], s['nombre'], s['email'], s['created_at']])
+
+    output.seek(0)
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=suscriptores_gothprods.csv"}
+    )
+
+@app.route('/admin/newsletter/delete/<int:id>', methods=['POST'])
+def admin_newsletter_delete(id):
+    if session.get('role') not in ['admin', 'root']:
+        flash('Acceso denegado', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    conn = get_db_connection()
+    conn.execute("DELETE FROM newsletter_subscribers WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+    flash('Suscriptor eliminado correctamente.', 'success')
+    return redirect(url_for('admin_dashboard'))
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

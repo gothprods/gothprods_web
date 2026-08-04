@@ -1991,11 +1991,6 @@ html, body {
         max-height: 400px;
     }
 }
-    .modal-comments-pane {
-        border-left: none;
-        border-top: 1px solid #333;
-    }
-}
 
 /* Medios Aliados in Footer */
 .medios-aliados-footer {
@@ -2013,19 +2008,19 @@ html, body {
 }
 
 .aliados-grid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 90px);
     justify-content: center;
     align-items: center;
-    gap: 20px;
-    max-width: 1200px;
+    gap: 16px 20px;
     margin: 0 auto;
+    width: fit-content;
 }
 
 .aliado-wrapper {
     position: relative;
-    width: 120px;
-    height: 120px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     background-image: url('assets/viking_shield.png');
     background-size: cover;
@@ -2037,6 +2032,7 @@ html, body {
     transition: transform 0.3s ease;
     border: 2px solid #555;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .aliado-wrapper:hover {
@@ -2092,6 +2088,15 @@ html, body {
 }
 
 @media (max-width: 768px) {
+    .newsletter-medios-section #contacto-medios > div {
+        grid-template-columns: 1fr !important;
+    }
+    .newsletter-medios-section div[style*="border-left"] {
+        border-left: none !important;
+        border-top: 1px solid rgba(113, 109, 74, 0.3) !important;
+        padding-left: 0 !important;
+        padding-top: 30px !important;
+    }
     #medios-aliados h2 {
         font-size: 2rem;
     }
@@ -2105,8 +2110,10 @@ html, body {
 }
 
 .section-medal {
-    width: 65px;
-    height: 65px;
+    width: 65px !important;
+    height: 65px !important;
+    max-width: 65px !important;
+    max-height: 65px !important;
     object-fit: contain;
     background: #000;
     border: 2px solid rgba(113, 109, 74, 0.6);
@@ -2131,7 +2138,7 @@ span[style*="color: #ffffff"], span[style*="color: rgb(255, 255, 255)"], span[st
 .equipo-section {
     position: relative;
     z-index: 5;
-    padding: 60px 20px 0 20px;
+    padding: 2rem 5% 0 5%;
     background: radial-gradient(circle at center, rgba(113, 109, 74, 0.05) 0%, transparent 60%);
 }
 

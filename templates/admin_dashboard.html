@@ -495,6 +495,123 @@ input:checked + .slider:before { transform: translateX(20px); }
         </div>
     </div>
 
+    <!-- TAB NEWSLETTER -->
+    <div id="tab-newsletter" class="tab-content">
+        <div class="panel-card" style="margin-top: 10px;">
+            <h2><i class="fa-solid fa-envelope-open-text"></i> Gestión de Newsletter & Boletines Mensuales</h2>
+            <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Genera automáticamente el boletín oficial con lo más destacado de la web y envíalo a tu horda de suscriptores.</p>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;">
+                <button type="button" class="btn-primary" onclick="generarBoletinAuto()" style="width: auto; padding: 12px 25px; background: var(--accent-color); color: #000; font-weight: bold;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generar Newsletter del Mes (Auto 1-Clic)
+                </button>
+                <a href="/admin/newsletter/export_csv" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 12px 20px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px;">
+                    <i class="fa-solid fa-file-csv"></i> Exportar Suscriptores (CSV)
+                </a>
+            </div>
+
+            <!-- Formulario Generador / Editor de Boletín -->
+            <form id="form-newsletter-send" method="POST" action="/admin/newsletter/send" style="background: var(--bg-primary); padding: 25px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #333;">
+                <h3 style="color: var(--accent-color); margin-bottom: 15px;"><i class="fa-solid fa-paper-plane"></i> Redactar & Enviar Boletín</h3>
+                
+                <label><i class="fa-solid fa-heading"></i> Asunto del Correo</label>
+                <input type="text" name="asunto" id="news_asunto" placeholder="Ej. GothProds Newsletter - Lo más destacado de Agosto" required style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+
+                <label><i class="fa-solid fa-message"></i> Mensaje Introductorio (Opcional)</label>
+                <textarea name="mensaje_intro" id="news_intro" rows="3" placeholder="Hola Horda Metalera! Aquí tienen el resumen mensual exclusivo..." style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;"></textarea>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" onclick="previewNewsletterHTML()" style="background: #333; color: #fff; border: 1px solid var(--accent-color); padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        <i class="fa-solid fa-eye"></i> Vista Previa HTML
+                    </button>
+                    <button type="submit" onclick="return confirm('¿Estás seguro de enviar este boletín a TODOS los suscriptores activos?');" style="background: #ff3b3b; color: #fff; border: none; padding: 10px 25px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        <i class="fa-solid fa-paper-plane"></i> Enviar Boletín Masivo
+                    </button>
+                </div>
+
+                <!-- Previsualizador integrado -->
+                <div id="newsletter-preview-pane" style="display: none; background: #000; border: 1px solid var(--accent-color); padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <h4 style="color: var(--accent-color); margin-top: 0;"><i class="fa-solid fa-desktop"></i> Vista Previa del Boletín</h4>
+                    <iframe id="news-preview-iframe" style="width: 100%; height: 500px; border: none; background: #fff; border-radius: 4px;"></iframe>
+                </div>
+            </form>
+
+            <script>
+                async function generarBoletinAuto() {
+                    const asunto = document.getElementById('news_asunto');
+                    const intro = document.getElementById('news_intro');
+                    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                    const now = new Date();
+                    const monthStr = monthNames[now.getMonth()] + " " + now.getFullYear();
+
+                    asunto.value = `🦇 GothProds Newsletter - Resumen Brutal de ${monthStr}`;
+                    intro.value = `¡Saludos Horda Metalera! Les presentamos la recopilación oficial de ${monthStr} con lo más destacado de Radar del Caos, El Pit, Los 10 Favoritos de Metal Pulse, La Galería Nocturna y la Agenda Metalera.`;
+
+                    previewNewsletterHTML();
+                }
+
+                async function previewNewsletterHTML() {
+                    const asunto = document.getElementById('news_asunto').value;
+                    const intro = document.getElementById('news_intro').value;
+                    const pane = document.getElementById('newsletter-preview-pane');
+                    const iframe = document.getElementById('news-preview-iframe');
+
+                    pane.style.display = 'block';
+
+                    try {
+                        const res = await fetch('/admin/newsletter/preview', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ asunto: asunto, intro: intro })
+                        });
+                        const html = await res.text();
+                        iframe.contentWindow.document.open();
+                        iframe.contentWindow.document.write(html);
+                        iframe.contentWindow.document.close();
+                    } catch (e) {
+                        alert('Error al generar la vista previa.');
+                    }
+                }
+            </script>
+
+            <h3 style="margin-top: 30px; margin-bottom: 15px;"><i class="fa-solid fa-users"></i> Suscriptores Activos ({{ suscriptores|length if suscriptores else 0 }})</h3>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #444;">
+                            <th style="padding: 10px;">ID</th>
+                            <th style="padding: 10px;">Nombre</th>
+                            <th style="padding: 10px;">Correo Electrónico</th>
+                            <th style="padding: 10px;">Fecha Registro</th>
+                            <th style="padding: 10px; text-align: right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if suscriptores %}
+                        {% for sub in suscriptores %}
+                        <tr style="border-bottom: 1px solid #333;">
+                            <td style="padding: 10px; color: #888;">#{{ sub.id }}</td>
+                            <td style="padding: 10px; color: #fff;"><strong>{{ sub.nombre }}</strong></td>
+                            <td style="padding: 10px; color: var(--accent-color);">{{ sub.email }}</td>
+                            <td style="padding: 10px; color: #aaa;">{{ sub.created_at[:10] if sub.created_at else '' }}</td>
+                            <td style="padding: 10px; text-align: right;">
+                                <form action="/admin/newsletter/delete/{{ sub.id }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Eliminar este suscriptor?');">
+                                    <button type="submit" style="padding: 5px 10px; background: #ff3b3b; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;"><i class="fa-solid fa-trash"></i> Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5" style="padding: 20px; text-align: center; color: #888;">Aún no hay suscriptores registrados.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- TAB 7: LOOK & FEEL -->
     <div id="tab-lookfeel" class="tab-content">
         <h3><i class="fa-solid fa-paint-roller"></i> Personalización (Look & Feel)</h3>
