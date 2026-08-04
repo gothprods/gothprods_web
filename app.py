@@ -273,12 +273,22 @@ def get_db_connection(live=False):
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+
+        # Auto-create schema for newsletter_subscribers
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nombre TEXT,
+                email TEXT UNIQUE,
+                is_active INTEGER DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
         
         # Add tracking columns to eventos_semana if not exists (existing logic follows)
         conn.commit()
     except Exception as e:
-        print("Schema creation error (eventos_semana / performance):", e)
-        print("Schema creation error (eventos_semana):", e)
+        print("Schema creation error (eventos_semana / performance / newsletter):", e)
 
     # Auto-migrate schema for eventos_semana
     try:

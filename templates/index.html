@@ -27,7 +27,7 @@
     <!-- Favicons -->
     <link rel="icon" href="assets/viking.webp" type="image/jpeg">
     <link rel="apple-touch-icon" href="assets/viking.webp">
-    <link rel="stylesheet" href="index.css?v=39">
+    <link rel="stylesheet" href="index.css?v=41">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -1183,6 +1183,67 @@
             </form>
         </section>
         {% endif %}
+        <!-- NEWSLETTER SECTION -->
+        <section id="newsletter" class="section newsletter-section" style="padding: 40px 20px; background: linear-gradient(180deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.98) 100%); border-top: 1px solid var(--accent-color); border-bottom: 1px solid var(--accent-color); margin-top: 50px;">
+            <div style="max-width: 900px; margin: 0 auto; text-align: center; background: rgba(0, 0, 0, 0.6); padding: 35px 25px; border-radius: 12px; border: 1px solid rgba(113, 109, 74, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -50px; right: -50px; opacity: 0.05; pointer-events: none;">
+                    <img src="assets/viking.webp" style="width: 250px; height: 250px;">
+                </div>
+                <h2 style="font-family: 'Creepster', cursive; font-weight: 400; font-size: 2.5rem; color: #fff; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;">
+                    Únete a la <span style="color: var(--accent-color);">Horda Metalera</span>
+                </h2>
+                <p style="color: #ccc; font-size: 1rem; max-width: 650px; margin: 0 auto 25px auto; line-height: 1.5;">
+                    Recibe cada mes el boletín oficial de <strong>GothProds</strong> con lo más brutal del Radar del Caos, El Pit, novedades de La Galería Nocturna y la Agenda Metalera completa directamente en tu correo.
+                </p>
+                <form id="public-newsletter-form" onsubmit="submitPublicNewsletter(event)" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; max-width: 600px; margin: 0 auto;">
+                    <input type="text" id="news_nombre" placeholder="Tu Nombre o Apodo" required style="flex: 1 1 200px; padding: 12px 15px; border-radius: 6px; border: 1px solid #444; background: #111; color: #fff; font-size: 0.95rem; outline: none;">
+                    <input type="email" id="news_email" placeholder="tu_correo@metal.com" required style="flex: 1 1 240px; padding: 12px 15px; border-radius: 6px; border: 1px solid #444; background: #111; color: #fff; font-size: 0.95rem; outline: none;">
+                    <button type="submit" id="news_submit_btn" style="background: var(--accent-color); color: #000; font-family: 'Oswald', sans-serif; font-weight: bold; padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 1rem; transition: all 0.3s ease; white-space: nowrap;">
+                        <i class="fa-solid fa-skull"></i> Suscribirme
+                    </button>
+                </form>
+                <div id="news_msg" style="display: none; margin-top: 15px; font-weight: bold; font-size: 0.95rem;"></div>
+            </div>
+            <script>
+                async function submitPublicNewsletter(e) {
+                    e.preventDefault();
+                    const btn = document.getElementById('news_submit_btn');
+                    const msg = document.getElementById('news_msg');
+                    const nombre = document.getElementById('news_nombre').value;
+                    const email = document.getElementById('news_email').value;
+
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando...';
+                    msg.style.display = 'none';
+
+                    try {
+                        const res = await fetch('/subscribe_newsletter', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ nombre: nombre, email: email })
+                        });
+                        const data = await res.json();
+                        msg.style.display = 'block';
+                        if (data.success) {
+                            msg.style.color = '#4caf50';
+                            msg.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + data.message;
+                            document.getElementById('public-newsletter-form').reset();
+                        } else {
+                            msg.style.color = '#ff4d4d';
+                            msg.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ' + data.message;
+                        }
+                    } catch (err) {
+                        msg.style.display = 'block';
+                        msg.style.color = '#ff4d4d';
+                        msg.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Hubo un error de conexión.';
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-skull"></i> Suscribirme';
+                    }
+                }
+            </script>
+        </section>
+
     </main>
 
     <footer>
@@ -1191,11 +1252,20 @@
             <div class="medios-aliados-footer">
                 <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">Medios <span>Aliados</span></h2>
                 <div class="aliados-grid">
+                    {% set aliado_names = {
+                        '1': 'Mexapedia',
+                        '2': 'Brutal Revista',
+                        '3': 'Johny Metal',
+                        '4': 'Metal Memes',
+                        '5': 'Metal Morfosis',
+                        '6': 'Heavy Mextal'
+                    } %}
                     {% for i in range(1, 11) %}
                         {% set logo_path = settings.get('logo_aliado_' ~ i) %}
                         {% if logo_path %}
-                            <div class="aliado-wrapper">
-                                <img src="{{ logo_path if logo_path.startswith('http') or logo_path.startswith('assets') or logo_path.startswith('updates') else 'updates/' + logo_path }}" alt="Medio Aliado {{ i }}" class="aliado-logo" loading="lazy">
+                            <div class="aliado-wrapper" data-name="{{ aliado_names.get(i ~ '', 'Medio Aliado ' ~ i) }}">
+                                <img src="{{ logo_path if logo_path.startswith('http') or logo_path.startswith('assets') or logo_path.startswith('updates') else 'updates/' + logo_path }}" alt="{{ aliado_names.get(i ~ '', 'Medio Aliado ' ~ i) }}" class="aliado-logo" loading="lazy">
+                                <span class="aliado-banner">{{ aliado_names.get(i ~ '', 'Aliado ' ~ i) }}</span>
                             </div>
                         {% endif %}
                     {% endfor %}
