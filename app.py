@@ -591,6 +591,7 @@ def track_like(item_id):
 def index():
     is_preview = request.args.get('preview') == '1' and 'user_id' in session
     conn = get_db_connection(live=not is_preview)
+    settings = get_settings(live=not is_preview)
     import datetime
     mexico_tz = datetime.timezone(datetime.timedelta(hours=-6))
     current_date = datetime.datetime.now(mexico_tz).strftime("%Y-%m-%d")
@@ -650,7 +651,34 @@ def index():
     galeria_items = conn.execute("SELECT * FROM content_items WHERE section IN ('La Galería Nocturna', 'Caos Sonoro', 'Colaboraciones') ORDER BY created_at DESC, id DESC").fetchall()
     metalpulse_items = conn.execute("SELECT * FROM content_items WHERE section = 'Metal Pulse' ORDER BY created_at DESC, id DESC").fetchall()
     caossonoro_items = conn.execute("SELECT * FROM content_items WHERE section = 'Caos Sonoro' ORDER BY created_at DESC, id DESC").fetchall()
-    metalpulse_tracks = conn.execute("SELECT * FROM content_items WHERE section = 'Metal Pulse Tracks' ORDER BY id DESC").fetchall()
+    
+    # Filter Metal Pulse Tracks: exclude invalid/old tracks (like '.') and keep valid recent ones
+    all_tracks = conn.execute("SELECT * FROM content_items WHERE section = 'Metal Pulse Tracks' AND full_desc != '.' ORDER BY id DESC").fetchall()
+    
+    hide_past_mp = settings.get('hide_past_metalpulse', '0') == '1'
+    if hide_past_mp and all_tracks:
+        # Determine the latest available month from existing records if current month has none
+        months_es = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+        now_mx = datetime.datetime.now(mexico_tz)
+        cur_year = now_mx.year
+        cur_month_idx = now_mx.month - 1
+        
+        valid_months = set()
+        for i in range(24): # current and next 24 months
+            m_idx = (cur_month_idx + i) % 12
+            y = cur_year + (cur_month_idx + i) // 12
+            valid_months.add(f"{months_es[m_idx]} {y}")
+            
+        filtered = [t for t in all_tracks if t['full_desc'] in valid_months]
+        if filtered:
+            metalpulse_tracks = filtered
+        else:
+            # Fallback to the latest available month's tracks
+            latest_month = all_tracks[0]['full_desc']
+            metalpulse_tracks = [t for t in all_tracks if t['full_desc'] == latest_month]
+    else:
+        metalpulse_tracks = all_tracks
+        
     conn.close()
     
     # Group agenda items by month and year
@@ -1697,13 +1725,23 @@ def fetch_meta():
         title_match = re.search(r'<meta property="og:title" content="([^"]+)"', html)
         if title_match:
             og_title = title_match.group(1)
-            # Spotify format: "Track Name - song and lyrics by Band Name | Spotify"
+            band = ''
+            song_or_album = og_title
+
+            # Spotify track: "Song Name - song and lyrics by Band Name | Spotify"
+            # Spotify album: "Album Name - Album by Band Name | Spotify"
             if ' by ' in og_title:
                 parts = og_title.split(' by ')
-                song = parts[0].replace(' - song and lyrics', '').replace(' - song', '').strip()
+                song_or_album = parts[0].replace(' - song and lyrics', '').replace(' - song', '').replace(' - Album', '').replace(' - Single', '').replace(' - EP', '').strip()
                 band = parts[1].split('|')[0].replace('on Apple Music', '').strip()
-                return jsonify({'title': song, 'band': band})
-            return jsonify({'title': og_title, 'band': ''})
+            elif ' - ' in og_title:
+                # Fallback splitting by dash if no " by "
+                parts = og_title.split(' - ')
+                if len(parts) >= 2:
+                    song_or_album = parts[0].strip()
+                    band = parts[1].split('|')[0].strip()
+
+            return jsonify({'title': song_or_album, 'band': band})
             
         return jsonify({'title': '', 'band': ''})
     except Exception as e:

@@ -301,10 +301,10 @@ input:checked + .slider:before { transform: translateX(20px); }
     <!-- TAB 5: METAL PULSE -->
     <div id="tab-metalpulse" class="tab-content">
         <div class="panel-card" style="margin-top: 10px;">
-            <h2><i class="fa-solid fa-headphones"></i> Gestión Metal Pulse</h2>
-            <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Agrega recomendaciones de canciones y álbumes para la sección Metal Pulse (Top 10).</p>
+            <h2 id="pulse-form-title"><i class="fa-solid fa-headphones"></i> Gestión Metal Pulse</h2>
+            <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Agrega o edita recomendaciones de canciones y álbumes para la sección Metal Pulse (Top 10).</p>
             
-            <form method="POST" action="/admin/dashboard" style="background: var(--bg-primary); padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <form id="pulse-main-form" method="POST" action="/admin/dashboard" style="background: var(--bg-primary); padding: 20px; border-radius: 8px; margin-bottom: 30px;">
                 <input type="hidden" name="section" value="Metal Pulse Tracks">
                 
                 <label><i class="fa-brands fa-spotify" style="color: #1DB954;"></i> Link de Spotify / Apple</label>
@@ -322,21 +322,55 @@ input:checked + .slider:before { transform: translateX(20px); }
                 
                 <label><i class="fa-solid fa-calendar-days"></i> Mes Correspondiente</label>
                 <select name="full_desc" id="pulse_full_desc" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
-                    <option value="Abril 2026">Abril 2026</option>
-                    <option value="Mayo 2026" selected>Mayo 2026</option>
-                    <option value="Junio 2026">Junio 2026</option>
-                    <option value="Julio 2026">Julio 2026</option>
-                    <option value="Agosto 2026">Agosto 2026</option>
-                    <option value="Septiembre 2026">Septiembre 2026</option>
-                    <option value="Octubre 2026">Octubre 2026</option>
-                    <option value="Noviembre 2026">Noviembre 2026</option>
-                    <option value="Diciembre 2026">Diciembre 2026</option>
                 </select>
                 
-                <button type="submit" class="btn-primary" style="margin-top: 10px;"><i class="fa-solid fa-plus"></i> Agregar Track</button>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" id="pulse-submit-btn" class="btn-primary" style="margin-top: 10px; flex: 1;"><i class="fa-solid fa-plus"></i> Agregar Track</button>
+                    <button type="button" id="pulse-cancel-btn" style="display: none; margin-top: 10px; background: #555; width: auto; padding: 10px 20px; border: none; border-radius: 4px; color: #fff; cursor: pointer;" onclick="cancelMetalPulseEdit()"><i class="fa-solid fa-xmark"></i> Cancelar</button>
+                </div>
             </form>
             
             <script>
+                (function initMetalPulseMonths() {
+                    const select = document.getElementById('pulse_full_desc');
+                    if (!select) return;
+                    
+                    const monthsEs = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                    const now = new Date();
+                    const currentYear = now.getFullYear();
+                    const currentMonthIdx = now.getMonth();
+                    
+                    select.innerHTML = '';
+                    
+                    // Generar meses desde el corriente hasta los próximos 12 meses
+                    for (let i = 0; i < 12; i++) {
+                        let targetMonthIdx = (currentMonthIdx + i) % 12;
+                        let targetYear = currentYear + Math.floor((currentMonthIdx + i) / 12);
+                        let monthStr = `${monthsEs[targetMonthIdx]} ${targetYear}`;
+                        
+                        let opt = document.createElement('option');
+                        opt.value = monthStr;
+                        opt.textContent = monthStr;
+                        if (i === 0) opt.selected = true; // Mes corriente por defecto
+                        select.appendChild(opt);
+                    }
+                })();
+
+                function setPulseCurrentMonth() {
+                    const select = document.getElementById('pulse_full_desc');
+                    if (!select) return;
+                    const monthsEs = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                    const now = new Date();
+                    const currentStr = `${monthsEs[now.getMonth()]} ${now.getFullYear()}`;
+                    
+                    for (let opt of select.options) {
+                        if (opt.value === currentStr) {
+                            opt.selected = true;
+                            break;
+                        }
+                    }
+                }
+
                 document.getElementById('pulse_sp_link').addEventListener('input', async function() {
                     const url = this.value;
                     if (!url.includes('spotify.com') && !url.includes('apple.com')) return;
@@ -355,121 +389,59 @@ input:checked + .slider:before { transform: translateX(20px); }
                         const data = await response.json();
                         if (data.title) document.getElementById('pulse_short_desc').value = data.title;
                         if (data.band) document.getElementById('pulse_title').value = data.band;
+                        setPulseCurrentMonth();
                     } catch (e) {
                         console.error('Error:', e);
                     } finally {
                         document.getElementById('pulse_loading').style.display = 'none';
                     }
                 });
-            
-        // User Management scripts
-        function editUser(id, nombre, username, email, role) {
-            document.getElementById('form-users-title').innerHTML = '<i class="fa-solid fa-user-pen"></i> Editar Usuario';
-            var form = document.getElementById('users-form');
-            form.action = '/admin/users/edit/' + id;
-            document.getElementById('user_nombre').value = nombre;
-            document.getElementById('user_username').value = username;
-            document.getElementById('user_email').value = email;
-            document.getElementById('user_role').value = role;
-            
-            document.getElementById('submit-user-btn').innerHTML = '<i class="fa-solid fa-save"></i> Actualizar Usuario';
-            document.getElementById('cancel-user-btn').style.display = 'inline-block';
-            
-            form.scrollIntoView({ behavior: 'smooth' });
-        }
 
-                function toggleUserStatus(id) {
-            fetch('/admin/users/toggle/' + id, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(!data.success) {
-                    alert('Error al actualizar el estado del usuario');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Hubo un error de conexión');
-            });
-        }
+                function editMetalPulseRecord(btn) {
+                    var id = btn.getAttribute('data-id');
+                    var title = btn.getAttribute('data-title') || '';
+                    var short_desc = btn.getAttribute('data-short') || '';
+                    var full_desc = btn.getAttribute('data-full') || '';
+                    var sp_link = btn.getAttribute('data-sp') || '';
 
-        function cancelUserEdit() {
-            document.getElementById('form-users-title').innerHTML = '<i class="fa-solid fa-user-plus"></i> Añadir Nuevo Usuario';
-            var form = document.getElementById('users-form');
-            form.action = '/admin/users/add';
-            form.reset();
-            
-            document.getElementById('submit-user-btn').innerHTML = '<i class="fa-solid fa-save"></i> Guardar Usuario';
-            document.getElementById('cancel-user-btn').style.display = 'none';
-        }
+                    document.getElementById('pulse-form-title').innerHTML = '<i class="fa-solid fa-pen-nib"></i> Editar Track #' + id;
+                    document.getElementById('pulse-main-form').action = '/admin/edit/' + id;
+                    document.getElementById('pulse-submit-btn').innerHTML = '<i class="fa-solid fa-save"></i> Guardar Cambios';
+                    document.getElementById('pulse-cancel-btn').style.display = 'inline-block';
 
-</script>
+                    document.getElementById('pulse_title').value = title;
+                    document.getElementById('pulse_short_desc').value = short_desc;
+                    document.getElementById('pulse_sp_link').value = sp_link;
 
-            <script>
-                function updateSingleSetting(key, value) {
-                    const formData = new FormData();
-                    formData.append('key', key);
-                    formData.append('value', value);
-                    fetch('/admin/update_single_setting', {
-                        method: 'POST',
-                        body: formData
-                    }).then(res => res.json()).then(data => {
-                        if(data.success) {
-                             // Setting updated
+                    var select = document.getElementById('pulse_full_desc');
+                    var monthFound = false;
+                    for (var i = 0; i < select.options.length; i++) {
+                        if (select.options[i].value === full_desc) {
+                            select.selectedIndex = i;
+                            monthFound = true;
+                            break;
                         }
-                    });
-                }
-            
-        // User Management scripts
-        function editUser(id, nombre, username, email, role) {
-            document.getElementById('form-users-title').innerHTML = '<i class="fa-solid fa-user-pen"></i> Editar Usuario';
-            var form = document.getElementById('users-form');
-            form.action = '/admin/users/edit/' + id;
-            document.getElementById('user_nombre').value = nombre;
-            document.getElementById('user_username').value = username;
-            document.getElementById('user_email').value = email;
-            document.getElementById('user_role').value = role;
-            
-            document.getElementById('submit-user-btn').innerHTML = '<i class="fa-solid fa-save"></i> Actualizar Usuario';
-            document.getElementById('cancel-user-btn').style.display = 'inline-block';
-            
-            form.scrollIntoView({ behavior: 'smooth' });
-        }
+                    }
+                    if (!monthFound && full_desc) {
+                        var newOpt = document.createElement('option');
+                        newOpt.value = full_desc;
+                        newOpt.textContent = full_desc;
+                        newOpt.selected = true;
+                        select.appendChild(newOpt);
+                    }
 
-                function toggleUserStatus(id) {
-            fetch('/admin/users/toggle/' + id, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
+                    document.getElementById('pulse-main-form').scrollIntoView({ behavior: 'smooth' });
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(!data.success) {
-                    alert('Error al actualizar el estado del usuario');
+
+                function cancelMetalPulseEdit() {
+                    document.getElementById('pulse-form-title').innerHTML = '<i class="fa-solid fa-headphones"></i> Gestión Metal Pulse';
+                    document.getElementById('pulse-main-form').action = '/admin/dashboard';
+                    document.getElementById('pulse-submit-btn').innerHTML = '<i class="fa-solid fa-plus"></i> Agregar Track';
+                    document.getElementById('pulse-cancel-btn').style.display = 'none';
+                    document.getElementById('pulse-main-form').reset();
+                    setPulseCurrentMonth();
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Hubo un error de conexión');
-            });
-        }
-
-        function cancelUserEdit() {
-            document.getElementById('form-users-title').innerHTML = '<i class="fa-solid fa-user-plus"></i> Añadir Nuevo Usuario';
-            var form = document.getElementById('users-form');
-            form.action = '/admin/users/add';
-            form.reset();
-            
-            document.getElementById('submit-user-btn').innerHTML = '<i class="fa-solid fa-save"></i> Guardar Usuario';
-            document.getElementById('cancel-user-btn').style.display = 'none';
-        }
-
-</script>
+            </script>
 
             <h3 style="margin-bottom: 15px;">Tracks Actuales</h3>
             <label style="display: flex; align-items: center; gap: 10px; color: #fff; margin-bottom: 15px; font-size: 0.9rem; background: #222; padding: 10px; border-radius: 8px; border: 1px solid #444;">
@@ -499,14 +471,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                                 <button type="button" class="edit-record-btn"
                                     data-id="{{ item.id }}"
                                     data-section="{{ item.section }}"
-                                    data-pub=""
-                                    data-title="{{ item.title }}" data-author="{{ item.author }}"
+                                    data-title="{{ item.title }}"
                                     data-short="{{ item.short_desc }}"
                                     data-full="{{ item.full_desc | default('', true) | forceescape }}"
-                                    data-yt=""
                                     data-sp="{{ item.sp_link | default('', true) }}"
-                                    data-ap=""
-                                    onclick="editRecord(this)"
+                                    onclick="editMetalPulseRecord(this)"
                                     style="display: inline-block; padding: 5px 10px; background: #333; color: white; border: none; border-radius: 4px; margin-right: 5px; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto;">
                                     <i class="fa-solid fa-pen"></i> Editar
                                 </button>
