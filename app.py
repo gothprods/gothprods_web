@@ -410,16 +410,14 @@ def send_goth_email(to_email, subject, html_content, text_content=None, reply_to
     - Soporta fallback multinivel: Hostinger SSL (465) -> Hostinger TLS (587) -> Gmail SSL (465) -> Gmail TLS (587).
     """
     if not text_content:
-        text_content = f"""¡Saludos Berserker!
+        text_content = f"""¡Bienvenido! Ahora eres un Berserker.
 
 Has recibido un comunicado oficial de Goth Productions.
 
 - Portal Web: https://gothprods.com
-- Agenda Metalera: https://gothprods.com#agenda
-- Playlist Oficial: https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31
 
-Para cualquier duda o gestion de tu suscripcion, contactanos a: {reply_to}
-GOTH PRODUCTIONS - THE UNDERGROUND RESISTANCE
+Para cualquier duda o gestión de tu suscripción, contáctanos a: {reply_to}
+GOTH PRODUCTIONS • MEDIO MEXICANO DE DIVULGACIÓN DEL GÉNERO MÁS FEROZ DEL PLANETA
 """
 
     using_hostinger = bool(os.getenv('MAIL_PASSWORD'))
@@ -2153,13 +2151,13 @@ def build_welcome_email_html(nombre="Berserker"):
                     <tr>
                         <td bgcolor="#080808" class="darkmode-card" style="background-color: #080808 !important; background: #080808 !important; padding: 30px 25px 20px 25px;">
                             <h2 class="darkmode-title" style="color: #716d4a !important; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 16px 0; line-height: 1.3;">
-                                ¡Bienvenido a la Horda de Berserkers, {display_name}!
+                                ¡Bienvenido, {display_name}! Ahora eres un Berserker
                             </h2>
                             <p class="darkmode-text" style="color: #ffffff !important; font-size: 14px; line-height: 1.6; margin: 0 0 14px 0;">
-                                Tu suscripción ha sido confirmada exitosamente. A partir de este momento formas parte de la hermandad oficial de <strong style="color: #ffffff !important;">GothProds</strong>.
+                                Tu suscripción ha sido confirmada exitosamente. A partir de este momento formas parte de <strong style="color: #ffffff !important;">GothProds</strong>.
                             </p>
                             <p class="darkmode-text" style="color: #ffffff !important; font-size: 14px; line-height: 1.6; margin: 0 0 18px 0;">
-                                Como miembro oficial de la Horda, recibirás en tu correo:
+                                Como Berserker oficial de Goth Productions, recibirás en tu correo:
                             </p>
 
                             <!-- BENEFICIOS BOX -->
@@ -2186,32 +2184,14 @@ def build_welcome_email_html(nombre="Berserker"):
                                     </td>
                                 </tr>
                             </table>
-
-                            <!-- DIRECT LINKS -->
-                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 15px;">
-                                <tr>
-                                    <td align="center" style="padding: 6px 0;">
-                                        <a href="https://gothprods.com#agenda" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; margin: 0 10px;">
-                                            Ver Agenda Metalera
-                                        </a>
-                                        <span style="color: #716d4a !important;">|</span>
-                                        <a href="https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; margin: 0 10px;">
-                                            Escuchar Playlist Oficial
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
                         </td>
                     </tr>
 
                     <!-- FOOTER -->
                     <tr>
                         <td align="center" bgcolor="#000000" style="background-color: #000000 !important; background: #000000 !important; border-top: 1px solid #716d4a; padding: 22px 20px; text-align: center;">
-                            <p class="darkmode-title" style="color: #716d4a !important; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 6px 0;">
-                                GOTH PRODUCTIONS &bull; THE UNDERGROUND RESISTANCE
-                            </p>
-                            <p class="darkmode-text" style="color: #ffffff !important; font-size: 12px; margin: 0 0 8px 0;">
-                                Portal Oficial del Metal y la Escena Oscura &bull; <a href="https://gothprods.com" target="_blank" style="color: #ffffff !important; text-decoration: underline;">gothprods.com</a>
+                            <p class="darkmode-title" style="color: #716d4a !important; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 8px 0;">
+                                GOTH PRODUCTIONS &bull; MEDIO MEXICANO DE DIVULGACIÓN DEL GÉNERO MÁS FEROZ DEL PLANETA
                             </p>
                             <p style="color: #777777 !important; font-size: 11px; margin: 0; line-height: 1.4;">
                                 Has recibido este correo porque te registraste en nuestra comunidad de Berserkers. Si deseas gestionar tu suscripción, contáctanos a <a href="mailto:contacto@gothprods.com" style="color: #716d4a !important; text-decoration: none;">contacto@gothprods.com</a>.
@@ -2231,19 +2211,16 @@ def send_newsletter_welcome_email(to_email, nombre="Berserker"):
     def _send_task():
         try:
             display_name = nombre.strip() if nombre and nombre.strip() else "Berserker"
-            subject = f"⚔️ ¡Bienvenido a GothProds, {display_name}! Pacto Confirmado ⚔️"
+            subject = f"⚔️ ¡Bienvenido a GothProds, {display_name}! Ahora eres un Berserker ⚔️"
             html_body = build_welcome_email_html(nombre=display_name)
-            text_body = f"""¡Saludos Berserker {display_name}!
+            text_body = f"""¡Bienvenido, {display_name}! Ahora eres un Berserker.
 
-Tu suscripción a la comunidad oficial de Goth Productions ha sido confirmada con éxito.
-Bienvenido a la resistencia del metal underground.
+Tu suscripción a Goth Productions ha sido confirmada con éxito.
 
 - Portal Web Oficial: https://gothprods.com
-- Agenda Metalera: https://gothprods.com#agenda
-- Playlist Oficial Spotify: https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31
 
 Para cualquier duda o gestión de tu suscripción, contáctanos a: contacto@gothprods.com
-GOTH PRODUCTIONS • THE UNDERGROUND RESISTANCE
+GOTH PRODUCTIONS • MEDIO MEXICANO DE DIVULGACIÓN DEL GÉNERO MÁS FEROZ DEL PLANETA
 """
             send_goth_email(to_email, subject, html_body, text_body)
         except Exception as e:
@@ -2276,7 +2253,7 @@ def subscribe_newsletter():
                 return jsonify({
                     'success': True,
                     'is_existing': True,
-                    'message': f'¡Ya formas parte de la Horda de GothProds{nombre_text}! Te hemos reenviado tu correo oficial de confirmación y bienvenida a {email}.'
+                    'message': f'¡Bienvenido! Ahora eres un Berserker{nombre_text}. Te hemos reenviado tu correo oficial de confirmación y bienvenida a {email}.'
                 })
             else:
                 conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (active_name, existing['id']))
@@ -2299,7 +2276,7 @@ def subscribe_newsletter():
         return jsonify({
             'success': True,
             'is_existing': False,
-            'message': f'¡Bienvenido a la Horda{nombre_saludo}! Te has suscrito exitosamente. Revisa tu bandeja de entrada para ver tu correo de bienvenida oficial.'
+            'message': f'¡Bienvenido! Ahora eres un Berserker{nombre_saludo}. Te has suscrito exitosamente. Revisa tu bandeja de entrada para ver tu correo de bienvenida oficial.'
         })
     except Exception as e:
         conn.close()
@@ -2844,8 +2821,8 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
                             <p style="color: #716d4a !important; font-weight: bold; margin: 0 0 8px 0; font-size: 13px; letter-spacing: 1px; text-transform: uppercase;">
                                 ⚔️ ERES PARTE DE LA COMUNIDAD BERSERKERS ⚔️
                             </p>
-                            <p style="margin: 4px 0; color: #ffffff !important; font-size: 12px;">&copy; 2026 Goth Productions. Todos los derechos reservados.</p>
-                            <p style="margin: 4px 0; color: #aaaaaa !important; font-size: 11px;">Estás recibiendo este correo oficial porque formas parte de la horda en <a href="https://gothprods.com" target="_blank" style="color: #aaaaaa !important; text-decoration: underline;">gothprods.com</a></p>
+                            <p style="margin: 4px 0; color: #ffffff !important; font-size: 12px;">&copy; 2026 Goth Productions &bull; Medio Mexicano de Divulgación del Género Más Feroz del Planeta</p>
+                            <p style="margin: 4px 0; color: #aaaaaa !important; font-size: 11px;">Estás recibiendo este correo oficial porque eres un Berserker en <a href="https://gothprods.com" target="_blank" style="color: #aaaaaa !important; text-decoration: underline;">gothprods.com</a></p>
                         </td>
                     </tr>
 
@@ -2903,7 +2880,7 @@ def admin_newsletter_send():
 - Agenda Metalera: https://gothprods.com#agenda
 - Playlist Oficial: https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31
 
-GOTH PRODUCTIONS • THE UNDERGROUND RESISTANCE
+GOTH PRODUCTIONS • MEDIO MEXICANO DE DIVULGACIÓN DEL GÉNERO MÁS FEROZ DEL PLANETA
 """
         if send_goth_email(sub_email, asunto, html_content, text_content):
             sent_count += 1
