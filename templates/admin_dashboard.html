@@ -523,6 +523,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                     </button>
                 </div>
                 <div>
+                    <a href="#sec-sync-remote" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 11px 18px; background: #182234; border: 1px solid #3b82f6; color: #93c5fd; border-radius: 4px; font-size: 0.9rem; font-weight: bold;">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> Sincronizar con Producción
+                    </a>
+                </div>
+                <div>
                     <a href="/admin/newsletter/export_csv" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 11px 18px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; font-size: 0.9rem;">
                         <i class="fa-solid fa-file-csv"></i> Exportar CSV Suscriptores
                     </a>
@@ -723,17 +728,58 @@ input:checked + .slider:before { transform: translateX(20px); }
                 }
             </script>
 
-            <!-- INFORMACIÓN DE ALMACENAMIENTO DE SUSCRIPTORES -->
-            <div style="background: #151515; border-left: 4px solid var(--accent-color); padding: 15px 20px; border-radius: 4px; margin-top: 35px; margin-bottom: 20px; font-size: 0.9rem;">
-                <h4 style="color: var(--accent-color); margin-top: 0; margin-bottom: 6px; font-size: 1rem;">
-                    <i class="fa-solid fa-database"></i> ¿Dónde se guardan los suscriptores?
-                </h4>
-                <p style="color: #ccc; margin: 0 0 8px 0; line-height: 1.5;">
-                    Los suscriptores registrados desde el formulario público del sitio web (sección <em>"Únete a los Berserkers"</em>) se guardan automáticamente en la tabla <code>newsletter_subscribers</code> de la base de datos (<code>gothprods.db</code>).
+            <!-- SINCRONIZACIÓN CON PRODUCCIÓN Y DESCARGA DE USUARIOS (MÉTODO 1) -->
+            <div id="sec-sync-remote" style="background: #141414; border: 1px solid #3a3a3a; border-radius: 8px; padding: 22px; margin-top: 30px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="color: var(--accent-color); margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-cloud-arrow-down" style="font-size: 1.3rem;"></i> Sincronización Directa de Suscriptores desde Producción
+                    </h3>
+                    <span style="background: rgba(212,175,55,0.15); color: var(--accent-color); border: 1px solid var(--accent-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">
+                        <i class="fa-solid fa-bolt"></i> Conexión Directa en 1-Clic
+                    </span>
+                </div>
+                <p style="color: #bbb; font-size: 0.88rem; margin-top: 0; margin-bottom: 18px; line-height: 1.5;">
+                    Conecta directamente con tu página web productiva (<strong>gothprods.com</strong>) para descargar todos los usuarios registrados y fusionarlos en tu base de datos local sin duplicar correos.
                 </p>
-                <p style="color: #999; margin: 0; font-size: 0.85rem;">
-                    <i class="fa-solid fa-circle-info" style="color: var(--accent-color);"></i> <strong>Nota importante:</strong> Si los usuarios se registraron en el sitio web público en línea (<code>gothprods.com</code>), sus registros se encuentran en la base de datos del servidor de producción. Si deseas agregar contactos manualmente a esta base de datos local, utiliza el formulario rápido de abajo.
-                </p>
+
+                <form action="/admin/newsletter/sync_remote" method="POST" style="background: #1c1c1c; border: 1px solid #333; border-radius: 6px; padding: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-size: 0.82rem; color: #d4af37; font-weight: bold; margin-bottom: 5px;">
+                                <i class="fa-solid fa-globe"></i> URL del Sitio Productivo:
+                            </label>
+                            <input type="text" name="remote_url" id="sync_remote_url" value="https://gothprods.com" placeholder="https://gothprods.com" style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: #111; color: #fff; border: 1px solid #444; border-radius: 4px; font-size: 0.9rem;" required>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.82rem; color: #aaa; margin-bottom: 5px;">
+                                <i class="fa-solid fa-key"></i> Clave / Token de Sincronización API:
+                            </label>
+                            <input type="text" name="sync_token" id="sync_remote_token" value="gothprods_berserkers_sync_2026" placeholder="gothprods_berserkers_sync_2026" style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: #111; color: #fff; border: 1px solid #444; border-radius: 4px; font-size: 0.9rem;">
+                        </div>
+                    </div>
+
+                    <!-- OPCIÓN DE RESPALDO CON CREDENCIALES DE ADMIN SI LA API AÚN NO ESTÁ DESPLEGADA EN PRODUCCIÓN -->
+                    <div style="background: #151515; border-left: 3px solid #3b82f6; padding: 12px 16px; border-radius: 4px; margin-bottom: 16px;">
+                        <div style="font-size: 0.82rem; color: #93c5fd; font-weight: bold; margin-bottom: 8px;">
+                            <i class="fa-solid fa-circle-info"></i> ¿Te salió error 404? 
+                            <span style="color: #ccc; font-weight: normal;">Si aún no has subido el nuevo <code>app.py</code> a PythonAnywhere/producción, ingresa tus credenciales de Administrador en vivo para conectar de inmediato:</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+                            <div>
+                                <label style="display: block; font-size: 0.78rem; color: #aaa; margin-bottom: 3px;">Correo de Administrador (Producción):</label>
+                                <input type="email" name="admin_email" placeholder="ej. goth.prods@gmail.com" style="width: 100%; box-sizing: border-box; padding: 8px 10px; background: #0c0c0c; color: #fff; border: 1px solid #444; border-radius: 4px; font-size: 0.85rem;">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.78rem; color: #aaa; margin-bottom: 3px;">Contraseña de Administrador (Producción):</label>
+                                <input type="password" name="admin_password" placeholder="Tu contraseña del panel en vivo" style="width: 100%; box-sizing: border-box; padding: 8px 10px; background: #0c0c0c; color: #fff; border: 1px solid #444; border-radius: 4px; font-size: 0.85rem;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-sync-live" style="width: 100%; padding: 13px 20px; background: var(--accent-color); color: #000; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; box-shadow: 0 4px 12px rgba(212,175,55,0.3);">
+                        <i class="fa-solid fa-rotate"></i> Sincronizar Ahora desde Producción
+                    </button>
+                </form>
             </div>
 
             <!-- REGISTRO MANUAL DE SUSCRIPTOR -->

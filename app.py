@@ -2532,6 +2532,288 @@ def admin_newsletter_delete(id):
     flash('Suscriptor eliminado correctamente.', 'success')
     return redirect(url_for('admin_dashboard'))
 
+@app.route('/api/sync/subscribers', methods=['GET', 'POST'])
+def api_sync_subscribers():
+    # Permitir autenticación mediante token en header, parámetro GET/POST o sesión de admin
+    token = request.headers.get('X-Sync-Token') or request.args.get('token') or request.form.get('token')
+    if not token and request.is_json:
+        token = request.get_json().get('token')
+        
+    expected_token = os.getenv('SYNC_TOKEN', 'gothprods_berserkers_sync_2026')
+    
+    is_admin = session.get('role') in ['admin', 'root']
+    
+    if (not token or token != expected_token) and not is_admin:
+        return jsonify({'error': 'Unauthorized', 'message': 'Token de sincronización inválido o no proporcionado.'}), 401
+        
+    conn = get_db_connection()
+    try:
+        cur = conn.execute("SELECT id, nombre, email, is_active, created_at FROM newsletter_subscribers ORDER BY id ASC")
+        rows = cur.fetchall()
+        data = [dict(r) for r in rows]
+        return jsonify({
+            'status': 'success',
+            'count': len(data),
+            'subscribers': data
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route('/admin/newsletter/sync_remote', methods=['POST'])
+def admin_newsletter_sync_remote():
+    if session.get('role') not in ['admin', 'root']:
+        flash('Acceso denegado', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    remote_url = request.form.get('remote_url', '').strip().rstrip('/')
+    sync_token = request.form.get('sync_token', '').strip() or os.getenv('SYNC_TOKEN', 'gothprods_berserkers_sync_2026')
+    admin_email = request.form.get('admin_email', '').strip()
+    admin_password = request.form.get('admin_password', '').strip()
+
+    if not remote_url:
+        remote_url = 'https://gothprods.com'
+
+    if not remote_url.startswith('http://') and not remote_url.startswith('https://'):
+        remote_url = 'https://' + remote_url
+
+    import urllib.request
+    import urllib.parse
+    import http.cookiejar
+    import json
+    import ssl
+    import csv
+    import io
+    import re
+
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+
+    cj = http.cookiejar.CookieJar()
+    opener = urllib.request.build_opener(
+        urllib.request.HTTPCookieProcessor(cj),
+        urllib.request.HTTPSHandler(context=ctx)
+    )
+
+    subscribers = []
+    sync_source = None
+    last_error = None
+
+    # ESTRATEGIA 1: Probar endpoint directo de API con token
+    try:
+        endpoint = f"{remote_url}/api/sync/subscribers"
+        req = urllib.request.Request(
+            endpoint,
+            headers={
+                'X-Sync-Token': sync_token,
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) GothProds-Sync/1.0'
+            }
+        )
+        with opener.open(req, timeout=10) as response:
+            if response.status == 200:
+                payload = json.loads(response.read().decode('utf-8'))
+                subscribers = payload.get('subscribers', [])
+                sync_source = 'API en vivo'
+    except urllib.error.HTTPError as e:
+        last_error = f"Código HTTP {e.code}"
+    except Exception as e:
+        last_error = str(e)
+
+    # ESTRATEGIA 2: Si la API dio 404 (porque aún no se subió app.py a producción) y el usuario ingresó credenciales de admin
+    if not subscribers and admin_email and admin_password:
+        try:
+            login_url = f"{remote_url}/admin/login"
+            login_data = urllib.parse.urlencode({'email': admin_email, 'password': admin_password}).encode('utf-8')
+            login_req = urllib.request.Request(
+                login_url,
+                data=login_data,
+                headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'}
+            )
+            with opener.open(login_req, timeout=12) as login_resp:
+                pass
+
+            # Intentar descargar CSV de suscriptores con la sesión iniciada
+            csv_url = f"{remote_url}/admin/newsletter/export_csv"
+            csv_req = urllib.request.Request(csv_url, headers={'User-Agent': 'Mozilla/5.0'})
+            try:
+                with opener.open(csv_req, timeout=12) as csv_resp:
+                    content_type = csv_resp.headers.get('Content-Type', '')
+                    if csv_resp.status == 200 and ('csv' in content_type or 'text' in content_type):
+                        csv_text = csv_resp.read().decode('utf-8', errors='ignore')
+                        if 'Email' in csv_text or 'Correo' in csv_text or '@' in csv_text:
+                            reader = csv.reader(io.StringIO(csv_text))
+                            headers = next(reader, None)
+                            for row in reader:
+                                if len(row) >= 3 and '@' in row[2]:
+                                    subscribers.append({'nombre': row[1], 'email': row[2], 'created_at': row[3] if len(row) > 3 else None})
+                            if subscribers:
+                                sync_source = 'Exportación CSV autenticada'
+            except Exception:
+                pass
+
+            # Si no se obtuvo por CSV, scrapear la tabla de suscriptores del panel de control
+            if not subscribers:
+                dash_url = f"{remote_url}/admin"
+                dash_req = urllib.request.Request(dash_url, headers={'User-Agent': 'Mozilla/5.0'})
+                with opener.open(dash_req, timeout=12) as dash_resp:
+                    dash_html = dash_resp.read().decode('utf-8', errors='ignore')
+                    # Extraer filas con correos
+                    matches = re.findall(r'<tr[^>]*>\s*<td[^>]*>#?(\d+)</td>\s*<td[^>]*>(?:<strong>)?(.*?)(?:</strong>)?</td>\s*<td[^>]*>(.*?)</td>\s*<td[^>]*>(.*?)</td>', dash_html, re.DOTALL)
+                    for m in matches:
+                        email_cand = m[2].strip()
+                        if '@' in email_cand:
+                            # Limpiar posibles tags html residuales
+                            email_clean = re.sub(r'<[^>]+>', '', email_cand)
+                            nombre_clean = re.sub(r'<[^>]+>', '', m[1].strip())
+                            fecha_clean = re.sub(r'<[^>]+>', '', m[3].strip())
+                            subscribers.append({'nombre': nombre_clean, 'email': email_clean, 'created_at': fecha_clean})
+                    if subscribers:
+                        sync_source = 'Panel de Administración en vivo'
+        except Exception as e:
+            last_error = f"Error al conectar con credenciales: {str(e)}"
+
+    if not subscribers:
+        if not admin_email or not admin_password:
+            flash(f'No se pudo sincronizar automáticamente con {remote_url} (Ruta API no encontrada en el servidor productivo, Error 404). Para solucionarlo de inmediato: 1) Sube el archivo app.py actualizado a PythonAnywhere/producción y recarga la web, O BIEN 2) Escribe abajo tu correo y contraseña de Administrador de {remote_url} para conectarse directamente.', 'error')
+        else:
+            flash(f'No se pudieron obtener suscriptores desde {remote_url}. Verifica que el usuario y contraseña de administrador de la página en vivo sean correctos. ({last_error})', 'error')
+        return redirect(url_for('admin_dashboard') + '#sec-sync-remote')
+
+    # Guardar en base de datos local
+    conn = get_db_connection()
+    added = 0
+    updated = 0
+
+    for sub in subscribers:
+        email = (sub.get('email') or '').strip().lower()
+        if not email or '@' not in email:
+            continue
+
+        nombre = (sub.get('nombre') or 'Berserker').strip()
+        is_active = sub.get('is_active', 1)
+        created_at = sub.get('created_at')
+
+        cur = conn.execute("SELECT id FROM newsletter_subscribers WHERE email = ?", (email,))
+        existing = cur.fetchone()
+        if existing:
+            conn.execute("UPDATE newsletter_subscribers SET nombre = ?, is_active = ? WHERE id = ?", (nombre, is_active, existing['id']))
+            updated += 1
+        else:
+            if created_at:
+                conn.execute("INSERT INTO newsletter_subscribers (nombre, email, is_active, created_at) VALUES (?, ?, ?, ?)", (nombre, email, is_active, created_at))
+            else:
+                conn.execute("INSERT INTO newsletter_subscribers (nombre, email, is_active) VALUES (?, ?, ?)", (nombre, email, is_active))
+            added += 1
+
+    conn.commit()
+    conn.close()
+
+    flash(f'¡Sincronización completada con éxito vía {sync_source}! Se descargaron {added} suscriptores nuevos y se actualizaron {updated} existentes desde {remote_url}.', 'success')
+    return redirect(url_for('admin_dashboard') + '#sec-sync-remote')
+
+
+@app.route('/admin/newsletter/import_csv', methods=['POST'])
+def admin_newsletter_import_csv():
+    if session.get('role') not in ['admin', 'root']:
+        flash('Acceso denegado', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    if 'csv_file' not in request.files:
+        flash('Por favor selecciona un archivo CSV.', 'error')
+        return redirect(url_for('admin_dashboard') + '#tab-newsletter')
+
+    file = request.files['csv_file']
+    if not file or file.filename == '':
+        flash('Por favor selecciona un archivo CSV válido.', 'error')
+        return redirect(url_for('admin_dashboard') + '#tab-newsletter')
+
+    import csv
+    import io
+
+    try:
+        content = file.stream.read().decode('utf-8', errors='ignore')
+        stream = io.StringIO(content, newline=None)
+        reader = csv.reader(stream)
+
+        headers = next(reader, None)
+        if not headers:
+            flash('El archivo CSV está vacío.', 'error')
+            return redirect(url_for('admin_dashboard') + '#tab-newsletter')
+
+        email_idx = -1
+        name_idx = -1
+        date_idx = -1
+
+        for i, h in enumerate(headers):
+            h_clean = h.strip().lower()
+            if 'email' in h_clean or 'correo' in h_clean:
+                email_idx = i
+            elif 'nombre' in h_clean or 'name' in h_clean or 'usuario' in h_clean:
+                name_idx = i
+            elif 'fecha' in h_clean or 'date' in h_clean or 'created' in h_clean:
+                date_idx = i
+
+        rows_to_process = []
+        # Si la cabecera es en realidad una fila con datos (ej. contiene un correo)
+        if any('@' in cell for cell in headers):
+            rows_to_process.append(headers)
+            if email_idx == -1:
+                for idx, cell in enumerate(headers):
+                    if '@' in cell:
+                        email_idx = idx
+                        break
+
+        if email_idx == -1:
+            if len(headers) >= 3 and '@' in headers[2]:
+                email_idx = 2
+                name_idx = 1
+            elif len(headers) >= 2 and '@' in headers[1]:
+                email_idx = 1
+                name_idx = 0
+            else:
+                email_idx = 0
+
+        for row in reader:
+            if row:
+                rows_to_process.append(row)
+
+        conn = get_db_connection()
+        added = 0
+        updated = 0
+
+        for r in rows_to_process:
+            if len(r) <= email_idx:
+                continue
+            email = r[email_idx].strip().lower()
+            if not email or '@' not in email:
+                continue
+
+            nombre = r[name_idx].strip() if name_idx >= 0 and len(r) > name_idx and r[name_idx].strip() else 'Berserker'
+            created_at = r[date_idx].strip() if date_idx >= 0 and len(r) > date_idx and r[date_idx].strip() else None
+
+            cur = conn.execute("SELECT id FROM newsletter_subscribers WHERE email = ?", (email,))
+            existing = cur.fetchone()
+            if existing:
+                conn.execute("UPDATE newsletter_subscribers SET nombre = ?, is_active = 1 WHERE id = ?", (nombre, existing['id']))
+                updated += 1
+            else:
+                if created_at:
+                    conn.execute("INSERT INTO newsletter_subscribers (nombre, email, is_active, created_at) VALUES (?, ?, 1, ?)", (nombre, email, created_at))
+                else:
+                    conn.execute("INSERT INTO newsletter_subscribers (nombre, email, is_active) VALUES (?, ?, 1)", (nombre, email))
+                added += 1
+
+        conn.commit()
+        conn.close()
+
+        flash(f'¡Importación completada! Se registraron {added} nuevos suscriptores y se actualizaron {updated}.', 'success')
+    except Exception as e:
+        flash(f'Error al procesar el archivo CSV: {str(e)}', 'error')
+
+    return redirect(url_for('admin_dashboard') + '#tab-newsletter')
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
 
