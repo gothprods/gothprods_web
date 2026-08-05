@@ -1971,18 +1971,126 @@ def admin_logout():
 
 # --- RUTAS DE NEWSLETTER ---
 
+def build_welcome_email_html(nombre="Berserker"):
+    """Genera el HTML para el correo de bienvenida y confirmación de suscripción de GothProds."""
+    display_name = nombre.strip() if nombre and nombre.strip() else "Berserker"
+    logo_url = "https://gothprods.com/assets/images/logo.png"
+
+    return f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido a GothProds</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #000000; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #ffffff; -webkit-font-smoothing: antialiased;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #000000; min-height: 100vh; padding: 30px 10px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 650px; background-color: #080808; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.9);">
+                    <!-- HEADER -->
+                    <tr>
+                        <td align="center" style="background: linear-gradient(180deg, #111111 0%, #080808 100%); padding: 35px 25px 25px 25px; border-bottom: 2px solid #716d4a;">
+                            <a href="https://gothprods.com" target="_blank" style="text-decoration: none;">
+                                <img src="{logo_url}" alt="Goth Productions" style="max-width: 220px; height: auto; display: block; margin: 0 auto 15px auto;" onerror="this.style.display='none'">
+                                <h1 style="color: #716d4a; font-size: 26px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">
+                                    GOTH PRODUCTIONS
+                                </h1>
+                            </a>
+                            <div style="margin-top: 10px;">
+                                <span style="background: #716d4a; color: #ffffff; font-size: 11px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 3px; display: inline-block;">
+                                    ⚔️ PACTO OFICIAL CONFIRMADO ⚔️
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- HERO GREETING -->
+                    <tr>
+                        <td style="padding: 35px 30px 20px 30px;">
+                            <h2 style="color: #716d4a; font-size: 22px; margin: 0 0 16px 0; font-weight: 800; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.5px;">
+                                ¡Bienvenido a la Horda de Berserkers, {display_name}!
+                            </h2>
+                            <p style="color: #ffffff; font-size: 15px; line-height: 1.7; margin: 0 0 16px 0;">
+                                Tu suscripción ha sido confirmada exitosamente. A partir de este momento formas parte de la hermandad oficial de <strong>GothProds</strong>.
+                            </p>
+                            <p style="color: #ffffff; font-size: 14px; line-height: 1.7; margin: 0 0 20px 0;">
+                                Como miembro oficial de la Horda, recibirás en tu correo:
+                            </p>
+
+                            <!-- BENEFICIOS -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: #0d0d0d; border: 1px solid #716d4a; border-radius: 6px; margin-bottom: 25px;">
+                                <tr>
+                                    <td style="padding: 16px 20px;">
+                                        <div style="color: #ffffff; font-size: 14px; line-height: 1.8;">
+                                            <strong style="color: #716d4a;">• El Noticiero Nocturno:</strong> Novedades, lanzamientos y coberturas de la escena underground.<br>
+                                            <strong style="color: #716d4a;">• Agenda Metalera:</strong> Cartelera mensual anticipada con los mejores conciertos y festivales.<br>
+                                            <strong style="color: #716d4a;">• Reseñas & Entrevistas:</strong> Críticas de álbumes y entrevistas exclusivas con las bandas más brutales.<br>
+                                            <strong style="color: #716d4a;">• Metal Pulse & Galería:</strong> Lo mejor de nuestros playlists de Spotify y producciones audiovisuales.
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- BOTONES DE ACCIÓN -->
+                            <div style="text-align: center; margin: 30px 0 20px 0;">
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
+                                    <tr>
+                                        <td style="border-radius: 4px; background: #716d4a; text-align: center;">
+                                            <a href="https://gothprods.com" target="_blank" style="background: #716d4a; border: 1px solid #716d4a; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 4px; display: inline-block;">
+                                                Explorar GothProds.com &rarr;
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top: 15px;">
+                                <tr>
+                                    <td align="center" style="padding: 10px 0;">
+                                        <a href="https://gothprods.com#agenda" target="_blank" style="color: #716d4a; font-size: 13px; font-weight: bold; text-decoration: underline; margin: 0 12px; display: inline-block;">
+                                            Ver Agenda Metalera
+                                        </a>
+                                        <span style="color: #716d4a;">|</span>
+                                        <a href="https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31" target="_blank" style="color: #716d4a; font-size: 13px; font-weight: bold; text-decoration: underline; margin: 0 12px; display: inline-block;">
+                                            Escuchar Playlist Oficial
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- FOOTER -->
+                    <tr>
+                        <td style="background-color: #000000; border-top: 1px solid #716d4a; padding: 25px 30px; text-align: center;">
+                            <p style="color: #716d4a; font-size: 13px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 8px 0;">
+                                GOTH PRODUCTIONS &bull; THE UNDERGROUND RESISTANCE
+                            </p>
+                            <p style="color: #ffffff; font-size: 12px; margin: 0 0 12px 0;">
+                                Portal Oficial del Metal y la Escena Oscura &bull; <a href="https://gothprods.com" target="_blank" style="color: #ffffff; text-decoration: underline;">gothprods.com</a>
+                            </p>
+                            <p style="color: #777777; font-size: 11px; margin: 0; line-height: 1.4;">
+                                Has recibido este correo porque te registraste en nuestra comunidad de Berserkers. Si deseas gestionar tu suscripción, contáctanos a <a href="mailto:contacto@gothprods.com" style="color: #716d4a; text-decoration: none;">contacto@gothprods.com</a>.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>"""
+
+
 def send_newsletter_welcome_email(to_email, nombre="Berserker"):
-    """Envía un correo de confirmación y bienvenida que incluye la edición completa del Boletín Oficial de GothProds."""
+    """Envía un correo de confirmación y bienvenida con branding oficial de GothProds."""
     def _send_task():
         try:
             display_name = nombre.strip() if nombre and nombre.strip() else "Berserker"
-            subject = f"⚔️ ¡Bienvenido a GothProds, {display_name}! Tu Boletín Oficial de Metal ⚔️"
-            intro_msg = f"¡Tu pacto ha sido sellado! Te damos la bienvenida oficial a la Horda de GothProds. A partir de hoy recibirás en exclusiva las noticias, entrevistas y coberturas del metal extremo. Aquí tienes la edición oficial más reciente de nuestro boletín mensual:"
+            subject = f"⚔️ ¡Bienvenido a GothProds, {display_name}! Pacto Confirmado ⚔️"
             
-            html_body = build_newsletter_html(
-                asunto=f"¡Bienvenido a la Horda, {display_name}!",
-                mensaje_intro=intro_msg
-            )
+            html_body = build_welcome_email_html(nombre=display_name)
 
             using_hostinger = bool(os.getenv('MAIL_PASSWORD'))
             smtp_server = os.getenv('MAIL_SERVER', 'smtp.hostinger.com') if using_hostinger else SMTP_SERVER
@@ -2007,9 +2115,9 @@ def send_newsletter_welcome_email(to_email, nombre="Berserker"):
                 server.login(smtp_user, smtp_password)
             server.sendmail(smtp_user, [to_email], msg.as_string())
             server.quit()
-            print(f"[SUCCESS] Newsletter welcome email sent to {to_email}")
+            print(f"[SUCCESS] Welcome email sent to {to_email}")
         except Exception as e:
-            print(f"[WARNING] Could not send newsletter welcome email to {to_email}: {e}")
+            print(f"[WARNING] Could not send welcome email to {to_email}: {e}")
 
     thread = threading.Thread(target=_send_task)
     thread.daemon = True
