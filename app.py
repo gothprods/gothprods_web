@@ -25,6 +25,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
+import email.utils
+from email.header import Header
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
@@ -398,7 +400,78 @@ def get_settings(live=False):
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SENDER_EMAIL = "goth.prods@gmail.com"
-SENDER_PASSWORD = "vywvezpzobnwurdd"
+SENDER_PASSWORD = os.getenv('GMAIL_APP_PASSWORD') or "vywvezpzobnwurdd"
+
+def send_goth_email(to_email, subject, html_content, text_content=None, reply_to="contacto@gothprods.com"):
+    """
+    Envio robusto y compatible con RFC/DKIM/SPF para correos de Goth Productions.
+    - Adjunta multipart/alternative (text/plain y text/html) para evitar filtros antispam (iCloud, Gmail, Outlook).
+    - Agrega Message-ID, Date, X-Mailer, List-Unsubscribe y Reply-To.
+    - Soporta fallback multinivel: Hostinger SSL (465) -> Hostinger TLS (587) -> Gmail SSL (465) -> Gmail TLS (587).
+    """
+    if not text_content:
+        text_content = f"""¡Saludos Berserker!
+
+Has recibido un comunicado oficial de Goth Productions.
+
+- Portal Web: https://gothprods.com
+- Agenda Metalera: https://gothprods.com#agenda
+- Playlist Oficial: https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31
+
+Para cualquier duda o gestion de tu suscripcion, contactanos a: {reply_to}
+GOTH PRODUCTIONS - THE UNDERGROUND RESISTANCE
+"""
+
+    using_hostinger = bool(os.getenv('MAIL_PASSWORD'))
+    hostinger_server = os.getenv('MAIL_SERVER', 'smtp.hostinger.com')
+    hostinger_user = os.getenv('MAIL_USERNAME', 'contacto@gothprods.com')
+    hostinger_pass = os.getenv('MAIL_PASSWORD')
+
+    gmail_server = "smtp.gmail.com"
+    gmail_user = "goth.prods@gmail.com"
+    gmail_pass = os.getenv('GMAIL_APP_PASSWORD') or "vywvezpzobnwurdd"
+
+    def _build_mime(from_addr):
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = Header(subject, 'utf-8').encode()
+        msg['From'] = f"Goth Productions <{from_addr}>"
+        msg['To'] = to_email
+        msg['Reply-To'] = reply_to
+        msg['Date'] = email.utils.formatdate(localtime=True)
+        msg['Message-ID'] = email.utils.make_msgid(domain='gothprods.com')
+        msg['X-Mailer'] = 'GothProds Mailer/2.0'
+        msg['List-Unsubscribe'] = f'<mailto:{reply_to}?subject=Unsubscribe>'
+        msg.attach(MIMEText(text_content, 'plain', 'utf-8'))
+        msg.attach(MIMEText(html_content, 'html', 'utf-8'))
+        return msg
+
+    attempts = []
+    if using_hostinger and hostinger_pass:
+        attempts.append(('Hostinger SSL:465', hostinger_server, 465, hostinger_user, hostinger_pass, True))
+        attempts.append(('Hostinger TLS:587', hostinger_server, 587, hostinger_user, hostinger_pass, False))
+
+    if gmail_pass:
+        attempts.append(('Gmail SSL:465', gmail_server, 465, gmail_user, gmail_pass, True))
+        attempts.append(('Gmail TLS:587', gmail_server, 587, gmail_user, gmail_pass, False))
+
+    for label, s_host, s_port, s_user, s_pass, is_ssl in attempts:
+        try:
+            msg = _build_mime(s_user)
+            if is_ssl:
+                server = smtplib.SMTP_SSL(s_host, s_port, timeout=12)
+            else:
+                server = smtplib.SMTP(s_host, s_port, timeout=12)
+                server.starttls()
+            server.login(s_user, s_pass)
+            server.sendmail(s_user, [to_email], msg.as_string())
+            server.quit()
+            print(f"[SUCCESS] Email sent to {to_email} via {label} ({s_host}:{s_port})")
+            return True
+        except Exception as e_att:
+            print(f"[WARNING] SMTP attempt {label} failed for {to_email}: {e_att}")
+
+    print(f"[ERROR] All SMTP delivery attempts failed for {to_email}")
+    return False
 
 def send_verification_email(to_email, code, subject="Código de Verificación - Goth Prods"):
     if not SENDER_PASSWORD:
@@ -2160,53 +2233,19 @@ def send_newsletter_welcome_email(to_email, nombre="Berserker"):
             display_name = nombre.strip() if nombre and nombre.strip() else "Berserker"
             subject = f"⚔️ ¡Bienvenido a GothProds, {display_name}! Pacto Confirmado ⚔️"
             html_body = build_welcome_email_html(nombre=display_name)
+            text_body = f"""¡Saludos Berserker {display_name}!
 
-            using_hostinger = bool(os.getenv('MAIL_PASSWORD'))
-            smtp_server = os.getenv('MAIL_SERVER', 'smtp.hostinger.com') if using_hostinger else SMTP_SERVER
-            smtp_port = int(os.getenv('MAIL_PORT', 465)) if using_hostinger else 465
-            smtp_user = os.getenv('MAIL_USERNAME', 'contacto@gothprods.com') if using_hostinger else SENDER_EMAIL
-            smtp_password = os.getenv('MAIL_PASSWORD') if using_hostinger else SENDER_PASSWORD
+Tu suscripción a la comunidad oficial de Goth Productions ha sido confirmada con éxito.
+Bienvenido a la resistencia del metal underground.
 
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = subject
-            msg['From'] = f"Goth Productions <{smtp_user}>"
-            msg['To'] = to_email
-            msg['Reply-To'] = "contacto@gothprods.com"
-            msg.attach(MIMEText(html_body, 'html', 'utf-8'))
+- Portal Web Oficial: https://gothprods.com
+- Agenda Metalera: https://gothprods.com#agenda
+- Playlist Oficial Spotify: https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31
 
-            sent = False
-            try:
-                if smtp_port == 465:
-                    server = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=12)
-                else:
-                    server = smtplib.SMTP(smtp_server, smtp_port, timeout=12)
-                    server.starttls()
-                if smtp_password:
-                    server.login(smtp_user, smtp_password)
-                server.sendmail(smtp_user, [to_email], msg.as_string())
-                server.quit()
-                sent = True
-                print(f"[SUCCESS] Welcome email sent to {to_email} via {smtp_server}:{smtp_port}")
-            except Exception as e1:
-                print(f"[WARNING] Primary SMTP failed for welcome email to {to_email}: {e1}")
-                if using_hostinger and SENDER_PASSWORD:
-                    try:
-                        print(f"[INFO] Attempting Gmail fallback for welcome email to {to_email}...")
-                        fb_msg = MIMEMultipart('alternative')
-                        fb_msg['Subject'] = subject
-                        fb_msg['From'] = f"Goth Productions <{SENDER_EMAIL}>"
-                        fb_msg['To'] = to_email
-                        fb_msg['Reply-To'] = "contacto@gothprods.com"
-                        fb_msg.attach(MIMEText(html_body, 'html', 'utf-8'))
-
-                        fb_server = smtplib.SMTP_SSL(SMTP_SERVER, 465, timeout=12)
-                        fb_server.login(SENDER_EMAIL, SENDER_PASSWORD)
-                        fb_server.sendmail(SENDER_EMAIL, [to_email], fb_msg.as_string())
-                        fb_server.quit()
-                        sent = True
-                        print(f"[SUCCESS] Welcome email sent to {to_email} via Gmail fallback")
-                    except Exception as e2:
-                        print(f"[ERROR] Gmail fallback failed for welcome email to {to_email}: {e2}")
+Para cualquier duda o gestión de tu suscripción, contáctanos a: contacto@gothprods.com
+GOTH PRODUCTIONS • THE UNDERGROUND RESISTANCE
+"""
+            send_goth_email(to_email, subject, html_body, text_body)
         except Exception as e:
             print(f"[WARNING] Could not send welcome email to {to_email}: {e}")
 
@@ -2629,7 +2668,7 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
                         <td align="center" bgcolor="#000000" style="background-color: #000000 !important; padding: 30px 20px 24px 20px; border-bottom: 2px solid #716d4a;">
                             <img src="{logo_img_url}" width="150" alt="Goth Prods Logo" style="display: block; width: 150px; max-width: 150px; height: auto; margin: 0 auto 12px auto; border: 0;" />
                             <h1 style="color: #716d4a !important; margin: 0 0 10px 0; font-size: 22px; text-transform: uppercase; letter-spacing: 2px; font-weight: 900; line-height: 1.2;">
-                                BOLETÍN MENSUAL BERSERKERS
+                                Newsletter
                             </h1>
                             <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center">
                                 <tr>
@@ -2852,40 +2891,27 @@ def admin_newsletter_send():
 
     html_content = build_newsletter_html(asunto, mensaje_intro, target_month=target_month)
     
-    using_hostinger = bool(os.getenv('MAIL_PASSWORD'))
-    smtp_server = os.getenv('MAIL_SERVER', 'smtp.hostinger.com') if using_hostinger else SMTP_SERVER
-    smtp_port = int(os.getenv('MAIL_PORT', 465)) if using_hostinger else 465
-    smtp_user = os.getenv('MAIL_USERNAME', 'contacto@gothprods.com') if using_hostinger else SENDER_EMAIL
-    smtp_password = os.getenv('MAIL_PASSWORD') if using_hostinger else SENDER_PASSWORD
-
     sent_count = 0
-    try:
-        if smtp_password:
-            if smtp_port == 465:
-                server = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=15)
-            else:
-                server = smtplib.SMTP(smtp_server, smtp_port, timeout=15)
-                server.starttls()
-            server.login(smtp_user, smtp_password)
+    for sub in subs:
+        sub_email = sub['email']
+        sub_name = sub['nombre'] or 'Berserker'
+        text_content = f"""¡Saludos Berserker {sub_name}!
 
-            for sub in subs:
-                msg = MIMEMultipart('alternative')
-                msg['Subject'] = asunto
-                msg['From'] = f"Goth Productions <{smtp_user}>"
-                msg['To'] = sub['email']
-                msg['Reply-To'] = "contacto@gothprods.com"
-                msg.attach(MIMEText(html_content, 'html', 'utf-8'))
-                try:
-                    server.sendmail(smtp_user, [sub['email']], msg.as_string())
-                    sent_count += 1
-                except Exception as ex:
-                    print(f"Error enviando correo a {sub['email']}: {ex}")
-            server.quit()
-            flash(f'¡Boletín enviado exitosamente a {sent_count} suscriptor(es) vía {smtp_user}!', 'success')
-        else:
-            flash(f'Boletín generado correctamente pero no se encontró contraseña SMTP activa.', 'error')
-    except Exception as e:
-        flash(f'El boletín se procesó pero hubo un error de conexión SMTP: {str(e)}', 'error')
+{mensaje_intro if mensaje_intro else 'Te compartimos las novedades más destacadas y los próximos conciertos en nuestra agenda metalera.'}
+
+- Portal Web: https://gothprods.com
+- Agenda Metalera: https://gothprods.com#agenda
+- Playlist Oficial: https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31
+
+GOTH PRODUCTIONS • THE UNDERGROUND RESISTANCE
+"""
+        if send_goth_email(sub_email, asunto, html_content, text_content):
+            sent_count += 1
+
+    if sent_count > 0:
+        flash(f'¡Newsletter enviado exitosamente a {sent_count} suscriptor(es)!', 'success')
+    else:
+        flash(f'No se pudo entregar el newsletter a los suscriptores. Revisa la configuración SMTP.', 'error')
 
     return redirect(url_for('admin_dashboard'))
 
