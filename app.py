@@ -5,7 +5,22 @@ import random
 import string
 import smtplib
 import threading
+import datetime
 from datetime import timedelta
+
+MEXICO_TZ = datetime.timezone(datetime.timedelta(hours=-6))
+
+def get_mexico_now():
+    """Retorna datetime actual en zona horaria de Mexico (UTC-6)."""
+    return datetime.datetime.now(MEXICO_TZ)
+
+def get_mexico_now_str():
+    """Retorna fecha y hora actual formateada como YYYY-MM-DD HH:MM:SS en hora de Mexico."""
+    return get_mexico_now().strftime("%Y-%m-%d %H:%M:%S")
+
+def get_mexico_today_str():
+    """Retorna la fecha actual como YYYY-MM-DD en hora de Mexico."""
+    return get_mexico_now().strftime("%Y-%m-%d")
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -282,7 +297,7 @@ def get_db_connection(live=False):
                 nombre TEXT,
                 email TEXT UNIQUE,
                 is_active INTEGER DEFAULT 1,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT (datetime('now', '-6 hours'))
             )
         ''')
         
@@ -351,6 +366,19 @@ def get_db_connection(live=False):
         conn.commit()
     except Exception as e:
         print("Schema creation/migration error (comments):", e)
+
+    # Auto-adjust existing UTC timestamps in newsletter_subscribers if they were stored in UTC
+    try:
+        cursor = conn.cursor()
+        mexico_now_check = get_mexico_now_str()
+        cursor.execute("""
+            UPDATE newsletter_subscribers 
+            SET created_at = datetime(created_at, '-6 hours') 
+            WHERE created_at > ?
+        """, (mexico_now_check,))
+        conn.commit()
+    except Exception as e_time:
+        pass
 
     return conn
 
@@ -1972,87 +2000,129 @@ def admin_logout():
 # --- RUTAS DE NEWSLETTER ---
 
 def build_welcome_email_html(nombre="Berserker"):
-    """Genera el HTML para el correo de bienvenida y confirmación de suscripción de GothProds."""
+    """Genera el HTML para el correo de bienvenida de GothProds con fondo negro y estilo Berserker a prueba de clientes de correo."""
     display_name = nombre.strip() if nombre and nombre.strip() else "Berserker"
-    logo_url = "https://gothprods.com/assets/images/logo.png"
+    logo_url = "https://gothprods.com/assets/logo.png"
 
-    return f"""<!DOCTYPE html>
-<html lang="es">
+    return f"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
     <title>Bienvenido a GothProds</title>
+    <style type="text/css">
+        :root {{
+            color-scheme: dark;
+            supported-color-schemes: dark;
+        }}
+        body, table, td, p, a, span, h1, h2, h3 {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+            -webkit-font-smoothing: antialiased;
+        }}
+        body {{
+            background-color: #000000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            min-width: 100% !important;
+            color: #ffffff !important;
+        }}
+        @media (prefers-color-scheme: light) {{
+            .darkmode-bg {{ background-color: #000000 !important; }}
+            .darkmode-card {{ background-color: #080808 !important; }}
+            .darkmode-inner {{ background-color: #0d0d0d !important; }}
+            .darkmode-text {{ color: #ffffff !important; }}
+            .darkmode-title {{ color: #716d4a !important; }}
+        }}
+        @media (prefers-color-scheme: dark) {{
+            .darkmode-bg {{ background-color: #000000 !important; }}
+            .darkmode-card {{ background-color: #080808 !important; }}
+            .darkmode-inner {{ background-color: #0d0d0d !important; }}
+            .darkmode-text {{ color: #ffffff !important; }}
+            .darkmode-title {{ color: #716d4a !important; }}
+        }}
+    </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #000000; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #ffffff; -webkit-font-smoothing: antialiased;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #000000; min-height: 100vh; padding: 30px 10px;">
+<body bgcolor="#000000" class="darkmode-bg" style="margin: 0; padding: 0; background-color: #000000 !important; background: #000000 !important; color: #ffffff !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+    <!-- WRAPPER TABLE -->
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#000000" class="darkmode-bg" style="width: 100% !important; background-color: #000000 !important; background: #000000 !important; margin: 0; padding: 25px 10px;">
         <tr>
-            <td align="center">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 650px; background-color: #080808; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.9);">
+            <td align="center" bgcolor="#000000" class="darkmode-bg" style="background-color: #000000 !important; padding: 0;">
+                <!-- MAIN CARD -->
+                <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#080808" class="darkmode-card" style="max-width: 620px; width: 100% !important; background-color: #080808 !important; background: #080808 !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden;">
+                    
                     <!-- HEADER -->
                     <tr>
-                        <td align="center" style="background: linear-gradient(180deg, #111111 0%, #080808 100%); padding: 35px 25px 25px 25px; border-bottom: 2px solid #716d4a;">
-                            <a href="https://gothprods.com" target="_blank" style="text-decoration: none;">
-                                <img src="{logo_url}" alt="Goth Productions" style="max-width: 220px; height: auto; display: block; margin: 0 auto 15px auto;" onerror="this.style.display='none'">
-                                <h1 style="color: #716d4a; font-size: 26px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">
+                        <td align="center" bgcolor="#000000" style="background-color: #000000 !important; background: #000000 !important; padding: 32px 20px 24px 20px; border-bottom: 2px solid #716d4a;">
+                            <a href="https://gothprods.com" target="_blank" style="text-decoration: none; display: block;">
+                                <img src="{logo_url}" width="190" alt="GOTH PRODUCTIONS" style="display: block; width: 190px; max-width: 190px; height: auto; margin: 0 auto 12px auto; border: 0;" />
+                                <h1 class="darkmode-title" style="color: #716d4a !important; font-size: 24px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 10px 0; line-height: 1.2;">
                                     GOTH PRODUCTIONS
                                 </h1>
                             </a>
-                            <div style="margin-top: 10px;">
-                                <span style="background: #716d4a; color: #ffffff; font-size: 11px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 3px; display: inline-block;">
-                                    ⚔️ PACTO OFICIAL CONFIRMADO ⚔️
-                                </span>
+                            <div style="margin-top: 8px;">
+                                <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center">
+                                    <tr>
+                                        <td bgcolor="#716d4a" style="background-color: #716d4a !important; border-radius: 4px; padding: 5px 14px;">
+                                            <span style="color: #ffffff !important; font-size: 11px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; display: inline-block;">
+                                                ⚔️ PACTO OFICIAL CONFIRMADO ⚔️
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </td>
                     </tr>
 
-                    <!-- HERO GREETING -->
+                    <!-- CONTENT BODY -->
                     <tr>
-                        <td style="padding: 35px 30px 20px 30px;">
-                            <h2 style="color: #716d4a; font-size: 22px; margin: 0 0 16px 0; font-weight: 800; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <td bgcolor="#080808" class="darkmode-card" style="background-color: #080808 !important; background: #080808 !important; padding: 30px 25px 20px 25px;">
+                            <h2 class="darkmode-title" style="color: #716d4a !important; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 16px 0; line-height: 1.3;">
                                 ¡Bienvenido a la Horda de Berserkers, {display_name}!
                             </h2>
-                            <p style="color: #ffffff; font-size: 15px; line-height: 1.7; margin: 0 0 16px 0;">
-                                Tu suscripción ha sido confirmada exitosamente. A partir de este momento formas parte de la hermandad oficial de <strong>GothProds</strong>.
+                            <p class="darkmode-text" style="color: #ffffff !important; font-size: 14px; line-height: 1.6; margin: 0 0 14px 0;">
+                                Tu suscripción ha sido confirmada exitosamente. A partir de este momento formas parte de la hermandad oficial de <strong style="color: #ffffff !important;">GothProds</strong>.
                             </p>
-                            <p style="color: #ffffff; font-size: 14px; line-height: 1.7; margin: 0 0 20px 0;">
+                            <p class="darkmode-text" style="color: #ffffff !important; font-size: 14px; line-height: 1.6; margin: 0 0 18px 0;">
                                 Como miembro oficial de la Horda, recibirás en tu correo:
                             </p>
 
-                            <!-- BENEFICIOS -->
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: #0d0d0d; border: 1px solid #716d4a; border-radius: 6px; margin-bottom: 25px;">
+                            <!-- BENEFICIOS BOX -->
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; background: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 6px; margin-bottom: 24px;">
                                 <tr>
-                                    <td style="padding: 16px 20px;">
-                                        <div style="color: #ffffff; font-size: 14px; line-height: 1.8;">
-                                            <strong style="color: #716d4a;">• El Noticiero Nocturno:</strong> Novedades, lanzamientos y coberturas de la escena underground.<br>
-                                            <strong style="color: #716d4a;">• Agenda Metalera:</strong> Cartelera mensual anticipada con los mejores conciertos y festivales.<br>
-                                            <strong style="color: #716d4a;">• Reseñas & Entrevistas:</strong> Críticas de álbumes y entrevistas exclusivas con las bandas más brutales.<br>
-                                            <strong style="color: #716d4a;">• Metal Pulse & Galería:</strong> Lo mejor de nuestros playlists de Spotify y producciones audiovisuales.
+                                    <td bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; background: #0d0d0d !important; padding: 16px 18px; color: #ffffff !important;">
+                                        <div style="color: #ffffff !important; font-size: 13px; line-height: 1.8;">
+                                            <span style="color: #716d4a !important; font-weight: bold;">• El Noticiero Nocturno:</span> <span style="color: #ffffff !important;">Novedades, lanzamientos y coberturas de la escena underground.</span><br />
+                                            <span style="color: #716d4a !important; font-weight: bold;">• Agenda Metalera:</span> <span style="color: #ffffff !important;">Cartelera mensual anticipada con los mejores conciertos y festivales.</span><br />
+                                            <span style="color: #716d4a !important; font-weight: bold;">• Reseñas & Entrevistas:</span> <span style="color: #ffffff !important;">Críticas de álbumes y entrevistas exclusivas con las bandas más brutales.</span><br />
+                                            <span style="color: #716d4a !important; font-weight: bold;">• Metal Pulse & Galería:</span> <span style="color: #ffffff !important;">Lo mejor de nuestros playlists de Spotify y producciones audiovisuales.</span>
                                         </div>
                                     </td>
                                 </tr>
                             </table>
 
-                            <!-- BOTONES DE ACCIÓN -->
-                            <div style="text-align: center; margin: 30px 0 20px 0;">
-                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
-                                    <tr>
-                                        <td style="border-radius: 4px; background: #716d4a; text-align: center;">
-                                            <a href="https://gothprods.com" target="_blank" style="background: #716d4a; border: 1px solid #716d4a; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 4px; display: inline-block;">
-                                                Explorar GothProds.com &rarr;
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top: 15px;">
+                            <!-- CTA BUTTON -->
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 25px auto 15px auto;">
                                 <tr>
-                                    <td align="center" style="padding: 10px 0;">
-                                        <a href="https://gothprods.com#agenda" target="_blank" style="color: #716d4a; font-size: 13px; font-weight: bold; text-decoration: underline; margin: 0 12px; display: inline-block;">
+                                    <td align="center" bgcolor="#716d4a" style="background-color: #716d4a !important; border-radius: 4px; padding: 13px 28px;">
+                                        <a href="https://gothprods.com" target="_blank" style="color: #ffffff !important; font-size: 14px; font-weight: bold; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; display: inline-block;">
+                                            EXPLORAR GOTHPRODS.COM &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- DIRECT LINKS -->
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 15px;">
+                                <tr>
+                                    <td align="center" style="padding: 6px 0;">
+                                        <a href="https://gothprods.com#agenda" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; margin: 0 10px;">
                                             Ver Agenda Metalera
                                         </a>
-                                        <span style="color: #716d4a;">|</span>
-                                        <a href="https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31" target="_blank" style="color: #716d4a; font-size: 13px; font-weight: bold; text-decoration: underline; margin: 0 12px; display: inline-block;">
+                                        <span style="color: #716d4a !important;">|</span>
+                                        <a href="https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; margin: 0 10px;">
                                             Escuchar Playlist Oficial
                                         </a>
                                     </td>
@@ -2063,15 +2133,15 @@ def build_welcome_email_html(nombre="Berserker"):
 
                     <!-- FOOTER -->
                     <tr>
-                        <td style="background-color: #000000; border-top: 1px solid #716d4a; padding: 25px 30px; text-align: center;">
-                            <p style="color: #716d4a; font-size: 13px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 8px 0;">
+                        <td align="center" bgcolor="#000000" style="background-color: #000000 !important; background: #000000 !important; border-top: 1px solid #716d4a; padding: 22px 20px; text-align: center;">
+                            <p class="darkmode-title" style="color: #716d4a !important; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 6px 0;">
                                 GOTH PRODUCTIONS &bull; THE UNDERGROUND RESISTANCE
                             </p>
-                            <p style="color: #ffffff; font-size: 12px; margin: 0 0 12px 0;">
-                                Portal Oficial del Metal y la Escena Oscura &bull; <a href="https://gothprods.com" target="_blank" style="color: #ffffff; text-decoration: underline;">gothprods.com</a>
+                            <p class="darkmode-text" style="color: #ffffff !important; font-size: 12px; margin: 0 0 8px 0;">
+                                Portal Oficial del Metal y la Escena Oscura &bull; <a href="https://gothprods.com" target="_blank" style="color: #ffffff !important; text-decoration: underline;">gothprods.com</a>
                             </p>
-                            <p style="color: #777777; font-size: 11px; margin: 0; line-height: 1.4;">
-                                Has recibido este correo porque te registraste en nuestra comunidad de Berserkers. Si deseas gestionar tu suscripción, contáctanos a <a href="mailto:contacto@gothprods.com" style="color: #716d4a; text-decoration: none;">contacto@gothprods.com</a>.
+                            <p style="color: #777777 !important; font-size: 11px; margin: 0; line-height: 1.4;">
+                                Has recibido este correo porque te registraste en nuestra comunidad de Berserkers. Si deseas gestionar tu suscripción, contáctanos a <a href="mailto:contacto@gothprods.com" style="color: #716d4a !important; text-decoration: none;">contacto@gothprods.com</a>.
                             </p>
                         </td>
                     </tr>
@@ -2084,12 +2154,11 @@ def build_welcome_email_html(nombre="Berserker"):
 
 
 def send_newsletter_welcome_email(to_email, nombre="Berserker"):
-    """Envía un correo de confirmación y bienvenida con branding oficial de GothProds."""
+    """Envía un correo de confirmación y bienvenida con branding oficial de GothProds y fallback robusto."""
     def _send_task():
         try:
             display_name = nombre.strip() if nombre and nombre.strip() else "Berserker"
             subject = f"⚔️ ¡Bienvenido a GothProds, {display_name}! Pacto Confirmado ⚔️"
-            
             html_body = build_welcome_email_html(nombre=display_name)
 
             using_hostinger = bool(os.getenv('MAIL_PASSWORD'))
@@ -2105,17 +2174,39 @@ def send_newsletter_welcome_email(to_email, nombre="Berserker"):
             msg['Reply-To'] = "contacto@gothprods.com"
             msg.attach(MIMEText(html_body, 'html', 'utf-8'))
 
-            if smtp_port == 465:
-                server = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=12)
-            else:
-                server = smtplib.SMTP(smtp_server, smtp_port, timeout=12)
-                server.starttls()
+            sent = False
+            try:
+                if smtp_port == 465:
+                    server = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=12)
+                else:
+                    server = smtplib.SMTP(smtp_server, smtp_port, timeout=12)
+                    server.starttls()
+                if smtp_password:
+                    server.login(smtp_user, smtp_password)
+                server.sendmail(smtp_user, [to_email], msg.as_string())
+                server.quit()
+                sent = True
+                print(f"[SUCCESS] Welcome email sent to {to_email} via {smtp_server}:{smtp_port}")
+            except Exception as e1:
+                print(f"[WARNING] Primary SMTP failed for welcome email to {to_email}: {e1}")
+                if using_hostinger and SENDER_PASSWORD:
+                    try:
+                        print(f"[INFO] Attempting Gmail fallback for welcome email to {to_email}...")
+                        fb_msg = MIMEMultipart('alternative')
+                        fb_msg['Subject'] = subject
+                        fb_msg['From'] = f"Goth Productions <{SENDER_EMAIL}>"
+                        fb_msg['To'] = to_email
+                        fb_msg['Reply-To'] = "contacto@gothprods.com"
+                        fb_msg.attach(MIMEText(html_body, 'html', 'utf-8'))
 
-            if smtp_password:
-                server.login(smtp_user, smtp_password)
-            server.sendmail(smtp_user, [to_email], msg.as_string())
-            server.quit()
-            print(f"[SUCCESS] Welcome email sent to {to_email}")
+                        fb_server = smtplib.SMTP_SSL(SMTP_SERVER, 465, timeout=12)
+                        fb_server.login(SENDER_EMAIL, SENDER_PASSWORD)
+                        fb_server.sendmail(SENDER_EMAIL, [to_email], fb_msg.as_string())
+                        fb_server.quit()
+                        sent = True
+                        print(f"[SUCCESS] Welcome email sent to {to_email} via Gmail fallback")
+                    except Exception as e2:
+                        print(f"[ERROR] Gmail fallback failed for welcome email to {to_email}: {e2}")
         except Exception as e:
             print(f"[WARNING] Could not send welcome email to {to_email}: {e}")
 
@@ -2138,27 +2229,28 @@ def subscribe_newsletter():
         cur = conn.execute("SELECT id, is_active, nombre FROM newsletter_subscribers WHERE email = ?", (email,))
         existing = cur.fetchone()
         if existing:
+            active_name = existing['nombre'] if existing['nombre'] and existing['nombre'] != 'Berserker' else (nombre or 'Berserker')
             if existing['is_active'] == 1:
                 conn.close()
-                existing_name = existing['nombre'] if existing['nombre'] and existing['nombre'] != 'Berserker' else ''
-                nombre_text = f", {existing_name}" if existing_name else ""
+                send_newsletter_welcome_email(email, active_name)
+                nombre_text = f", {active_name}" if active_name and active_name != 'Berserker' else ""
                 return jsonify({
                     'success': True,
                     'is_existing': True,
-                    'message': f'¡Ya formas parte de la Horda de GothProds{nombre_text}! Tu correo ({email}) ya está dado de alta en nuestra lista oficial de novedades.'
+                    'message': f'¡Ya formas parte de la Horda de GothProds{nombre_text}! Te hemos reenviado tu correo oficial de confirmación y bienvenida a {email}.'
                 })
             else:
-                conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (nombre or existing['nombre'] or 'Berserker', existing['id']))
+                conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (active_name, existing['id']))
                 conn.commit()
                 conn.close()
-                send_newsletter_welcome_email(email, nombre or existing['nombre'] or 'Berserker')
+                send_newsletter_welcome_email(email, active_name)
                 return jsonify({
                     'success': True,
                     'is_existing': False,
                     'message': '¡Tu suscripción ha sido reactivada exitosamente! Te hemos enviado un correo de bienvenida oficial.'
                 })
         
-        conn.execute("INSERT INTO newsletter_subscribers (nombre, email) VALUES (?, ?)", (nombre or 'Berserker', email))
+        conn.execute("INSERT INTO newsletter_subscribers (nombre, email, created_at) VALUES (?, ?, ?)", (nombre or 'Berserker', email, get_mexico_now_str()))
         conn.commit()
         conn.close()
         
@@ -2174,7 +2266,9 @@ def subscribe_newsletter():
         conn.close()
         return jsonify({'success': False, 'message': 'Hubo un inconveniente al procesar tu registro. Por favor intenta más tarde.'})
 
+
 def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=False, base_url_override=None):
+    """Genera el HTML del boletín mensual con tablas compatibles con clientes de correo y fondo negro obligatorio."""
     conn = get_db_connection(live=live)
     import datetime, re
     mexico_tz = datetime.timezone(datetime.timedelta(hours=-6))
@@ -2249,7 +2343,7 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
             
     conn.close()
 
-    def get_full_img_url(path, default_img="assets/logo.webp", band_title=None, sec=None):
+    def get_full_img_url(path, default_img="assets/logo.png", band_title=None, sec=None):
         if not path or str(path).strip() == '':
             if sec == 'Agenda Metalera':
                 return f"{base_url}/assets/agenda_icon.png"
@@ -2257,7 +2351,7 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
             
         path_str = str(path).strip()
         
-        # YouTube URLs -> convert to standard reliable img.youtube.com thumbnail
+        # YouTube URLs
         if 'youtube.com' in path_str or 'youtu.be' in path_str or 'ytimg.com' in path_str:
             m = re.search(r"vi/([a-zA-Z0-9_-]+)", path_str)
             if m:
@@ -2271,18 +2365,15 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
         if not clean_path.startswith('assets/') and not clean_path.startswith('updates/'):
             clean_path = f"updates/{clean_path}"
             
-        # Check if file exists locally
         if os.path.exists(clean_path):
             return f"{base_url}/{clean_path}"
             
-        # Check alternate extensions (.webp, .png, .jpg)
         base, ext = os.path.splitext(clean_path)
-        for alt_ext in ['.webp', '.png', '.jpg', '.jpeg']:
+        for alt_ext in ['.png', '.webp', '.jpg', '.jpeg']:
             alt_path = base + alt_ext
             if os.path.exists(alt_path):
                 return f"{base_url}/{alt_path}"
                 
-        # Band logo matching in assets/logos
         if band_title:
             title_clean = re.sub(r'[^a-zA-Z0-9]', '', band_title).lower()
             if os.path.exists('assets/logos'):
@@ -2295,96 +2386,130 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
             return f"{base_url}/assets/agenda_icon.png"
         return f"{base_url}/{default_img}"
 
-    # Generar secciones HTML con Fondo Negro (#000000), Títulos en #716d4a y Textos en Blanco (#ffffff)
+    # Tarjetas con estructura de tabla sólida a prueba de clientes de correo
     noticiero_cards = "".join([f"""
-    <div style="background: #0d0d0d; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.8);">
-        <img src="{get_full_img_url(n['image_filename'], band_title=n['title'], sec='El Noticiero Nocturno')}" alt="{n['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
-        <div style="padding: 18px;">
-            <div style="margin-bottom: 8px;">
-                <span style="background: #716d4a; color: #ffffff; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px;">Noticia</span>
-                <span style="color: #ffffff; font-size: 12px; margin-left: 8px;">📅 {n['created_at'][:10] if n['created_at'] else ''}</span>
-            </div>
-            <h3 style="color: #716d4a; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{n['title']}</h3>
-            <p style="color: #ffffff; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(n['short_desc'] or n['full_desc'] or '')[:180]}...</p>
-            <a href="https://gothprods.com" style="color: #716d4a; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Leer Nota Completa en GothProds &rarr;</a>
-        </div>
-    </div>
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                <img src="{get_full_img_url(n['image_filename'], band_title=n['title'], sec='El Noticiero Nocturno')}" alt="{n['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 18px; color: #ffffff !important;">
+                <div style="margin-bottom: 8px;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">Noticia</span>
+                    <span style="color: #ffffff !important; font-size: 12px; margin-left: 8px;">📅 {n['created_at'][:10] if n['created_at'] else ''}</span>
+                </div>
+                <h3 style="color: #716d4a !important; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{n['title']}</h3>
+                <p style="color: #ffffff !important; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(n['short_desc'] or n['full_desc'] or '')[:180]}...</p>
+                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Leer Nota Completa en GothProds &rarr;</a>
+            </td>
+        </tr>
+    </table>
     """ for n in noticiero])
 
     reseñas_cards = "".join([f"""
-    <div style="background: #0d0d0d; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.8);">
-        <img src="{get_full_img_url(r['image_filename'], band_title=r['title'], sec='Reseñas de Conciertos')}" alt="{r['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
-        <div style="padding: 18px;">
-            <div style="margin-bottom: 8px;">
-                <span style="background: #716d4a; color: #ffffff; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px;">Reseña en Vivo</span>
-                <span style="color: #ffffff; font-size: 12px; margin-left: 8px;">📅 {r['created_at'][:10] if r['created_at'] else ''}</span>
-            </div>
-            <h3 style="color: #716d4a; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{r['title']}</h3>
-            <p style="color: #ffffff; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(r['short_desc'] or r['full_desc'] or '')[:180]}...</p>
-            <a href="https://gothprods.com" style="color: #716d4a; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Leer Reseña Completa &rarr;</a>
-        </div>
-    </div>
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                <img src="{get_full_img_url(r['image_filename'], band_title=r['title'], sec='Reseñas de Conciertos')}" alt="{r['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 18px; color: #ffffff !important;">
+                <div style="margin-bottom: 8px;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">Reseña en Vivo</span>
+                    <span style="color: #ffffff !important; font-size: 12px; margin-left: 8px;">📅 {r['created_at'][:10] if r['created_at'] else ''}</span>
+                </div>
+                <h3 style="color: #716d4a !important; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{r['title']}</h3>
+                <p style="color: #ffffff !important; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(r['short_desc'] or r['full_desc'] or '')[:180]}...</p>
+                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Leer Reseña Completa &rarr;</a>
+            </td>
+        </tr>
+    </table>
     """ for r in reseñas])
 
     entrevistas_cards = "".join([f"""
-    <div style="background: #0d0d0d; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.8);">
-        <img src="{get_full_img_url(e['image_filename'], band_title=e['title'], sec='Entrevistas Under')}" alt="{e['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
-        <div style="padding: 18px;">
-            <div style="margin-bottom: 8px;">
-                <span style="background: #716d4a; color: #ffffff; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px;">Entrevista Exclusiva</span>
-                <span style="color: #ffffff; font-size: 12px; margin-left: 8px;">📅 {e['created_at'][:10] if e['created_at'] else ''}</span>
-            </div>
-            <h3 style="color: #716d4a; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{e['title']}</h3>
-            <p style="color: #ffffff; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(e['short_desc'] or e['full_desc'] or '')[:180]}...</p>
-            <a href="https://gothprods.com" style="color: #716d4a; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Ver Entrevista en GothProds &rarr;</a>
-        </div>
-    </div>
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                <img src="{get_full_img_url(e['image_filename'], band_title=e['title'], sec='Entrevistas Under')}" alt="{e['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 18px; color: #ffffff !important;">
+                <div style="margin-bottom: 8px;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">Entrevista Exclusiva</span>
+                    <span style="color: #ffffff !important; font-size: 12px; margin-left: 8px;">📅 {e['created_at'][:10] if e['created_at'] else ''}</span>
+                </div>
+                <h3 style="color: #716d4a !important; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{e['title']}</h3>
+                <p style="color: #ffffff !important; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(e['short_desc'] or e['full_desc'] or '')[:180]}...</p>
+                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Ver Entrevista en GothProds &rarr;</a>
+            </td>
+        </tr>
+    </table>
     """ for e in entrevistas])
 
     galeria_cards = "".join([f"""
-    <div style="background: #0d0d0d; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.8);">
-        <img src="{get_full_img_url(g['image_filename'], band_title=g['title'], sec='La Galería Nocturna')}" alt="{g['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
-        <div style="padding: 18px;">
-            <div style="margin-bottom: 8px;">
-                <span style="background: #716d4a; color: #ffffff; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px;">Podcast & Video</span>
-                <span style="color: #ffffff; font-size: 12px; margin-left: 8px;">📅 {g['created_at'][:10] if g['created_at'] else ''}</span>
-            </div>
-            <h3 style="color: #716d4a; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{g['title']}</h3>
-            <p style="color: #ffffff; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(g['short_desc'] or g['full_desc'] or '')[:180]}...</p>
-            <a href="https://gothprods.com" style="color: #716d4a; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Reproducir Episodio &rarr;</a>
-        </div>
-    </div>
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                <img src="{get_full_img_url(g['image_filename'], band_title=g['title'], sec='La Galería Nocturna')}" alt="{g['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 18px; color: #ffffff !important;">
+                <div style="margin-bottom: 8px;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">Podcast & Video</span>
+                    <span style="color: #ffffff !important; font-size: 12px; margin-left: 8px;">📅 {g['created_at'][:10] if g['created_at'] else ''}</span>
+                </div>
+                <h3 style="color: #716d4a !important; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{g['title']}</h3>
+                <p style="color: #ffffff !important; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(g['short_desc'] or g['full_desc'] or '')[:180]}...</p>
+                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Reproducir Episodio &rarr;</a>
+            </td>
+        </tr>
+    </table>
     """ for g in galeria])
 
     pulse_items = "".join([f"""
-    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #0d0d0d; margin-bottom: 8px; border-radius: 6px; border: 1px solid #716d4a; border-left: 4px solid #716d4a;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="background: #716d4a; color: #ffffff; font-weight: 900; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 50%; display: inline-block; font-size: 12px;">{idx + 1}</span>
-            <div>
-                <strong style="color: #716d4a; font-size: 14px; display: block;">{t['title']}</strong>
-                <span style="color: #ffffff; font-size: 12px;">{t['short_desc']}</span>
-            </div>
-        </div>
-        <span style="color: #ffffff; font-weight: bold; font-size: 11px; white-space: nowrap; background: #191812; border: 1px solid #716d4a; padding: 3px 8px; border-radius: 3px;">{t['full_desc']}</span>
-    </div>
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 6px; margin-bottom: 8px;">
+        <tr>
+            <td style="padding: 10px 14px; vertical-align: middle;">
+                <table role="presentation" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td bgcolor="#716d4a" style="background-color: #716d4a !important; color: #ffffff !important; font-weight: 900; width: 26px; height: 26px; text-align: center; border-radius: 50%; font-size: 12px; padding: 0;">
+                            {idx + 1}
+                        </td>
+                        <td style="padding-left: 12px;">
+                            <strong style="color: #716d4a !important; font-size: 14px; display: block;">{t['title']}</strong>
+                            <span style="color: #ffffff !important; font-size: 12px;">{t['short_desc']}</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td align="right" style="padding: 10px 14px; vertical-align: middle; white-space: nowrap;">
+                <span style="color: #ffffff !important; font-weight: bold; font-size: 11px; background-color: #191812 !important; border: 1px solid #716d4a; padding: 4px 8px; border-radius: 3px; display: inline-block;">{t['full_desc']}</span>
+            </td>
+        </tr>
+    </table>
     """ for idx, t in enumerate(pulse_tracks[:10])])
 
     # Agenda Metalera: Solo Bandas (con link directo), Venues y Fecha (sin emojis)
     agenda_cards = "".join([f"""
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: #0d0d0d; border: 1px solid #716d4a; border-radius: 6px; margin-bottom: 10px;">
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 6px; margin-bottom: 10px;">
         <tr>
-            <td style="padding: 12px 16px; vertical-align: middle;">
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 12px 16px; vertical-align: middle;">
                 <div style="margin-bottom: 4px;">
-                    <a href="https://gothprods.com#agenda" target="_blank" style="color: #ffffff; font-size: 16px; font-weight: bold; text-decoration: underline; text-underline-offset: 3px;">
+                    <a href="https://gothprods.com#agenda" target="_blank" style="color: #ffffff !important; font-size: 16px; font-weight: bold; text-decoration: underline; text-underline-offset: 3px;">
                         {a['title']}
                     </a>
                 </div>
-                <div style="color: #ffffff; font-size: 13px; line-height: 1.4;">
-                    Venue: <span style="color: #ffffff; font-weight: bold;">{(a['short_desc'] or 'Por confirmar').replace(chr(10), ' - ')}</span>
+                <div style="color: #ffffff !important; font-size: 13px; line-height: 1.4;">
+                    Venue: <span style="color: #ffffff !important; font-weight: bold;">{(a['short_desc'] or 'Por confirmar').replace(chr(10), ' - ')}</span>
                 </div>
             </td>
-            <td align="right" style="padding: 12px 16px; width: 130px; vertical-align: middle;">
-                <div style="background: #191812; border: 1px solid #716d4a; color: #ffffff; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-align: center; display: inline-block; white-space: nowrap;">
+            <td bgcolor="#0d0d0d" align="right" style="background-color: #0d0d0d !important; padding: 12px 16px; width: 130px; vertical-align: middle;">
+                <div style="background-color: #191812 !important; border: 1px solid #716d4a; color: #ffffff !important; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-align: center; display: inline-block; white-space: nowrap;">
                     {a['author']}
                 </div>
             </td>
@@ -2395,30 +2520,42 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
     bandas_eventos_cards = ""
     if bandas or eventos:
         b_html = "".join([f"""
-        <div style="background: #0d0d0d; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
-            <img src="{get_full_img_url(b['imagen'] or b['ultimo_lanzamiento_url'])}" class="card-img" style="width: 100%; max-height: 200px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
-            <div style="padding: 14px;">
-                <span style="background: #716d4a; color: #ffffff; font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase;">Banda Destacada</span>
-                <h3 style="color: #716d4a; margin: 6px 0; font-size: 17px; font-weight: bold;">{b['nombre']} ({b['pais'] or 'Underground'})</h3>
-                <p style="color: #ffffff; font-size: 13px; margin: 0;">{(b['texto_resena'] or b['bio_larga'] or '')[:160]}...</p>
-            </div>
-        </div>
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
+            <tr>
+                <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                    <img src="{get_full_img_url(b['imagen'] or b['ultimo_lanzamiento_url'])}" style="width: 100%; max-height: 200px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 14px; color: #ffffff !important;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; display: inline-block;">Banda Destacada</span>
+                    <h3 style="color: #716d4a !important; margin: 6px 0; font-size: 17px; font-weight: bold;">{b['nombre']} ({b['pais'] or 'Underground'})</h3>
+                    <p style="color: #ffffff !important; font-size: 13px; margin: 0;">{(b['texto_resena'] or b['bio_larga'] or '')[:160]}...</p>
+                </td>
+            </tr>
+        </table>
         """ for b in bandas])
         e_html = "".join([f"""
-        <div style="background: #0d0d0d; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
-            <img src="{get_full_img_url(e['img_video_path'])}" class="card-img" style="width: 100%; max-height: 200px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
-            <div style="padding: 14px;">
-                <span style="background: #716d4a; color: #ffffff; font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase;">Evento Destacado</span>
-                <h3 style="color: #716d4a; margin: 6px 0; font-size: 17px; font-weight: bold;">{e['nombre_evento']}</h3>
-                <p style="color: #ffffff; font-size: 13px; margin: 0;">📍 {e['ciudad']}, {e['pais']} | 📅 {e['fecha_evento']}</p>
-            </div>
-        </div>
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
+            <tr>
+                <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                    <img src="{get_full_img_url(e['img_video_path'])}" style="width: 100%; max-height: 200px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 14px; color: #ffffff !important;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; display: inline-block;">Evento Destacado</span>
+                    <h3 style="color: #716d4a !important; margin: 6px 0; font-size: 17px; font-weight: bold;">{e['nombre_evento']}</h3>
+                    <p style="color: #ffffff !important; font-size: 13px; margin: 0;">📍 {e['ciudad']}, {e['pais']} | 📅 {e['fecha_evento']}</p>
+                </td>
+            </tr>
+        </table>
         """ for e in eventos])
         bandas_eventos_cards = b_html + e_html
 
     default_intro = f"¡Saludos, Berserkers! Bienvenidos a la edición oficial de {month_label}. Les presentamos la recopilación más brutal del mes con los lanzamientos pesados, noticias exclusivas de la escena, reseñas de conciertos, entrevistas under, podcast y la agenda de conciertos para {next_month_label}."
 
-    logo_img_url = get_full_img_url('assets/logo.webp')
+    logo_img_url = get_full_img_url('assets/logo.png')
     noticiero_icon_url = get_full_img_url('assets/noticiero_icon.png')
     resenas_icon_url = get_full_img_url('assets/resenas_icon.png')
     entrevistas_icon_url = get_full_img_url('assets/entrevistas_icon.png')
@@ -2427,151 +2564,260 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
     agenda_icon_url = get_full_img_url('assets/agenda_icon.png')
     destacados_icon_url = get_full_img_url('assets/destacados_icon.png')
 
-    html = f"""
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{asunto}</title>
-        <style>
-            body {{ font-family: 'Oswald', 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #000000; color: #ffffff; margin: 0; padding: 0; }}
-            .container {{ max-width: 680px; margin: 20px auto; background: #080808; border: 1px solid #716d4a; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.95); }}
-            .top-banner {{ background: #000000; border-bottom: 2px solid #716d4a; padding: 10px; text-align: center; color: #716d4a; font-weight: 900; letter-spacing: 2px; font-size: 12px; text-transform: uppercase; }}
-            .header {{ background: #000000; padding: 25px 20px; text-align: center; border-bottom: 2px solid #716d4a; position: relative; }}
-            .header img {{ width: 140px; height: auto; margin-bottom: 10px; }}
-            .header h1 {{ color: #716d4a; margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; font-weight: 900; }}
-            .badge-month {{ display: inline-block; background: #000000; border: 1px solid #716d4a; color: #ffffff; padding: 4px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase; }}
-            .intro {{ padding: 22px 25px; background: #0a0a0a; border-bottom: 1px solid #222222; border-left: 4px solid #716d4a; font-size: 14px; line-height: 1.6; color: #ffffff; }}
-            .section {{ padding: 24px 25px; border-bottom: 1px solid #1a1a1a; }}
-            .section-header-box {{ display: flex; align-items: center; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid #716d4a; padding-bottom: 10px; }}
-            .section-icon {{ width: 34px; height: 34px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover; background: #000000; }}
-            .section-title {{ color: #716d4a; font-size: 20px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle; }}
-            .btn {{ display: inline-block; padding: 12px 26px; background: #716d4a; color: #ffffff; text-decoration: none; font-weight: 900; border-radius: 6px; font-size: 14px; text-transform: uppercase; letter-spacing: 1.5px; box-shadow: 0 4px 15px rgba(113,109,74,0.4); }}
-            .btn:hover {{ background: #8e8958; color: #ffffff; }}
-            .footer {{ background: #000000; padding: 30px 20px; text-align: center; font-size: 12px; color: #ffffff; border-top: 2px solid #716d4a; }}
-            @media print {{
-                body {{ -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background-color: #000000 !important; color: #ffffff !important; margin: 0 !important; padding: 0 !important; }}
-                .container {{ border: none !important; box-shadow: none !important; margin: 0 auto !important; max-width: 100% !important; }}
-                .section, .intro, .header, .footer, .section-header-box {{ page-break-inside: avoid; break-inside: avoid; }}
-            }}
-            .section, .intro, .header, .footer, .section-header-box {{ page-break-inside: avoid; break-inside: avoid; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="top-banner">⚔️ GOTH PRODUCTIONS &bull; COMUNIDAD BERSERKERS ⚔️</div>
-            
-            <div class="header">
-                <img src="{logo_img_url}" alt="Goth Prods Logo">
-                <h1>BOLETÍN MENSUAL BERSERKERS</h1>
-                <div class="badge-month">🔥 EDICIÓN OFICIAL: {month_label.upper()} 🔥</div>
-            </div>
-            
-            <div class="intro">
-                <strong style="color: #716d4a; font-size: 17px; display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">¡Saludos, Berserkers! ⚔️</strong>
-                <span style="color: #ffffff;">{mensaje_intro if mensaje_intro else default_intro}</span>
-            </div>
+    html = f"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
+    <title>{asunto}</title>
+    <style type="text/css">
+        :root {{
+            color-scheme: dark;
+            supported-color-schemes: dark;
+        }}
+        body, table, td, p, a, span, h1, h2, h3 {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+            -webkit-font-smoothing: antialiased;
+        }}
+        body {{
+            background-color: #000000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            color: #ffffff !important;
+        }}
+        @media (prefers-color-scheme: light) {{
+            .darkmode-bg {{ background-color: #000000 !important; }}
+            .darkmode-card {{ background-color: #080808 !important; }}
+            .darkmode-inner {{ background-color: #0d0d0d !important; }}
+            .darkmode-text {{ color: #ffffff !important; }}
+            .darkmode-title {{ color: #716d4a !important; }}
+        }}
+        @media (prefers-color-scheme: dark) {{
+            .darkmode-bg {{ background-color: #000000 !important; }}
+            .darkmode-card {{ background-color: #080808 !important; }}
+            .darkmode-inner {{ background-color: #0d0d0d !important; }}
+            .darkmode-text {{ color: #ffffff !important; }}
+            .darkmode-title {{ color: #716d4a !important; }}
+        }}
+        @media print {{
+            body {{ -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background-color: #000000 !important; color: #ffffff !important; margin: 0 !important; padding: 0 !important; }}
+            .darkmode-card {{ border: none !important; box-shadow: none !important; margin: 0 auto !important; max-width: 100% !important; }}
+        }}
+    </style>
+</head>
+<body bgcolor="#000000" class="darkmode-bg" style="margin: 0; padding: 0; background-color: #000000 !important; background: #000000 !important; color: #ffffff !important;">
+    <!-- FULL WRAPPER TABLE -->
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#000000" class="darkmode-bg" style="width: 100% !important; background-color: #000000 !important; background: #000000 !important; margin: 0; padding: 20px 10px;">
+        <tr>
+            <td align="center" bgcolor="#000000" class="darkmode-bg" style="background-color: #000000 !important; padding: 0;">
+                
+                <!-- CONTAINER CARD -->
+                <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#080808" class="darkmode-card" style="max-width: 660px; width: 100% !important; background-color: #080808 !important; background: #080808 !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden;">
+                    
+                    <!-- TOP BANNER -->
+                    <tr>
+                        <td align="center" bgcolor="#000000" style="background-color: #000000 !important; border-bottom: 2px solid #716d4a; padding: 10px 15px; color: #716d4a !important; font-weight: 900; letter-spacing: 2px; font-size: 11px; text-transform: uppercase;">
+                            ⚔️ GOTH PRODUCTIONS &bull; COMUNIDAD BERSERKERS ⚔️
+                        </td>
+                    </tr>
 
-            <!-- EL NOTICIERO NOCTURNO -->
-            {f'''
-            <div class="section">
-                <div class="section-header-box">
-                    <img src="{noticiero_icon_url}" class="section-icon">
-                    <h2 class="section-title">El Noticiero Nocturno</h2>
-                </div>
-                {noticiero_cards}
-            </div>
-            ''' if noticiero_cards else ''}
+                    <!-- HEADER -->
+                    <tr>
+                        <td align="center" bgcolor="#000000" style="background-color: #000000 !important; padding: 30px 20px 24px 20px; border-bottom: 2px solid #716d4a;">
+                            <img src="{logo_img_url}" width="150" alt="Goth Prods Logo" style="display: block; width: 150px; max-width: 150px; height: auto; margin: 0 auto 12px auto; border: 0;" />
+                            <h1 style="color: #716d4a !important; margin: 0 0 10px 0; font-size: 22px; text-transform: uppercase; letter-spacing: 2px; font-weight: 900; line-height: 1.2;">
+                                BOLETÍN MENSUAL BERSERKERS
+                            </h1>
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center">
+                                <tr>
+                                    <td bgcolor="#000000" style="border: 1px solid #716d4a; border-radius: 20px; padding: 4px 16px;">
+                                        <span style="color: #ffffff !important; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">
+                                            🔥 EDICIÓN OFICIAL: {month_label.upper()} 🔥
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-            <!-- RESEÑAS DE CONCIERTOS -->
-            {f'''
-            <div class="section">
-                <div class="section-header-box">
-                    <img src="{resenas_icon_url}" class="section-icon">
-                    <h2 class="section-title">Reseñas de Conciertos</h2>
-                </div>
-                {reseñas_cards}
-            </div>
-            ''' if reseñas_cards else ''}
+                    <!-- INTRO -->
+                    <tr>
+                        <td bgcolor="#0a0a0a" style="background-color: #0a0a0a !important; padding: 22px 25px; border-bottom: 1px solid #222222; border-left: 4px solid #716d4a; color: #ffffff !important;">
+                            <strong style="color: #716d4a !important; font-size: 16px; display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">¡Saludos, Berserkers! ⚔️</strong>
+                            <p style="color: #ffffff !important; font-size: 14px; line-height: 1.6; margin: 0;">
+                                {mensaje_intro if mensaje_intro else default_intro}
+                            </p>
+                        </td>
+                    </tr>
 
-            <!-- ENTREVISTAS UNDER -->
-            {f'''
-            <div class="section">
-                <div class="section-header-box">
-                    <img src="{entrevistas_icon_url}" class="section-icon">
-                    <h2 class="section-title">Entrevistas Under</h2>
-                </div>
-                {entrevistas_cards}
-            </div>
-            ''' if entrevistas_cards else ''}
+                    <!-- EL NOTICIERO NOCTURNO -->
+                    {f'''
+                    <tr>
+                        <td bgcolor="#080808" style="background-color: #080808 !important; padding: 24px 25px; border-bottom: 1px solid #1a1a1a;">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #716d4a; margin-bottom: 18px; padding-bottom: 10px;">
+                                <tr>
+                                    <td style="vertical-align: middle;">
+                                        <img src="{noticiero_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
+                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">El Noticiero Nocturno</h2>
+                                    </td>
+                                </tr>
+                            </table>
+                            {noticiero_cards}
+                        </td>
+                    </tr>
+                    ''' if noticiero_cards else ''}
 
-            <!-- TOP 10 METAL PULSE -->
-            {f'''
-            <div class="section">
-                <div class="section-header-box">
-                    <img src="{metal_pulse_icon_url}" class="section-icon">
-                    <h2 class="section-title">Metal Pulse - Los Favoritos de {month_label}</h2>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    {pulse_items}
-                </div>
-                <div style="text-align: center; margin-top: 15px;">
-                    <a href="https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31" style="display: inline-block; padding: 8px 16px; background: #1db954; color: #000000; font-weight: bold; font-size: 12px; border-radius: 20px; text-decoration: none; text-transform: uppercase;">
-                        🎧 Escuchar Playlist en Spotify &rarr;
-                    </a>
-                </div>
-            </div>
-            ''' if pulse_items else ''}
+                    <!-- RESEÑAS DE CONCIERTOS -->
+                    {f'''
+                    <tr>
+                        <td bgcolor="#080808" style="background-color: #080808 !important; padding: 24px 25px; border-bottom: 1px solid #1a1a1a;">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #716d4a; margin-bottom: 18px; padding-bottom: 10px;">
+                                <tr>
+                                    <td style="vertical-align: middle;">
+                                        <img src="{resenas_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
+                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">Reseñas de Conciertos</h2>
+                                    </td>
+                                </tr>
+                            </table>
+                            {reseñas_cards}
+                        </td>
+                    </tr>
+                    ''' if reseñas_cards else ''}
 
-            <!-- LA GALERÍA NOCTURNA & CAOS SONORO -->
-            {f'''
-            <div class="section">
-                <div class="section-header-box">
-                    <img src="{galeria_icon_url}" class="section-icon">
-                    <h2 class="section-title">La Galería Nocturna & Caos Sonoro</h2>
-                </div>
-                {galeria_cards}
-            </div>
-            ''' if galeria_cards else ''}
+                    <!-- ENTREVISTAS UNDER -->
+                    {f'''
+                    <tr>
+                        <td bgcolor="#080808" style="background-color: #080808 !important; padding: 24px 25px; border-bottom: 1px solid #1a1a1a;">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #716d4a; margin-bottom: 18px; padding-bottom: 10px;">
+                                <tr>
+                                    <td style="vertical-align: middle;">
+                                        <img src="{entrevistas_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
+                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">Entrevistas Under</h2>
+                                    </td>
+                                </tr>
+                            </table>
+                            {entrevistas_cards}
+                        </td>
+                    </tr>
+                    ''' if entrevistas_cards else ''}
 
-            <!-- AGENDA METALERA (DEL MES SIGUIENTE) -->
-            {f'''
-            <div class="section">
-                <div class="section-header-box">
-                    <img src="{agenda_icon_url}" class="section-icon">
-                    <h2 class="section-title">Agenda Metalera ({next_month_label})</h2>
-                </div>
-                {agenda_cards}
-            </div>
-            ''' if agenda_cards else ''}
+                    <!-- TOP 10 METAL PULSE -->
+                    {f'''
+                    <tr>
+                        <td bgcolor="#080808" style="background-color: #080808 !important; padding: 24px 25px; border-bottom: 1px solid #1a1a1a;">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #716d4a; margin-bottom: 18px; padding-bottom: 10px;">
+                                <tr>
+                                    <td style="vertical-align: middle;">
+                                        <img src="{metal_pulse_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
+                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">Metal Pulse - Los Favoritos de {month_label}</h2>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div style="margin-bottom: 15px;">
+                                {pulse_items}
+                            </div>
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 15px auto 5px auto;">
+                                <tr>
+                                    <td bgcolor="#1db954" style="background-color: #1db954 !important; border-radius: 20px; padding: 8px 18px;">
+                                        <a href="https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31" target="_blank" style="color: #000000 !important; font-weight: bold; font-size: 12px; text-decoration: none; text-transform: uppercase; display: inline-block;">
+                                            🎧 Escuchar Playlist en Spotify &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    ''' if pulse_items else ''}
 
-            <!-- RADAR DEL CAOS & EL PIT (SI HAY ACTIVOS) -->
-            {f'''
-            <div class="section">
-                <div class="section-header-box">
-                    <img src="{destacados_icon_url}" class="section-icon">
-                    <h2 class="section-title">Radar del Caos & El Pit</h2>
-                </div>
-                {bandas_eventos_cards}
-            </div>
-            ''' if bandas_eventos_cards else ''}
+                    <!-- LA GALERÍA NOCTURNA & CAOS SONORO -->
+                    {f'''
+                    <tr>
+                        <td bgcolor="#080808" style="background-color: #080808 !important; padding: 24px 25px; border-bottom: 1px solid #1a1a1a;">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #716d4a; margin-bottom: 18px; padding-bottom: 10px;">
+                                <tr>
+                                    <td style="vertical-align: middle;">
+                                        <img src="{galeria_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
+                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">La Galería Nocturna & Caos Sonoro</h2>
+                                    </td>
+                                </tr>
+                            </table>
+                            {galeria_cards}
+                        </td>
+                    </tr>
+                    ''' if galeria_cards else ''}
 
-            <div style="text-align: center; padding: 30px 20px; background: #000000; border-bottom: 1px solid #1a1a1a;">
-                <a href="https://gothprods.com" class="btn">Visitar GothProds.com &rarr;</a>
-            </div>
+                    <!-- AGENDA METALERA (DEL MES SIGUIENTE) -->
+                    {f'''
+                    <tr>
+                        <td bgcolor="#080808" style="background-color: #080808 !important; padding: 24px 25px; border-bottom: 1px solid #1a1a1a;">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #716d4a; margin-bottom: 18px; padding-bottom: 10px;">
+                                <tr>
+                                    <td style="vertical-align: middle;">
+                                        <img src="{agenda_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
+                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">Agenda Metalera ({next_month_label})</h2>
+                                    </td>
+                                </tr>
+                            </table>
+                            {agenda_cards}
+                        </td>
+                    </tr>
+                    ''' if agenda_cards else ''}
 
-            <div class="footer">
-                <img src="{logo_img_url}" style="width: 55px; height: auto; margin-bottom: 12px; opacity: 0.9;">
-                <p style="color: #716d4a; font-weight: bold; margin-bottom: 8px; font-size: 14px; letter-spacing: 1px;">⚔️ ERES PARTE DE LA COMUNIDAD BERSERKERS ⚔️</p>
-                <p style="margin: 4px 0; color: #ffffff;">&copy; 2026 Goth Productions. Todos los derechos reservados.</p>
-                <p style="margin: 4px 0; color: #aaaaaa;">Estás recibiendo este correo oficial porque formas parte de la horda en gothprods.com</p>
-            </div>
-        </div>
-    </body>
-    </html>
-    """
+                    <!-- RADAR DEL CAOS & EL PIT -->
+                    {f'''
+                    <tr>
+                        <td bgcolor="#080808" style="background-color: #080808 !important; padding: 24px 25px; border-bottom: 1px solid #1a1a1a;">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #716d4a; margin-bottom: 18px; padding-bottom: 10px;">
+                                <tr>
+                                    <td style="vertical-align: middle;">
+                                        <img src="{destacados_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
+                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">Radar del Caos & El Pit</h2>
+                                    </td>
+                                </tr>
+                            </table>
+                            {bandas_eventos_cards}
+                        </td>
+                    </tr>
+                    ''' if bandas_eventos_cards else ''}
+
+                    <!-- CTA WEB -->
+                    <tr>
+                        <td align="center" bgcolor="#000000" style="background-color: #000000 !important; padding: 30px 20px; border-bottom: 1px solid #1a1a1a;">
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center">
+                                <tr>
+                                    <td bgcolor="#716d4a" style="background-color: #716d4a !important; border-radius: 4px; padding: 12px 28px;">
+                                        <a href="https://gothprods.com" target="_blank" style="color: #ffffff !important; font-size: 14px; font-weight: 900; text-decoration: none; text-transform: uppercase; letter-spacing: 1.5px; display: inline-block;">
+                                            VISITAR GOTHPRODS.COM &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- FOOTER -->
+                    <tr>
+                        <td align="center" bgcolor="#000000" style="background-color: #000000 !important; padding: 30px 20px; text-align: center; border-top: 2px solid #716d4a; color: #ffffff !important;">
+                            <img src="{logo_img_url}" width="60" style="display: block; width: 60px; height: auto; margin: 0 auto 12px auto; opacity: 0.9;" />
+                            <p style="color: #716d4a !important; font-weight: bold; margin: 0 0 8px 0; font-size: 13px; letter-spacing: 1px; text-transform: uppercase;">
+                                ⚔️ ERES PARTE DE LA COMUNIDAD BERSERKERS ⚔️
+                            </p>
+                            <p style="margin: 4px 0; color: #ffffff !important; font-size: 12px;">&copy; 2026 Goth Productions. Todos los derechos reservados.</p>
+                            <p style="margin: 4px 0; color: #aaaaaa !important; font-size: 11px;">Estás recibiendo este correo oficial porque formas parte de la horda en <a href="https://gothprods.com" target="_blank" style="color: #aaaaaa !important; text-decoration: underline;">gothprods.com</a></p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>"""
     return html
+
 
 @app.route('/admin/newsletter/preview', methods=['POST'])
 def admin_newsletter_preview():
@@ -2584,6 +2830,7 @@ def admin_newsletter_preview():
     host_base = request.host_url.rstrip('/') if request.host_url else None
     html = build_newsletter_html(asunto, intro, target_month=target_month, base_url_override=host_base)
     return html
+
 
 @app.route('/admin/newsletter/send', methods=['POST'])
 def admin_newsletter_send():
@@ -2605,11 +2852,6 @@ def admin_newsletter_send():
 
     html_content = build_newsletter_html(asunto, mensaje_intro, target_month=target_month)
     
-    # Envío por SMTP (Hostinger si MAIL_PASSWORD existe, o Gmail SENDER_PASSWORD)
-    import os, smtplib
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
-
     using_hostinger = bool(os.getenv('MAIL_PASSWORD'))
     smtp_server = os.getenv('MAIL_SERVER', 'smtp.hostinger.com') if using_hostinger else SMTP_SERVER
     smtp_port = int(os.getenv('MAIL_PORT', 465)) if using_hostinger else 465
@@ -2694,7 +2936,7 @@ def admin_newsletter_subscriber_add():
             conn.commit()
             flash(f'Suscriptor {email} reactivado/actualizado exitosamente.', 'success')
         else:
-            conn.execute("INSERT INTO newsletter_subscribers (nombre, email) VALUES (?, ?)", (nombre or 'Berserker', email))
+            conn.execute("INSERT INTO newsletter_subscribers (nombre, email, created_at) VALUES (?, ?, ?)", (nombre or 'Berserker', email, get_mexico_now_str()))
             conn.commit()
             flash(f'Suscriptor {nombre or email} registrado exitosamente.', 'success')
         
@@ -2903,7 +3145,7 @@ def admin_newsletter_sync_remote():
             if created_at:
                 conn.execute("INSERT INTO newsletter_subscribers (nombre, email, is_active, created_at) VALUES (?, ?, ?, ?)", (nombre, email, is_active, created_at))
             else:
-                conn.execute("INSERT INTO newsletter_subscribers (nombre, email, is_active) VALUES (?, ?, ?)", (nombre, email, is_active))
+                conn.execute("INSERT INTO newsletter_subscribers (nombre, email, is_active, created_at) VALUES (?, ?, ?, ?)", (nombre, email, is_active, get_mexico_now_str()))
             added += 1
 
     conn.commit()
@@ -3001,7 +3243,7 @@ def admin_newsletter_import_csv():
                 if created_at:
                     conn.execute("INSERT INTO newsletter_subscribers (nombre, email, is_active, created_at) VALUES (?, ?, 1, ?)", (nombre, email, created_at))
                 else:
-                    conn.execute("INSERT INTO newsletter_subscribers (nombre, email, is_active) VALUES (?, ?, 1)", (nombre, email))
+                    conn.execute("INSERT INTO newsletter_subscribers (nombre, email, is_active, created_at) VALUES (?, ?, 1, ?)", (nombre, email, get_mexico_now_str()))
                 added += 1
 
         conn.commit()
