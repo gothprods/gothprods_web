@@ -892,8 +892,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                                 <td style="padding: 12px; color: #fff;"><strong>{{ sub.nombre or 'Berserker' }}</strong></td>
                                 <td style="padding: 12px; color: var(--accent-color); font-weight: 500;">{{ sub.email }}</td>
                                 <td style="padding: 12px; color: #aaa;">{{ sub.created_at[:10] if sub.created_at else '' }}</td>
-                                <td style="padding: 12px; text-align: right;">
-                                    <button type="button" onclick="deleteSingleSubscriber({{ sub.id }}, '{{ sub.email }}')" style="padding: 6px 12px; background: rgba(255, 59, 59, 0.15); color: #ff6b6b; border: 1px solid rgba(255, 59, 59, 0.35); border-radius: 4px; cursor: pointer; font-size: 0.82rem; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                                <td style="padding: 12px; text-align: right; white-space: nowrap;">
+                                    <button type="button" onclick="resendWelcomeEmail({{ sub.id }}, '{{ sub.email }}', this)" title="Reenviar correo oficial de bienvenida" style="padding: 6px 10px; background: rgba(212, 175, 55, 0.12); color: #d4af37; border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; margin-right: 6px; transition: all 0.2s;">
+                                        <i class="fa-solid fa-paper-plane"></i> Reenviar Bienvenida
+                                    </button>
+                                    <button type="button" onclick="deleteSingleSubscriber({{ sub.id }}, '{{ sub.email }}')" style="padding: 6px 10px; background: rgba(255, 59, 59, 0.12); color: #ff6b6b; border: 1px solid rgba(255, 59, 59, 0.3); border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;">
                                         <i class="fa-solid fa-trash"></i> Eliminar
                                     </button>
                                 </td>
@@ -976,6 +979,41 @@ input:checked + .slider:before { transform: translateX(20px); }
                                         </td>
                                     </tr>`;
                             }
+                        }
+                    }
+                }
+
+                async function resendWelcomeEmail(id, email, btn) {
+                    if (!confirm(`¿Reenviar correo oficial de bienvenida al Berserker "${email}"?`)) {
+                        return;
+                    }
+                    const origHtml = btn ? btn.innerHTML : '';
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+                    }
+
+                    try {
+                        const res = await fetch(`/admin/newsletter/resend_welcome/${id}`, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        const data = await res.json();
+                        if (data.status === 'success') {
+                            alert(data.message || 'Correo de bienvenida enviado exitosamente.');
+                        } else {
+                            alert(data.message || 'No se pudo enviar el correo de bienvenida.');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        alert('Hubo un problema de conexión al intentar enviar el correo.');
+                    } finally {
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = origHtml;
                         }
                     }
                 }

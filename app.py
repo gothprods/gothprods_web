@@ -431,12 +431,16 @@ GOTH PRODUCTIONS • MEDIO MEXICANO DE DIVULGACIÓN DEL GÉNERO MÁS FEROZ DEL P
 
     def _build_mime(from_addr):
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = Header(subject, 'utf-8').encode()
+        msg['Subject'] = Header(subject, 'utf-8')
         msg['From'] = f"Goth Productions <{from_addr}>"
         msg['To'] = to_email
         msg['Reply-To'] = reply_to
         msg['Date'] = email.utils.formatdate(localtime=True)
-        msg['Message-ID'] = email.utils.make_msgid(domain='gothprods.com')
+        if '@' in from_addr:
+            msg_domain = from_addr.split('@')[-1]
+            msg['Message-ID'] = email.utils.make_msgid(domain=msg_domain)
+        else:
+            msg['Message-ID'] = email.utils.make_msgid()
         msg['X-Mailer'] = 'GothProds Mailer/2.0'
         msg['List-Unsubscribe'] = f'<mailto:{reply_to}?subject=Unsubscribe>'
         msg.attach(MIMEText(text_content, 'plain', 'utf-8'))
@@ -444,21 +448,23 @@ GOTH PRODUCTIONS • MEDIO MEXICANO DE DIVULGACIÓN DEL GÉNERO MÁS FEROZ DEL P
         return msg
 
     attempts = []
-    if using_hostinger and hostinger_pass:
-        attempts.append(('Hostinger SSL:465', hostinger_server, 465, hostinger_user, hostinger_pass, True))
-        attempts.append(('Hostinger TLS:587', hostinger_server, 587, hostinger_user, hostinger_pass, False))
-
+    # Primary reliable SMTP: Gmail SSL (465) & TLS (587)
     if gmail_pass:
         attempts.append(('Gmail SSL:465', gmail_server, 465, gmail_user, gmail_pass, True))
         attempts.append(('Gmail TLS:587', gmail_server, 587, gmail_user, gmail_pass, False))
+
+    # Secondary / Custom domain SMTP: Hostinger
+    if using_hostinger and hostinger_pass:
+        attempts.append(('Hostinger SSL:465', hostinger_server, 465, hostinger_user, hostinger_pass, True))
+        attempts.append(('Hostinger TLS:587', hostinger_server, 587, hostinger_user, hostinger_pass, False))
 
     for label, s_host, s_port, s_user, s_pass, is_ssl in attempts:
         try:
             msg = _build_mime(s_user)
             if is_ssl:
-                server = smtplib.SMTP_SSL(s_host, s_port, timeout=12)
+                server = smtplib.SMTP_SSL(s_host, s_port, timeout=8)
             else:
-                server = smtplib.SMTP(s_host, s_port, timeout=12)
+                server = smtplib.SMTP(s_host, s_port, timeout=8)
                 server.starttls()
             server.login(s_user, s_pass)
             server.sendmail(s_user, [to_email], msg.as_string())
@@ -2207,13 +2213,12 @@ def build_welcome_email_html(nombre="Berserker"):
 
 
 def send_newsletter_welcome_email(to_email, nombre="Berserker"):
-    """Envía un correo de confirmación y bienvenida con branding oficial de GothProds y fallback robusto."""
-    def _send_task():
-        try:
-            display_name = nombre.strip() if nombre and nombre.strip() else "Berserker"
-            subject = f"⚔️ ¡Bienvenido a GothProds, {display_name}! Ahora eres un Berserker ⚔️"
-            html_body = build_welcome_email_html(nombre=display_name)
-            text_body = f"""¡Bienvenido, {display_name}! Ahora eres un Berserker.
+    """Envía un correo de confirmación y bienvenida con branding oficial de GothProds de manera síncrona y robusta."""
+    try:
+        display_name = nombre.strip() if nombre and nombre.strip() else "Berserker"
+        subject = f"⚔️ ¡Bienvenido a GothProds, {display_name}! Ahora eres un Berserker ⚔️"
+        html_body = build_welcome_email_html(nombre=display_name)
+        text_body = f"""¡Bienvenido, {display_name}! Ahora eres un Berserker.
 
 Tu suscripción a Goth Productions ha sido confirmada con éxito.
 
@@ -2222,13 +2227,15 @@ Tu suscripción a Goth Productions ha sido confirmada con éxito.
 Para cualquier duda o gestión de tu suscripción, contáctanos a: contacto@gothprods.com
 GOTH PRODUCTIONS • MEDIO MEXICANO DE DIVULGACIÓN DEL GÉNERO MÁS FEROZ DEL PLANETA
 """
-            send_goth_email(to_email, subject, html_body, text_body)
-        except Exception as e:
-            print(f"[WARNING] Could not send welcome email to {to_email}: {e}")
-
-    thread = threading.Thread(target=_send_task)
-    thread.daemon = True
-    thread.start()
+        success = send_goth_email(to_email, subject, html_body, text_body)
+        if success:
+            print(f"[SUCCESS] Welcome email delivered to {to_email} ({display_name})")
+        else:
+            print(f"[ERROR] Failed to deliver welcome email to {to_email}")
+        return success
+    except Exception as e:
+        print(f"[EXCEPTION] Could not send welcome email to {to_email}: {e}")
+        return False
 
 
 @app.route('/subscribe_newsletter', methods=['POST'])
@@ -2960,8 +2967,37 @@ def admin_newsletter_view():
     asunto = request.args.get('asunto', f'⚔️ GothProds Newsletter - Resumen Berserkers ({target_month})')
     intro = request.args.get('intro', '')
     host_base = request.host_url.rstrip('/') if request.host_url else None
-    html = build_newsletter_html(asunto, intro, target_month=target_month, base_url_override=host_base)
-    return html
+@app.route('/admin/newsletter/resend_welcome/<int:id>', methods=['POST'])
+def admin_newsletter_resend_welcome(id):
+    if session.get('role') not in ['admin', 'root']:
+        if request.is_json or request.headers.get('Accept') == 'application/json':
+            return jsonify({'status': 'error', 'message': 'Acceso denegado'}), 403
+        flash('Acceso denegado', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    conn = get_db_connection()
+    sub = conn.execute("SELECT id, nombre, email FROM newsletter_subscribers WHERE id = ?", (id,)).fetchone()
+    conn.close()
+
+    if not sub:
+        if request.is_json or request.headers.get('Accept') == 'application/json':
+            return jsonify({'status': 'error', 'message': 'Suscriptor no encontrado.'}), 404
+        flash('Suscriptor no encontrado.', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    success = send_newsletter_welcome_email(sub['email'], sub['nombre'] or 'Berserker')
+    if success:
+        msg = f"⚔️ Correo oficial de bienvenida reenviado exitosamente a {sub['email']}."
+        if request.is_json or request.headers.get('Accept') == 'application/json':
+            return jsonify({'status': 'success', 'message': msg})
+        flash(msg, 'success')
+    else:
+        msg = f"No se pudo entregar el correo de bienvenida a {sub['email']}. Revisa la configuración SMTP."
+        if request.is_json or request.headers.get('Accept') == 'application/json':
+            return jsonify({'status': 'error', 'message': msg})
+        flash(msg, 'error')
+
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/newsletter/delete/<int:id>', methods=['POST'])
 def admin_newsletter_delete(id):
