@@ -2966,6 +2966,8 @@ def admin_newsletter_view():
 @app.route('/admin/newsletter/delete/<int:id>', methods=['POST'])
 def admin_newsletter_delete(id):
     if session.get('role') not in ['admin', 'root']:
+        if request.is_json or request.headers.get('Accept') == 'application/json':
+            return jsonify({'status': 'error', 'message': 'Acceso denegado'}), 403
         flash('Acceso denegado', 'error')
         return redirect(url_for('admin_dashboard'))
 
@@ -2973,7 +2975,49 @@ def admin_newsletter_delete(id):
     conn.execute("DELETE FROM newsletter_subscribers WHERE id = ?", (id,))
     conn.commit()
     conn.close()
+    
+    if request.is_json or request.headers.get('Accept') == 'application/json':
+        return jsonify({'status': 'success', 'message': 'Suscriptor eliminado correctamente.', 'deleted_id': id})
+
     flash('Suscriptor eliminado correctamente.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/newsletter/delete_bulk', methods=['POST'])
+def admin_newsletter_delete_bulk():
+    if session.get('role') not in ['admin', 'root']:
+        if request.is_json or request.headers.get('Accept') == 'application/json':
+            return jsonify({'status': 'error', 'message': 'Acceso denegado'}), 403
+        flash('Acceso denegado', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    ids = []
+    if request.is_json:
+        data = request.get_json() or {}
+        ids = data.get('ids', [])
+    else:
+        ids = request.form.getlist('ids')
+        if not ids and request.form.get('ids'):
+            ids = [x.strip() for x in request.form.get('ids').split(',') if x.strip()]
+
+    clean_ids = [int(i) for i in ids if str(i).isdigit()]
+    if not clean_ids:
+        msg = 'No se seleccionó ningún suscriptor para eliminar.'
+        if request.is_json or request.headers.get('Accept') == 'application/json':
+            return jsonify({'status': 'error', 'message': msg}), 400
+        flash(msg, 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    conn = get_db_connection()
+    placeholders = ','.join(['?'] * len(clean_ids))
+    conn.execute(f"DELETE FROM newsletter_subscribers WHERE id IN ({placeholders})", tuple(clean_ids))
+    conn.commit()
+    conn.close()
+
+    msg = f'Se eliminaron {len(clean_ids)} suscriptor(es) correctamente.'
+    if request.is_json or request.headers.get('Accept') == 'application/json':
+        return jsonify({'status': 'success', 'message': msg, 'deleted_count': len(clean_ids), 'deleted_ids': clean_ids})
+
+    flash(msg, 'success')
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/api/sync/subscribers', methods=['GET', 'POST'])

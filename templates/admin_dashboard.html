@@ -501,33 +501,28 @@ input:checked + .slider:before { transform: translateX(20px); }
             <h2><i class="fa-solid fa-envelope-open-text"></i> Gestión de Newsletter Berserkers & Boletines Mensuales</h2>
             <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Genera automáticamente el boletín oficial para la comunidad de <strong>Berserkers</strong> con imágenes destacadas de cada sección, descárgalo en <strong>PDF</strong> o envíalo a tu lista de suscriptores Berserkers.</p>
             
-            <div style="display: flex; gap: 12px; align-items: flex-end; margin-bottom: 25px; flex-wrap: wrap; background: #181818; padding: 18px; border-radius: 8px; border: 1px solid #333;">
-                <div>
-                    <label style="display: block; font-size: 0.85rem; color: #d4af37; font-weight: bold; margin-bottom: 6px;"><i class="fa-solid fa-calendar-days"></i> Mes de Contenido:</label>
-                    <select id="news_target_month" style="padding: 10px 14px; background: #222; color: #fff; border: 1px solid var(--accent-color); border-radius: 4px; font-weight: bold; font-size: 0.95rem; cursor: pointer;">
-                        <option value="2026-07" selected>Julio 2026 (Contenido Actual)</option>
-                        <option value="2026-08">Agosto 2026</option>
-                        <option value="2026-06">Junio 2026</option>
-                        <option value="2026-05">Mayo 2026</option>
-                        <option value="2026-09">Septiembre 2026</option>
-                    </select>
+            <div style="display: flex; gap: 16px; align-items: flex-end; justify-content: space-between; margin-bottom: 25px; flex-wrap: wrap; background: #181818; padding: 18px 22px; border-radius: 8px; border: 1px solid #333;">
+                <div style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap;">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; color: #d4af37; font-weight: bold; margin-bottom: 6px;"><i class="fa-solid fa-calendar-days"></i> Mes de Contenido:</label>
+                        <select id="news_target_month" style="padding: 11px 16px; background: #222; color: #fff; border: 1px solid var(--accent-color); border-radius: 4px; font-weight: bold; font-size: 0.95rem; cursor: pointer;">
+                            <option value="2026-07" selected>Julio 2026 (Contenido Actual)</option>
+                            <option value="2026-08">Agosto 2026</option>
+                            <option value="2026-06">Junio 2026</option>
+                            <option value="2026-05">Mayo 2026</option>
+                            <option value="2026-09">Septiembre 2026</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="button" class="btn-primary" onclick="generarBoletinAuto()" style="width: auto; padding: 11px 22px; background: var(--accent-color); color: #000; font-weight: bold; cursor: pointer; border: none; border-radius: 4px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(113,109,74,0.35);">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Generar Newsletter (1-Clic)
+                        </button>
+                    </div>
                 </div>
-                <div>
-                    <button type="button" class="btn-primary" onclick="generarBoletinAuto()" style="width: auto; padding: 11px 20px; background: var(--accent-color); color: #000; font-weight: bold; cursor: pointer;">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generar Newsletter (1-Clic)
-                    </button>
-                </div>
-                <div>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                     <button type="button" id="btn-export-pdf" onclick="exportNewsletterToPDF()" style="width: auto; padding: 11px 20px; background: linear-gradient(135deg, #d4af37, #9b781e); color: #000; font-weight: bold; cursor: pointer; border: none; border-radius: 4px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(212,175,55,0.25);">
                         <i class="fa-solid fa-file-pdf"></i> Exportar a PDF (Descargar)
                     </button>
-                </div>
-                <div>
-                    <a href="#sec-sync-remote" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 11px 18px; background: #182234; border: 1px solid #3b82f6; color: #93c5fd; border-radius: 4px; font-size: 0.9rem; font-weight: bold;">
-                        <i class="fa-solid fa-cloud-arrow-down"></i> Sincronizar con Producción
-                    </a>
-                </div>
-                <div>
                     <a href="/admin/newsletter/export_csv" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 11px 18px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; font-size: 0.9rem;">
                         <i class="fa-solid fa-file-csv"></i> Exportar CSV Suscriptores
                     </a>
@@ -728,99 +723,224 @@ input:checked + .slider:before { transform: translateX(20px); }
                 }
             </script>
 
-            <!-- SINCRONIZACIÓN CON PRODUCCIÓN Y DESCARGA DE USUARIOS (MÉTODO 1) -->
-            <div id="sec-sync-remote" style="background: #141414; border: 1px solid #3a3a3a; border-radius: 8px; padding: 22px; margin-top: 30px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-                    <h3 style="color: var(--accent-color); margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 10px;">
-                        <i class="fa-solid fa-cloud-arrow-down" style="font-size: 1.3rem;"></i> Sincronización Directa de Suscriptores desde Producción
+            <!-- LISTA DE SUSCRIPTORES BERSERKERS -->
+            <div style="margin-top: 30px; background: #141414; border: 1px solid #333; border-radius: 8px; padding: 22px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+                    <h3 style="margin: 0; color: #fff; font-size: 1.15rem; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-users" style="color: var(--accent-color);"></i> Suscriptores Berserkers (<span id="subs-total-count">{{ suscriptores|length if suscriptores else 0 }}</span>)
                     </h3>
-                    <span style="background: rgba(76, 175, 80, 0.15); color: #4caf50; border: 1px solid #4caf50; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">
-                        <i class="fa-solid fa-circle-check"></i> Conexión Segura en 1-Clic
-                    </span>
-                </div>
-                <p style="color: #bbb; font-size: 0.88rem; margin-top: 0; margin-bottom: 18px; line-height: 1.5;">
-                    Descarga en tiempo real todos los usuarios que se han suscrito al newsletter en tu sitio web en vivo (<strong>gothprods.com</strong>) y guárdalos en tu base de datos local sin duplicar correos.
-                </p>
-
-                <form action="/admin/newsletter/sync_remote" method="POST" style="background: #1c1c1c; border: 1px solid #333; border-radius: 6px; padding: 20px;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 18px;">
-                        <div>
-                            <label style="display: block; font-size: 0.82rem; color: #d4af37; font-weight: bold; margin-bottom: 5px;">
-                                <i class="fa-solid fa-globe"></i> URL del Sitio Productivo:
-                            </label>
-                            <input type="text" name="remote_url" id="sync_remote_url" value="https://gothprods.com" placeholder="https://gothprods.com" style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: #111; color: #fff; border: 1px solid #444; border-radius: 4px; font-size: 0.9rem;" required>
-                        </div>
-                        <div>
-                            <label style="display: block; font-size: 0.82rem; color: #aaa; margin-bottom: 5px;">
-                                <i class="fa-solid fa-key"></i> Clave de Sincronización Segura:
-                            </label>
-                            <input type="text" name="sync_token" id="sync_remote_token" value="gothprods_berserkers_sync_2026" placeholder="gothprods_berserkers_sync_2026" style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: #111; color: #fff; border: 1px solid #444; border-radius: 4px; font-size: 0.9rem;">
-                        </div>
-                    </div>
-
-                    <button type="submit" id="btn-sync-live" style="width: 100%; padding: 13px 20px; background: var(--accent-color); color: #000; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; box-shadow: 0 4px 12px rgba(212,175,55,0.3); transition: all 0.2s ease;">
-                        <i class="fa-solid fa-rotate"></i> Sincronizar Ahora desde Producción (1-Clic)
-                    </button>
-                </form>
-            </div>
-
-            <!-- REGISTRO MANUAL DE SUSCRIPTOR -->
-            <div style="background: #1c1c1c; border: 1px solid #333; padding: 18px 20px; border-radius: 6px; margin-bottom: 25px;">
-                <h4 style="color: #fff; margin-top: 0; margin-bottom: 12px; font-size: 0.95rem;">
-                    <i class="fa-solid fa-user-plus" style="color: var(--accent-color);"></i> Registrar Suscriptor Manualmente
-                </h4>
-                <form action="/admin/newsletter/subscriber/add" method="POST" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
-                    <div style="flex: 1; min-width: 200px;">
-                        <label style="font-size: 0.8rem; color: #aaa; margin-top: 0; margin-bottom: 4px; display: block;">Nombre o Apodo:</label>
-                        <input type="text" name="nombre" placeholder="Ej. Berserker Fan" style="padding: 9px 12px; background: #111; color: #fff; border: 1px solid #444; border-radius: 4px; width: 100%; box-sizing: border-box; font-size: 0.9rem;" required>
-                    </div>
-                    <div style="flex: 1.5; min-width: 240px;">
-                        <label style="font-size: 0.8rem; color: #aaa; margin-top: 0; margin-bottom: 4px; display: block;">Correo Electrónico:</label>
-                        <input type="email" name="email" placeholder="usuario@correo.com" style="padding: 9px 12px; background: #111; color: #fff; border: 1px solid #444; border-radius: 4px; width: 100%; box-sizing: border-box; font-size: 0.9rem;" required>
-                    </div>
-                    <div>
-                        <button type="submit" style="padding: 10px 18px; background: var(--accent-color); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9rem; margin-top: 0;">
-                            <i class="fa-solid fa-plus"></i> Agregar a la Lista
+                    <div id="bulk-actions-bar" style="display: none; align-items: center; gap: 10px;">
+                        <span id="bulk-selected-label" style="font-size: 0.85rem; color: #aaa; font-weight: bold;">0 seleccionados</span>
+                        <button type="button" onclick="deleteSelectedSubscribers()" id="btn-bulk-delete" style="padding: 7px 16px; background: #ff3b3b; color: #fff; border: none; border-radius: 4px; font-weight: bold; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(255,59,59,0.35);">
+                            <i class="fa-solid fa-trash-can"></i> Eliminar Seleccionados (<span id="bulk-count">0</span>)
+                        </button>
+                        <button type="button" onclick="deselectAllSubscribers()" style="padding: 7px 12px; background: #2a2a2a; color: #ccc; border: 1px solid #444; border-radius: 4px; font-size: 0.82rem; cursor: pointer;">
+                            Cancelar
                         </button>
                     </div>
-                </form>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table id="table-subscribers" style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #444; background: #1c1c1c;">
+                                <th style="padding: 12px; width: 40px; text-align: center;">
+                                    <input type="checkbox" id="selectAllSubs" onchange="toggleSelectAllSubscribers(this)" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--accent-color);">
+                                </th>
+                                <th style="padding: 12px; width: 70px;">ID</th>
+                                <th style="padding: 12px;">Nombre / Berserker</th>
+                                <th style="padding: 12px;">Correo Electrónico</th>
+                                <th style="padding: 12px;">Fecha Registro</th>
+                                <th style="padding: 12px; text-align: right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscribers-tbody">
+                            {% if suscriptores %}
+                            {% for sub in suscriptores %}
+                            <tr id="sub-row-{{ sub.id }}" style="border-bottom: 1px solid #292929; transition: background 0.15s;">
+                                <td style="padding: 12px; text-align: center;">
+                                    <input type="checkbox" class="sub-checkbox" value="{{ sub.id }}" onchange="handleSubCheckboxChange()" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--accent-color);">
+                                </td>
+                                <td style="padding: 12px; color: #888;">#{{ sub.id }}</td>
+                                <td style="padding: 12px; color: #fff;"><strong>{{ sub.nombre or 'Berserker' }}</strong></td>
+                                <td style="padding: 12px; color: var(--accent-color); font-weight: 500;">{{ sub.email }}</td>
+                                <td style="padding: 12px; color: #aaa;">{{ sub.created_at[:10] if sub.created_at else '' }}</td>
+                                <td style="padding: 12px; text-align: right;">
+                                    <button type="button" onclick="deleteSingleSubscriber({{ sub.id }}, '{{ sub.email }}')" style="padding: 6px 12px; background: rgba(255, 59, 59, 0.15); color: #ff6b6b; border: 1px solid rgba(255, 59, 59, 0.35); border-radius: 4px; cursor: pointer; font-size: 0.82rem; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                                        <i class="fa-solid fa-trash"></i> Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr id="empty-subscribers-row">
+                                <td colspan="6" style="padding: 30px; text-align: center; color: #888;">
+                                    <i class="fa-solid fa-envelope-open" style="font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                                    Aún no hay suscriptores registrados.
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <h3 style="margin-top: 25px; margin-bottom: 15px;"><i class="fa-solid fa-users"></i> Suscriptores Activos ({{ suscriptores|length if suscriptores else 0 }})</h3>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
-                    <thead>
-                        <tr style="border-bottom: 1px solid #444;">
-                            <th style="padding: 10px;">ID</th>
-                            <th style="padding: 10px;">Nombre</th>
-                            <th style="padding: 10px;">Correo Electrónico</th>
-                            <th style="padding: 10px;">Fecha Registro</th>
-                            <th style="padding: 10px; text-align: right;">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if suscriptores %}
-                        {% for sub in suscriptores %}
-                        <tr style="border-bottom: 1px solid #333;">
-                            <td style="padding: 10px; color: #888;">#{{ sub.id }}</td>
-                            <td style="padding: 10px; color: #fff;"><strong>{{ sub.nombre }}</strong></td>
-                            <td style="padding: 10px; color: var(--accent-color);">{{ sub.email }}</td>
-                            <td style="padding: 10px; color: #aaa;">{{ sub.created_at[:10] if sub.created_at else '' }}</td>
-                            <td style="padding: 10px; text-align: right;">
-                                <form action="/admin/newsletter/delete/{{ sub.id }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Eliminar este suscriptor?');">
-                                    <button type="submit" style="padding: 5px 10px; background: #ff3b3b; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;"><i class="fa-solid fa-trash"></i> Eliminar</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td colspan="5" style="padding: 20px; text-align: center; color: #888;">Aún no hay suscriptores registrados.</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
+            <script>
+                function getSelectedSubIds() {
+                    const checked = document.querySelectorAll('.sub-checkbox:checked');
+                    return Array.from(checked).map(cb => parseInt(cb.value)).filter(Boolean);
+                }
+
+                function handleSubCheckboxChange() {
+                    const totalCheckboxes = document.querySelectorAll('.sub-checkbox');
+                    const selectedIds = getSelectedSubIds();
+                    const masterCheckbox = document.getElementById('selectAllSubs');
+                    const bulkBar = document.getElementById('bulk-actions-bar');
+                    const bulkCount = document.getElementById('bulk-count');
+                    const bulkSelectedLabel = document.getElementById('bulk-selected-label');
+
+                    if (masterCheckbox && totalCheckboxes.length > 0) {
+                        masterCheckbox.checked = (selectedIds.length === totalCheckboxes.length);
+                        masterCheckbox.indeterminate = (selectedIds.length > 0 && selectedIds.length < totalCheckboxes.length);
+                    }
+
+                    if (selectedIds.length > 0) {
+                        if (bulkBar) bulkBar.style.display = 'flex';
+                        if (bulkCount) bulkCount.textContent = selectedIds.length;
+                        if (bulkSelectedLabel) bulkSelectedLabel.textContent = `${selectedIds.length} seleccionado(s)`;
+                    } else {
+                        if (bulkBar) bulkBar.style.display = 'none';
+                    }
+                }
+
+                function toggleSelectAllSubscribers(master) {
+                    const checkboxes = document.querySelectorAll('.sub-checkbox');
+                    checkboxes.forEach(cb => {
+                        cb.checked = master.checked;
+                    });
+                    handleSubCheckboxChange();
+                }
+
+                function deselectAllSubscribers() {
+                    const masterCheckbox = document.getElementById('selectAllSubs');
+                    if (masterCheckbox) {
+                        masterCheckbox.checked = false;
+                        masterCheckbox.indeterminate = false;
+                    }
+                    const checkboxes = document.querySelectorAll('.sub-checkbox');
+                    checkboxes.forEach(cb => { cb.checked = false; });
+                    handleSubCheckboxChange();
+                }
+
+                function updateSubscriberCountDisplay(removedCount) {
+                    const countElem = document.getElementById('subs-total-count');
+                    if (countElem) {
+                        let current = parseInt(countElem.textContent) || 0;
+                        current = Math.max(0, current - removedCount);
+                        countElem.textContent = current;
+                        if (current === 0) {
+                            const tbody = document.getElementById('subscribers-tbody');
+                            if (tbody && !document.getElementById('empty-subscribers-row')) {
+                                tbody.innerHTML = `
+                                    <tr id="empty-subscribers-row">
+                                        <td colspan="6" style="padding: 30px; text-align: center; color: #888;">
+                                            <i class="fa-solid fa-envelope-open" style="font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                                            Aún no hay suscriptores registrados.
+                                        </td>
+                                    </tr>`;
+                            }
+                        }
+                    }
+                }
+
+                async function deleteSingleSubscriber(id, email) {
+                    if (!confirm(`¿Estás seguro de eliminar al suscriptor "${email}"?`)) {
+                        return;
+                    }
+
+                    try {
+                        const res = await fetch(`/admin/newsletter/delete/${id}`, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        const data = await res.json();
+                        if (data.status === 'success') {
+                            const row = document.getElementById(`sub-row-${id}`);
+                            if (row) {
+                                row.style.opacity = '0';
+                                row.style.transform = 'scale(0.95)';
+                                setTimeout(() => {
+                                    row.remove();
+                                    updateSubscriberCountDisplay(1);
+                                    handleSubCheckboxChange();
+                                }, 200);
+                            }
+                        } else {
+                            alert(data.message || 'Error al eliminar suscriptor.');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        // Fallback submit form if fetch fails
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `/admin/newsletter/delete/${id}`;
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                }
+
+                async function deleteSelectedSubscribers() {
+                    const selectedIds = getSelectedSubIds();
+                    if (selectedIds.length === 0) {
+                        alert('Selecciona al menos un suscriptor para eliminar.');
+                        return;
+                    }
+
+                    if (!confirm(`¿Estás seguro de eliminar definitivamente a los ${selectedIds.length} suscriptor(es) seleccionados?`)) {
+                        return;
+                    }
+
+                    const btn = document.getElementById('btn-bulk-delete');
+                    const origHtml = btn ? btn.innerHTML : '';
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Eliminando...';
+                    }
+
+                    try {
+                        const res = await fetch('/admin/newsletter/delete_bulk', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ ids: selectedIds })
+                        });
+                        const data = await res.json();
+                        if (data.status === 'success') {
+                            selectedIds.forEach(id => {
+                                const row = document.getElementById(`sub-row-${id}`);
+                                if (row) row.remove();
+                            });
+                            updateSubscriberCountDisplay(selectedIds.length);
+                            deselectAllSubscribers();
+                        } else {
+                            alert(data.message || 'Error al eliminar suscriptores.');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        alert('Ocurrió un error al procesar la eliminación múltiple.');
+                    } finally {
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = origHtml;
+                        }
+                    }
+                }
+            </script>
         </div>
     </div>
 
