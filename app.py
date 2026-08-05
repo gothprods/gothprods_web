@@ -4,6 +4,7 @@ import os
 import random
 import string
 import smtplib
+import threading
 from datetime import timedelta
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -1970,6 +1971,131 @@ def admin_logout():
 
 # --- RUTAS DE NEWSLETTER ---
 
+def send_newsletter_welcome_email(to_email, nombre="Berserker"):
+    """Envía un correo de confirmación y bienvenida con branding oficial de GothProds en un hilo en segundo plano."""
+    def _send_task():
+        try:
+            display_name = nombre.strip() if nombre and nombre.strip() else "Berserker"
+            subject = f"⚔️ ¡Bienvenido a la Horda de GothProds, {display_name}! ⚔️"
+            
+            html_body = f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bienvenido a Goth Productions</title>
+</head>
+<body style="margin:0; padding:0; background-color:#080808; font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#e0e0e0;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#080808; padding: 25px 10px;">
+    <tr>
+      <td align="center">
+        <!-- Contenedor Principal -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:600px; background-color:#121212; border:1px solid #333333; border-top: 4px solid #d4af37; border-radius:8px; overflow:hidden; box-shadow: 0 12px 35px rgba(0,0,0,0.9);">
+          
+          <!-- Encabezado con Logo y Lema -->
+          <tr>
+            <td align="center" style="padding: 35px 20px 25px 20px; background: linear-gradient(180deg, #1c1710 0%, #121212 100%); border-bottom: 1px solid #292929;">
+              <a href="https://gothprods.com" target="_blank" style="text-decoration:none;">
+                <img src="https://gothprods.com/assets/logo.png" alt="Goth Productions" style="max-width: 190px; height: auto; display: block; margin: 0 auto 15px auto;" />
+              </a>
+              <div style="font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: #d4af37; font-weight: bold;">
+                ⚔️ CREADORES DEL GÉNERO MÁS FEROZ DEL PLANETA ⚔️
+              </div>
+            </td>
+          </tr>
+
+          <!-- Cuerpo Principal -->
+          <tr>
+            <td style="padding: 35px 30px 25px 30px;">
+              <h1 style="color: #ffffff; font-size: 22px; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; text-align: center;">
+                ¡Tu pacto ha sido sellado, <span style="color: #d4af37;">{display_name}</span>!
+              </h1>
+              <p style="color: #cccccc; font-size: 15px; line-height: 1.6; margin: 0 0 22px 0; text-align: center;">
+                Te damos la bienvenida oficial a la <strong>Horda de GothProds</strong>. A partir de este momento recibirás en tu correo nuestro boletín exclusivo con lo más brutal y demoledor del metal internacional y underground.
+              </p>
+
+              <!-- Tarjeta de Beneficios / Secciones -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #171717; border: 1px solid #2a2a2a; border-radius: 6px; margin: 25px 0; padding: 18px 20px;">
+                <tr>
+                  <td style="padding: 9px 0; border-bottom: 1px solid #222;">
+                    <strong style="color: #d4af37; font-size: 14px;">⚡ Radar del Caos &amp; Reseñas:</strong><br>
+                    <span style="color: #aaa; font-size: 13px;">Análisis profundos de lanzamientos discográficos y novedades sonoras.</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 0; border-bottom: 1px solid #222;">
+                    <strong style="color: #d4af37; font-size: 14px;">🎙️ El Pit &amp; Entrevistas Under:</strong><br>
+                    <span style="color: #aaa; font-size: 13px;">Charlas exclusivas con músicos y referentes de la escena extrema.</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 0; border-bottom: 1px solid #222;">
+                    <strong style="color: #d4af37; font-size: 14px;">📸 La Galería Nocturna:</strong><br>
+                    <span style="color: #aaa; font-size: 13px;">Cobertura fotográfica de conciertos y festivales en alta definición.</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 0;">
+                    <strong style="color: #d4af37; font-size: 14px;">📅 Agenda Metalera:</strong><br>
+                    <span style="color: #aaa; font-size: 13px;">Giras, fechas, recintos y boletos de los shows más esperados.</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Botón de Llamada a la Acción -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin: 28px 0 15px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="https://gothprods.com" target="_blank" style="background: #d4af37; color: #0a0a0a; font-size: 14px; font-weight: 800; text-decoration: none; padding: 14px 28px; border-radius: 4px; display: inline-block; text-transform: uppercase; letter-spacing: 1.5px; box-shadow: 0 4px 15px rgba(212,175,55,0.35);">
+                      EXPLORAR EL PORTAL OFICIAL &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Pie de Página -->
+          <tr>
+            <td style="background-color: #0c0c0c; padding: 25px 20px; border-top: 1px solid #222222; text-align: center;">
+              <p style="color: #777777; font-size: 12px; margin: 0 0 10px 0; line-height: 1.5;">
+                Has recibido este mensaje porque te registraste voluntariamente en <a href="https://gothprods.com" style="color:#d4af37; text-decoration:none;">gothprods.com</a>.<br>
+                Para consultas o enviar tu material musical: <a href="mailto:contacto@gothprods.com" style="color: #d4af37; text-decoration: none;">contacto@gothprods.com</a>
+              </p>
+              <p style="color: #555555; font-size: 11px; margin: 0;">
+                &copy; 2026 Goth Productions. Todos los derechos reservados.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
+
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = subject
+            msg['From'] = f"Goth Productions <{SENDER_EMAIL}>"
+            msg['To'] = to_email
+            msg.attach(MIMEText(html_body, 'html', 'utf-8'))
+
+            server = smtplib.SMTP_SSL(SMTP_SERVER, 465, timeout=10)
+            if SENDER_PASSWORD:
+                server.login(SENDER_EMAIL, SENDER_PASSWORD)
+            server.sendmail(SENDER_EMAIL, to_email, msg.as_string())
+            server.quit()
+            print(f"[SUCCESS] Newsletter welcome email sent to {to_email}")
+        except Exception as e:
+            print(f"[WARNING] Could not send newsletter welcome email to {to_email}: {e}")
+
+    thread = threading.Thread(target=_send_task)
+    thread.daemon = True
+    thread.start()
+
+
 @app.route('/subscribe_newsletter', methods=['POST'])
 def subscribe_newsletter():
     data = request.get_json() or {}
@@ -1981,22 +2107,41 @@ def subscribe_newsletter():
 
     conn = get_db_connection()
     try:
-        cur = conn.execute("SELECT id, is_active FROM newsletter_subscribers WHERE email = ?", (email,))
+        cur = conn.execute("SELECT id, is_active, nombre FROM newsletter_subscribers WHERE email = ?", (email,))
         existing = cur.fetchone()
         if existing:
             if existing['is_active'] == 1:
                 conn.close()
-                return jsonify({'success': True, 'message': '¡Ya formas parte de la Horda Metalera! Gracias por seguir conectados.'})
+                existing_name = existing['nombre'] if existing['nombre'] and existing['nombre'] != 'Berserker' else ''
+                nombre_text = f", {existing_name}" if existing_name else ""
+                return jsonify({
+                    'success': True,
+                    'is_existing': True,
+                    'message': f'¡Ya formas parte de la Horda de GothProds{nombre_text}! Tu correo ({email}) ya está dado de alta en nuestra lista oficial de novedades.'
+                })
             else:
-                conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (nombre, existing['id']))
+                conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (nombre or existing['nombre'] or 'Berserker', existing['id']))
                 conn.commit()
                 conn.close()
-                return jsonify({'success': True, 'message': '¡Tu suscripción ha sido reactivada exitosamente!'})
+                send_newsletter_welcome_email(email, nombre or existing['nombre'] or 'Berserker')
+                return jsonify({
+                    'success': True,
+                    'is_existing': False,
+                    'message': '¡Tu suscripción ha sido reactivada exitosamente! Te hemos enviado un correo de bienvenida oficial.'
+                })
         
-        conn.execute("INSERT INTO newsletter_subscribers (nombre, email) VALUES (?, ?)", (nombre, email))
+        conn.execute("INSERT INTO newsletter_subscribers (nombre, email) VALUES (?, ?)", (nombre or 'Berserker', email))
         conn.commit()
         conn.close()
-        return jsonify({'success': True, 'message': '¡Bienvenido a la Horda! Te has suscrito exitosamente al newsletter oficial de GothProds.'})
+        
+        send_newsletter_welcome_email(email, nombre or 'Berserker')
+
+        nombre_saludo = f", {nombre}" if nombre else ""
+        return jsonify({
+            'success': True,
+            'is_existing': False,
+            'message': f'¡Bienvenido a la Horda{nombre_saludo}! Te has suscrito exitosamente. Revisa tu bandeja de entrada para ver tu correo de bienvenida oficial.'
+        })
     except Exception as e:
         conn.close()
         return jsonify({'success': False, 'message': 'Hubo un inconveniente al procesar tu registro. Por favor intenta más tarde.'})
