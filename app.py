@@ -3164,9 +3164,13 @@ def admin_newsletter_sync_remote():
 
     if not subscribers:
         if not admin_email or not admin_password:
-            flash(f'No se pudo sincronizar automáticamente con {remote_url} (Ruta API no encontrada en el servidor productivo, Error 404). Para solucionarlo de inmediato: 1) Sube el archivo app.py actualizado a PythonAnywhere/producción y recarga la web, O BIEN 2) Escribe abajo tu correo y contraseña de Administrador de {remote_url} para conectarse directamente.', 'error')
+            err_msg = f'No se pudo sincronizar automáticamente con {remote_url} (Ruta API no encontrada o no autorizada). Asegúrate de que el token de sincronización sea correcto y que los últimos cambios estén desplegados en Render.'
         else:
-            flash(f'No se pudieron obtener suscriptores desde {remote_url}. Verifica que el usuario y contraseña de administrador de la página en vivo sean correctos. ({last_error})', 'error')
+            err_msg = f'No se pudieron obtener suscriptores desde {remote_url}. Verifica que las credenciales de administrador de la página en vivo sean correctas. ({last_error})'
+        
+        if request.is_json or request.headers.get('Accept') == 'application/json':
+            return jsonify({'status': 'error', 'message': err_msg}), 400
+        flash(err_msg, 'error')
         return redirect(url_for('admin_dashboard') + '#sec-sync-remote')
 
     # Guardar en base de datos local
@@ -3198,7 +3202,11 @@ def admin_newsletter_sync_remote():
     conn.commit()
     conn.close()
 
-    flash(f'¡Sincronización completada con éxito vía {sync_source}! Se descargaron {added} suscriptores nuevos y se actualizaron {updated} existentes desde {remote_url}.', 'success')
+    success_msg = f'¡Sincronización completada con éxito vía {sync_source}! Se descargaron {added} suscriptores nuevos y se actualizaron {updated} existentes desde {remote_url}.'
+    if request.is_json or request.headers.get('Accept') == 'application/json':
+        return jsonify({'status': 'success', 'message': success_msg, 'added': added, 'updated': updated, 'total': len(subscribers)})
+
+    flash(success_msg, 'success')
     return redirect(url_for('admin_dashboard') + '#sec-sync-remote')
 
 
