@@ -498,60 +498,122 @@ input:checked + .slider:before { transform: translateX(20px); }
     <!-- TAB NEWSLETTER -->
     <div id="tab-newsletter" class="tab-content">
         <div class="panel-card" style="margin-top: 10px;">
-            <h2><i class="fa-solid fa-envelope-open-text"></i> Gestión de Newsletter & Boletines Mensuales</h2>
-            <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Genera automáticamente el boletín oficial con lo más destacado de la web y envíalo a tu horda de suscriptores.</p>
+            <h2><i class="fa-solid fa-envelope-open-text"></i> Gestión de Newsletter Berserkers & Boletines Mensuales</h2>
+            <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Genera automáticamente el boletín oficial para la comunidad de <strong>Berserkers</strong> con imágenes destacadas de cada sección, descárgalo en <strong>PDF</strong> o envíalo a tu horda de suscriptores.</p>
             
-            <div style="display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;">
-                <button type="button" class="btn-primary" onclick="generarBoletinAuto()" style="width: auto; padding: 12px 25px; background: var(--accent-color); color: #000; font-weight: bold;">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generar Newsletter del Mes (Auto 1-Clic)
-                </button>
-                <a href="/admin/newsletter/export_csv" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 12px 20px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px;">
-                    <i class="fa-solid fa-file-csv"></i> Exportar Suscriptores (CSV)
-                </a>
+            <div style="display: flex; gap: 12px; align-items: flex-end; margin-bottom: 25px; flex-wrap: wrap; background: #181818; padding: 18px; border-radius: 8px; border: 1px solid #333;">
+                <div>
+                    <label style="display: block; font-size: 0.85rem; color: #d4af37; font-weight: bold; margin-bottom: 6px;"><i class="fa-solid fa-calendar-days"></i> Mes de Contenido:</label>
+                    <select id="news_target_month" style="padding: 10px 14px; background: #222; color: #fff; border: 1px solid var(--accent-color); border-radius: 4px; font-weight: bold; font-size: 0.95rem; cursor: pointer;">
+                        <option value="2026-07" selected>Julio 2026 (Contenido Actual)</option>
+                        <option value="2026-08">Agosto 2026</option>
+                        <option value="2026-06">Junio 2026</option>
+                        <option value="2026-05">Mayo 2026</option>
+                        <option value="2026-09">Septiembre 2026</option>
+                    </select>
+                </div>
+                <div>
+                    <button type="button" class="btn-primary" onclick="generarBoletinAuto()" style="width: auto; padding: 11px 20px; background: var(--accent-color); color: #000; font-weight: bold; cursor: pointer;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generar Newsletter (1-Clic)
+                    </button>
+                </div>
+                <div>
+                    <button type="button" id="btn-export-pdf" onclick="exportNewsletterToPDF()" style="width: auto; padding: 11px 20px; background: linear-gradient(135deg, #d4af37, #9b781e); color: #000; font-weight: bold; cursor: pointer; border: none; border-radius: 4px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(212,175,55,0.25);">
+                        <i class="fa-solid fa-file-pdf"></i> Exportar a PDF (Descargar)
+                    </button>
+                </div>
+                <div>
+                    <a href="/admin/newsletter/export_csv" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 11px 18px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; font-size: 0.9rem;">
+                        <i class="fa-solid fa-file-csv"></i> Exportar CSV Suscriptores
+                    </a>
+                </div>
             </div>
 
             <!-- Formulario Generador / Editor de Boletín -->
             <form id="form-newsletter-send" method="POST" action="/admin/newsletter/send" style="background: var(--bg-primary); padding: 25px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #333;">
-                <h3 style="color: var(--accent-color); margin-bottom: 15px;"><i class="fa-solid fa-paper-plane"></i> Redactar & Enviar Boletín</h3>
+                <input type="hidden" name="target_month" id="hidden_target_month" value="2026-07">
+                <h3 style="color: var(--accent-color); margin-bottom: 15px;"><i class="fa-solid fa-paper-plane"></i> Redactar & Enviar Boletín a los Berserkers</h3>
                 
                 <label><i class="fa-solid fa-heading"></i> Asunto del Correo</label>
-                <input type="text" name="asunto" id="news_asunto" placeholder="Ej. GothProds Newsletter - Lo más destacado de Agosto" required style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                <input type="text" name="asunto" id="news_asunto" placeholder="Ej. ⚔️ GothProds Newsletter - Resumen Brutal de Julio 2026 (Berserkers)" required style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
 
-                <label><i class="fa-solid fa-message"></i> Mensaje Introductorio (Opcional)</label>
-                <textarea name="mensaje_intro" id="news_intro" rows="3" placeholder="Hola Horda Metalera! Aquí tienen el resumen mensual exclusivo..." style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;"></textarea>
+                <label><i class="fa-solid fa-message"></i> Mensaje Introductorio para los Berserkers (Opcional)</label>
+                <textarea name="mensaje_intro" id="news_intro" rows="3" placeholder="¡Saludos, Berserkers! Aquí tienen el resumen mensual exclusivo..." style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;"></textarea>
 
-                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
                     <button type="button" onclick="previewNewsletterHTML()" style="background: #333; color: #fff; border: 1px solid var(--accent-color); padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
                         <i class="fa-solid fa-eye"></i> Vista Previa HTML
                     </button>
-                    <button type="submit" onclick="return confirm('¿Estás seguro de enviar este boletín a TODOS los suscriptores activos?');" style="background: #ff3b3b; color: #fff; border: none; padding: 10px 25px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                        <i class="fa-solid fa-paper-plane"></i> Enviar Boletín Masivo
+                    <button type="button" onclick="exportNewsletterToPDF()" style="background: #2b2610; color: #d4af37; border: 1px solid #d4af37; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        <i class="fa-solid fa-file-pdf"></i> Descargar en PDF
+                    </button>
+                    <button type="submit" onclick="return confirm('¿Estás seguro de enviar este boletín a TODOS los suscriptores Berserkers activos?');" style="background: #ff3b3b; color: #fff; border: none; padding: 10px 25px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        <i class="fa-solid fa-paper-plane"></i> Enviar Boletín Masivo por Correo
                     </button>
                 </div>
 
                 <!-- Previsualizador integrado -->
                 <div id="newsletter-preview-pane" style="display: none; background: #000; border: 1px solid var(--accent-color); padding: 15px; border-radius: 8px; margin-top: 15px;">
-                    <h4 style="color: var(--accent-color); margin-top: 0;"><i class="fa-solid fa-desktop"></i> Vista Previa del Boletín</h4>
-                    <iframe id="news-preview-iframe" style="width: 100%; height: 500px; border: none; background: #fff; border-radius: 4px;"></iframe>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                        <h4 style="color: var(--accent-color); margin: 0;"><i class="fa-solid fa-desktop"></i> Vista Previa del Boletín Berserkers</h4>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" onclick="exportNewsletterToPDF()" style="padding: 6px 12px; background: var(--accent-color); color: #000; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold;">
+                                <i class="fa-solid fa-download"></i> Descargar PDF
+                            </button>
+                            <button type="button" onclick="printNewsletterIframe()" style="padding: 6px 12px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">
+                                <i class="fa-solid fa-print"></i> Imprimir
+                            </button>
+                            <button type="button" onclick="openNewsletterNewTab()" style="padding: 6px 12px; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">
+                                <i class="fa-solid fa-up-right-from-square"></i> Pantalla Completa
+                            </button>
+                        </div>
+                    </div>
+                    <iframe id="news-preview-iframe" style="width: 100%; height: 650px; border: none; background: #080808; border-radius: 4px;"></iframe>
                 </div>
             </form>
 
+            <!-- Script html2pdf CDN -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
             <script>
+                function updateTargetMonth() {
+                    const select = document.getElementById('news_target_month');
+                    const hidden = document.getElementById('hidden_target_month');
+                    if (select && hidden) {
+                        hidden.value = select.value;
+                    }
+                }
+
+                document.getElementById('news_target_month')?.addEventListener('change', function() {
+                    updateTargetMonth();
+                    previewNewsletterHTML();
+                });
+
                 async function generarBoletinAuto() {
+                    updateTargetMonth();
+                    const monthVal = document.getElementById('news_target_month').value;
                     const asunto = document.getElementById('news_asunto');
                     const intro = document.getElementById('news_intro');
-                    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-                    const now = new Date();
-                    const monthStr = monthNames[now.getMonth()] + " " + now.getFullYear();
+                    const monthNames = {
+                        "01": "Enero", "02": "Febrero", "03": "Marzo", "04": "Abril",
+                        "05": "Mayo", "06": "Junio", "07": "Julio", "08": "Agosto",
+                        "09": "Septiembre", "10": "Octubre", "11": "Noviembre", "12": "Diciembre"
+                    };
+                    const parts = monthVal.split('-');
+                    const mName = monthNames[parts[1]] || "Mes";
+                    const yName = parts[0] || "2026";
+                    const monthStr = `${mName} ${yName}`;
 
-                    asunto.value = `🦇 GothProds Newsletter - Resumen Brutal de ${monthStr}`;
-                    intro.value = `¡Saludos Horda Metalera! Les presentamos la recopilación oficial de ${monthStr} con lo más destacado de Radar del Caos, El Pit, Los 10 Favoritos de Metal Pulse, La Galería Nocturna y la Agenda Metalera.`;
+                    asunto.value = `⚔️ GothProds Newsletter - Resumen Brutal de ${monthStr} (Berserkers)`;
+                    intro.value = `¡Saludos, Berserkers! Les presentamos la recopilación oficial de ${monthStr} con lo más destacado de El Noticiero Nocturno, Reseñas de Conciertos, Entrevistas Under, Metal Pulse, La Galería Nocturna y la Agenda Metalera.`;
 
                     previewNewsletterHTML();
                 }
 
                 async function previewNewsletterHTML() {
-                    const asunto = document.getElementById('news_asunto').value;
+                    updateTargetMonth();
+                    const monthVal = document.getElementById('news_target_month').value;
+                    const asunto = document.getElementById('news_asunto').value || `⚔️ GothProds Newsletter - Resumen Brutal (Berserkers)`;
                     const intro = document.getElementById('news_intro').value;
                     const pane = document.getElementById('newsletter-preview-pane');
                     const iframe = document.getElementById('news-preview-iframe');
@@ -562,7 +624,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                         const res = await fetch('/admin/newsletter/preview', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ asunto: asunto, intro: intro })
+                            body: JSON.stringify({ asunto: asunto, intro: intro, target_month: monthVal })
                         });
                         const html = await res.text();
                         iframe.contentWindow.document.open();
@@ -572,9 +634,131 @@ input:checked + .slider:before { transform: translateX(20px); }
                         alert('Error al generar la vista previa.');
                     }
                 }
+
+                async function exportNewsletterToPDF() {
+                    updateTargetMonth();
+                    const monthVal = document.getElementById('news_target_month').value;
+                    const asunto = document.getElementById('news_asunto').value || `⚔️ GothProds Newsletter - Resumen Brutal (${monthVal})`;
+                    const intro = document.getElementById('news_intro').value;
+                    const btn = document.getElementById('btn-export-pdf');
+                    const origHtml = btn ? btn.innerHTML : '';
+
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando PDF...';
+                    }
+
+                    try {
+                        const res = await fetch('/admin/newsletter/preview', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ asunto: asunto, intro: intro, target_month: monthVal })
+                        });
+                        const html = await res.text();
+
+                        const tempDiv = document.createElement('div');
+                        tempDiv.style.position = 'fixed';
+                        tempDiv.style.left = '-9999px';
+                        tempDiv.style.top = '0';
+                        tempDiv.style.width = '700px';
+                        tempDiv.style.background = '#080808';
+                        tempDiv.innerHTML = html;
+                        document.body.appendChild(tempDiv);
+
+                        const targetElem = tempDiv.querySelector('.container') || tempDiv;
+
+                        const opt = {
+                            margin:       [8, 8, 8, 8],
+                            filename:     `GothProds_Newsletter_Berserkers_${monthVal}.pdf`,
+                            image:        { type: 'jpeg', quality: 0.98 },
+                            html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
+                            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+                        };
+
+                        await html2pdf().set(opt).from(targetElem).save();
+                        document.body.removeChild(tempDiv);
+
+                        if (btn) {
+                            btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡PDF Descargado!';
+                            setTimeout(() => {
+                                btn.disabled = false;
+                                btn.innerHTML = origHtml;
+                            }, 3000);
+                        }
+                    } catch (err) {
+                        console.error('Error al exportar PDF:', err);
+                        alert('No se pudo generar el PDF automáticamente. Puedes usar la opción "Imprimir / Guardar como PDF" desde la vista previa.');
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = origHtml;
+                        }
+                    }
+                }
+
+                function printNewsletterIframe() {
+                    const iframe = document.getElementById('news-preview-iframe');
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    } else {
+                        previewNewsletterHTML().then(() => {
+                            setTimeout(() => {
+                                const ifr = document.getElementById('news-preview-iframe');
+                                if (ifr && ifr.contentWindow) {
+                                    ifr.contentWindow.focus();
+                                    ifr.contentWindow.print();
+                                }
+                            }, 600);
+                        });
+                    }
+                }
+
+                function openNewsletterNewTab() {
+                    updateTargetMonth();
+                    const monthVal = document.getElementById('news_target_month').value;
+                    const asunto = encodeURIComponent(document.getElementById('news_asunto').value || '');
+                    const intro = encodeURIComponent(document.getElementById('news_intro').value || '');
+                    window.open(`/admin/newsletter/view?month=${monthVal}&asunto=${asunto}&intro=${intro}`, '_blank');
+                }
             </script>
 
-            <h3 style="margin-top: 30px; margin-bottom: 15px;"><i class="fa-solid fa-users"></i> Suscriptores Activos ({{ suscriptores|length if suscriptores else 0 }})</h3>
+            <!-- INFORMACIÓN DE ALMACENAMIENTO DE SUSCRIPTORES -->
+            <div style="background: #151515; border-left: 4px solid var(--accent-color); padding: 15px 20px; border-radius: 4px; margin-top: 35px; margin-bottom: 20px; font-size: 0.9rem;">
+                <h4 style="color: var(--accent-color); margin-top: 0; margin-bottom: 6px; font-size: 1rem;">
+                    <i class="fa-solid fa-database"></i> ¿Dónde se guardan los suscriptores?
+                </h4>
+                <p style="color: #ccc; margin: 0 0 8px 0; line-height: 1.5;">
+                    Los suscriptores registrados desde el formulario público del sitio web (sección <em>"Únete a los Berserkers"</em>) se guardan automáticamente en la tabla <code>newsletter_subscribers</code> de la base de datos (<code>gothprods.db</code>).
+                </p>
+                <p style="color: #999; margin: 0; font-size: 0.85rem;">
+                    <i class="fa-solid fa-circle-info" style="color: var(--accent-color);"></i> <strong>Nota importante:</strong> Si los usuarios se registraron en el sitio web público en línea (<code>gothprods.com</code>), sus registros se encuentran en la base de datos del servidor de producción. Si deseas agregar contactos manualmente a esta base de datos local, utiliza el formulario rápido de abajo.
+                </p>
+            </div>
+
+            <!-- REGISTRO MANUAL DE SUSCRIPTOR -->
+            <div style="background: #1c1c1c; border: 1px solid #333; padding: 18px 20px; border-radius: 6px; margin-bottom: 25px;">
+                <h4 style="color: #fff; margin-top: 0; margin-bottom: 12px; font-size: 0.95rem;">
+                    <i class="fa-solid fa-user-plus" style="color: var(--accent-color);"></i> Registrar Suscriptor Manualmente
+                </h4>
+                <form action="/admin/newsletter/subscriber/add" method="POST" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.8rem; color: #aaa; margin-top: 0; margin-bottom: 4px; display: block;">Nombre o Apodo:</label>
+                        <input type="text" name="nombre" placeholder="Ej. Berserker Fan" style="padding: 9px 12px; background: #111; color: #fff; border: 1px solid #444; border-radius: 4px; width: 100%; box-sizing: border-box; font-size: 0.9rem;" required>
+                    </div>
+                    <div style="flex: 1.5; min-width: 240px;">
+                        <label style="font-size: 0.8rem; color: #aaa; margin-top: 0; margin-bottom: 4px; display: block;">Correo Electrónico:</label>
+                        <input type="email" name="email" placeholder="usuario@correo.com" style="padding: 9px 12px; background: #111; color: #fff; border: 1px solid #444; border-radius: 4px; width: 100%; box-sizing: border-box; font-size: 0.9rem;" required>
+                    </div>
+                    <div>
+                        <button type="submit" style="padding: 10px 18px; background: var(--accent-color); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9rem; margin-top: 0;">
+                            <i class="fa-solid fa-plus"></i> Agregar a la Lista
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <h3 style="margin-top: 25px; margin-bottom: 15px;"><i class="fa-solid fa-users"></i> Suscriptores Activos ({{ suscriptores|length if suscriptores else 0 }})</h3>
             <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
                     <thead>

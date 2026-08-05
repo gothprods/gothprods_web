@@ -2001,161 +2001,375 @@ def subscribe_newsletter():
         conn.close()
         return jsonify({'success': False, 'message': 'Hubo un inconveniente al procesar tu registro. Por favor intenta más tarde.'})
 
-def build_newsletter_html(asunto, mensaje_intro, live=False):
+def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=False, base_url_override=None):
     conn = get_db_connection(live=live)
-    import datetime
+    import datetime, re
     mexico_tz = datetime.timezone(datetime.timedelta(hours=-6))
     now_mx = datetime.datetime.now(mexico_tz)
-    base_url = "https://gothprods.com"
+    base_url = base_url_override if base_url_override else "https://gothprods.com"
     
+    # Process target month
+    month_names = {
+        "01": "Enero", "02": "Febrero", "03": "Marzo", "04": "Abril",
+        "05": "Mayo", "06": "Junio", "07": "Julio", "08": "Agosto",
+        "09": "Septiembre", "10": "Octubre", "11": "Noviembre", "12": "Diciembre"
+    }
+    
+    if not target_month or '-' not in target_month:
+        target_month = "2026-07"
+        
+    parts = target_month.split('-')
+    year_str = parts[0]
+    month_str = parts[1]
+    month_name = month_names.get(month_str, "Julio")
+    month_label = f"{month_name} {year_str}"
+    
+    # 1. Bandas y Eventos (Radar del Caos & El Pit)
     bandas = conn.execute("SELECT * FROM banda_semana WHERE is_active = 1 ORDER BY id DESC LIMIT 2").fetchall()
     eventos = conn.execute("SELECT * FROM eventos_semana WHERE is_active = 1 ORDER BY id DESC LIMIT 2").fetchall()
     
-    # Filter Metal Pulse Tracks
-    all_tracks = conn.execute("SELECT * FROM content_items WHERE section = 'Metal Pulse Tracks' AND full_desc != '.' ORDER BY id DESC").fetchall()
-    settings = get_settings(live=live)
-    hide_past_mp = settings.get('hide_past_metalpulse', '0') == '1'
-    if hide_past_mp and all_tracks:
-        months_es = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-        cur_year = now_mx.year
-        cur_month_idx = now_mx.month - 1
-        valid_months = set()
-        for i in range(24):
-            m_idx = (cur_month_idx + i) % 12
-            y = cur_year + (cur_month_idx + i) // 12
-            valid_months.add(f"{months_es[m_idx]} {y}")
-        filtered = [t for t in all_tracks if t['full_desc'] in valid_months]
-        metalpulse_tracks = filtered if filtered else [t for t in all_tracks if t['full_desc'] == all_tracks[0]['full_desc']]
-    else:
-        metalpulse_tracks = all_tracks
-
-    galeria = conn.execute("SELECT * FROM content_items WHERE section IN ('La Galería Nocturna', 'Caos Sonoro') ORDER BY id DESC LIMIT 2").fetchall()
-    noticiero = conn.execute("SELECT * FROM content_items WHERE section = 'El Noticiero Nocturno' ORDER BY created_at DESC, id DESC LIMIT 2").fetchall()
-    reseñas = conn.execute("SELECT * FROM content_items WHERE section = 'Reseñas de Conciertos' ORDER BY created_at DESC, id DESC LIMIT 2").fetchall()
-
-    # Agenda Metalera: Filtrar por mes corriente YYYY-MM o meses posteriores más cercanos
-    current_year_month = now_mx.strftime("%Y-%m")
-    all_agenda = conn.execute("SELECT * FROM content_items WHERE section = 'Agenda Metalera' ORDER BY author ASC").fetchall()
-    
-    agenda_current = [a for a in all_agenda if a['author'] and a['author'].startswith(current_year_month)]
-    if agenda_current:
-        agenda = agenda_current[:4]
-    else:
-        # Fallback: proximos eventos ordenados por fecha a partir de hoy
+    # 2. El Noticiero Nocturno (Filtrado por mes objetivo)
+    noticiero = conn.execute("SELECT * FROM content_items WHERE section = 'El Noticiero Nocturno' AND created_at LIKE ? ORDER BY created_at DESC, id DESC", (f"{target_month}%",)).fetchall()
+    if not noticiero:
+        noticiero = conn.execute("SELECT * FROM content_items WHERE section = 'El Noticiero Nocturno' ORDER BY created_at DESC, id DESC LIMIT 6").fetchall()
+        
+    # 3. Reseñas de Conciertos (Filtrado por mes objetivo)
+    reseñas = conn.execute("SELECT * FROM content_items WHERE section = 'Reseñas de Conciertos' AND created_at LIKE ? ORDER BY created_at DESC, id DESC", (f"{target_month}%",)).fetchall()
+    if not reseñas:
+        reseñas = conn.execute("SELECT * FROM content_items WHERE section = 'Reseñas de Conciertos' ORDER BY created_at DESC, id DESC LIMIT 4").fetchall()
+        
+    # 4. Entrevistas Under (Filtrado por mes objetivo)
+    entrevistas = conn.execute("SELECT * FROM content_items WHERE section = 'Entrevistas Under' AND created_at LIKE ? ORDER BY created_at DESC, id DESC", (f"{target_month}%",)).fetchall()
+    if not entrevistas:
+        entrevistas = conn.execute("SELECT * FROM content_items WHERE section = 'Entrevistas Under' ORDER BY created_at DESC, id DESC LIMIT 4").fetchall()
+        
+    # 5. La Galería Nocturna & Caos Sonoro (Filtrado por mes objetivo)
+    galeria = conn.execute("SELECT * FROM content_items WHERE section IN ('La Galería Nocturna', 'Caos Sonoro') AND created_at LIKE ? ORDER BY created_at DESC, id DESC", (f"{target_month}%",)).fetchall()
+    if not galeria:
+        galeria = conn.execute("SELECT * FROM content_items WHERE section IN ('La Galería Nocturna', 'Caos Sonoro') ORDER BY created_at DESC, id DESC LIMIT 4").fetchall()
+        
+    # 6. Metal Pulse Tracks (Filtrado por mes objetivo)
+    pulse_tracks = conn.execute("SELECT * FROM content_items WHERE section = 'Metal Pulse Tracks' AND (full_desc LIKE ? OR full_desc LIKE ?) ORDER BY id DESC", (f"%{month_name}%", f"%{target_month}%")).fetchall()
+    if not pulse_tracks:
+        pulse_tracks = conn.execute("SELECT * FROM content_items WHERE section = 'Metal Pulse Tracks' AND full_desc != '.' ORDER BY id DESC LIMIT 10").fetchall()
+        
+    # 7. Agenda Metalera (Conciertos en el mes objetivo con imágenes)
+    agenda = conn.execute("SELECT * FROM content_items WHERE section = 'Agenda Metalera' AND author LIKE ? ORDER BY author ASC", (f"{target_month}%",)).fetchall()
+    if not agenda:
         today_str = now_mx.strftime("%Y-%m-%d")
-        agenda_future = [a for a in all_agenda if a['author'] and a['author'] >= today_str]
-        agenda = agenda_future[:4] if agenda_future else all_agenda[:4]
-
+        agenda = conn.execute("SELECT * FROM content_items WHERE section = 'Agenda Metalera' AND author >= ? ORDER BY author ASC LIMIT 8", (today_str,)).fetchall()
+        if not agenda:
+            agenda = conn.execute("SELECT * FROM content_items WHERE section = 'Agenda Metalera' ORDER BY author DESC LIMIT 8").fetchall()
+            
     conn.close()
 
-    def get_full_img_url(path):
-        if not path:
-            return f"{base_url}/assets/logo.png"
-        if path.startswith('http'):
-            return path
-        if path.startswith('assets/'):
-            return f"{base_url}/{path}"
-        return f"{base_url}/updates/{path}"
+    def get_full_img_url(path, default_img="assets/logo.webp", band_title=None, sec=None):
+        if not path or str(path).strip() == '':
+            if sec == 'Agenda Metalera':
+                return f"{base_url}/assets/agenda_icon.png"
+            return f"{base_url}/{default_img}"
+            
+        path_str = str(path).strip()
+        
+        # YouTube URLs -> convert to standard reliable img.youtube.com thumbnail
+        if 'youtube.com' in path_str or 'youtu.be' in path_str or 'ytimg.com' in path_str:
+            m = re.search(r"vi/([a-zA-Z0-9_-]+)", path_str)
+            if m:
+                return f"https://img.youtube.com/vi/{m.group(1)}/hqdefault.jpg"
+            return path_str
+            
+        if path_str.startswith('http://') or path_str.startswith('https://'):
+            return path_str
+            
+        clean_path = path_str.lstrip('/')
+        if not clean_path.startswith('assets/') and not clean_path.startswith('updates/'):
+            clean_path = f"updates/{clean_path}"
+            
+        # Check if file exists locally
+        if os.path.exists(clean_path):
+            return f"{base_url}/{clean_path}"
+            
+        # Check alternate extensions (.webp, .png, .jpg)
+        base, ext = os.path.splitext(clean_path)
+        for alt_ext in ['.webp', '.png', '.jpg', '.jpeg']:
+            alt_path = base + alt_ext
+            if os.path.exists(alt_path):
+                return f"{base_url}/{alt_path}"
+                
+        # Band logo matching in assets/logos
+        if band_title:
+            title_clean = re.sub(r'[^a-zA-Z0-9]', '', band_title).lower()
+            if os.path.exists('assets/logos'):
+                for lf in os.listdir('assets/logos'):
+                    lf_clean = re.sub(r'[^a-zA-Z0-9]', '', os.path.splitext(lf)[0]).lower()
+                    if lf_clean and (lf_clean == title_clean or lf_clean in title_clean or title_clean in lf_clean):
+                        return f"{base_url}/assets/logos/{lf}"
+                        
+        if sec == 'Agenda Metalera':
+            return f"{base_url}/assets/agenda_icon.png"
+        return f"{base_url}/{default_img}"
+
+    # Generar secciones HTML
+    noticiero_cards = "".join([f"""
+    <div style="background: #181818; border: 1px solid #282828; border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+        <img src="{get_full_img_url(n['image_filename'], band_title=n['title'], sec='El Noticiero Nocturno')}" alt="{n['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #333;" />
+        <div style="padding: 16px;">
+            <div style="margin-bottom: 8px;">
+                <span style="background: #716d4a; color: #000; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px;">Noticia</span>
+                <span style="color: #888; font-size: 12px; margin-left: 8px;">📅 {n['created_at'][:10] if n['created_at'] else ''}</span>
+            </div>
+            <h3 style="color: #fff; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3;">{n['title']}</h3>
+            <p style="color: #bbb; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(n['short_desc'] or n['full_desc'] or '')[:180]}...</p>
+            <a href="https://gothprods.com" style="color: #d4af37; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block;">Leer Nota Completa en GothProds &rarr;</a>
+        </div>
+    </div>
+    """ for n in noticiero])
+
+    reseñas_cards = "".join([f"""
+    <div style="background: #181818; border: 1px solid #282828; border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+        <img src="{get_full_img_url(r['image_filename'], band_title=r['title'], sec='Reseñas de Conciertos')}" alt="{r['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #333;" />
+        <div style="padding: 16px;">
+            <div style="margin-bottom: 8px;">
+                <span style="background: #a33; color: #fff; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px;">Reseña en Vivo</span>
+                <span style="color: #888; font-size: 12px; margin-left: 8px;">📅 {r['created_at'][:10] if r['created_at'] else ''}</span>
+            </div>
+            <h3 style="color: #fff; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3;">{r['title']}</h3>
+            <p style="color: #bbb; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(r['short_desc'] or r['full_desc'] or '')[:180]}...</p>
+            <a href="https://gothprods.com" style="color: #d4af37; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block;">Leer Reseña Completa &rarr;</a>
+        </div>
+    </div>
+    """ for r in reseñas])
+
+    entrevistas_cards = "".join([f"""
+    <div style="background: #181818; border: 1px solid #282828; border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+        <img src="{get_full_img_url(e['image_filename'], band_title=e['title'], sec='Entrevistas Under')}" alt="{e['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #333;" />
+        <div style="padding: 16px;">
+            <div style="margin-bottom: 8px;">
+                <span style="background: #2b5c8f; color: #fff; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px;">Entrevista Exclusiva</span>
+                <span style="color: #888; font-size: 12px; margin-left: 8px;">📅 {e['created_at'][:10] if e['created_at'] else ''}</span>
+            </div>
+            <h3 style="color: #fff; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3;">{e['title']}</h3>
+            <p style="color: #bbb; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(e['short_desc'] or e['full_desc'] or '')[:180]}...</p>
+            <a href="https://gothprods.com" style="color: #d4af37; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block;">Ver Entrevista en GothProds &rarr;</a>
+        </div>
+    </div>
+    """ for e in entrevistas])
+
+    galeria_cards = "".join([f"""
+    <div style="background: #181818; border: 1px solid #282828; border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+        <img src="{get_full_img_url(g['image_filename'], band_title=g['title'], sec='La Galería Nocturna')}" alt="{g['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #333;" />
+        <div style="padding: 16px;">
+            <div style="margin-bottom: 8px;">
+                <span style="background: #5a3d7a; color: #fff; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px;">Podcast & Video</span>
+                <span style="color: #888; font-size: 12px; margin-left: 8px;">📅 {g['created_at'][:10] if g['created_at'] else ''}</span>
+            </div>
+            <h3 style="color: #fff; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3;">{g['title']}</h3>
+            <p style="color: #bbb; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(g['short_desc'] or g['full_desc'] or '')[:180]}...</p>
+            <a href="https://gothprods.com" style="color: #d4af37; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block;">Reproducir Episodio &rarr;</a>
+        </div>
+    </div>
+    """ for g in galeria])
+
+    pulse_items = "".join([f"""
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #161616; margin-bottom: 8px; border-radius: 6px; border: 1px solid #282828; border-left: 3px solid #716d4a;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background: #716d4a; color: #000; font-weight: 900; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 50%; display: inline-block; font-size: 12px;">{idx + 1}</span>
+            <div>
+                <strong style="color: #fff; font-size: 14px; display: block;">{t['title']}</strong>
+                <span style="color: #888; font-size: 12px;">{t['short_desc']}</span>
+            </div>
+        </div>
+        <span style="color: #716d4a; font-weight: bold; font-size: 11px; white-space: nowrap;">{t['full_desc']}</span>
+    </div>
+    """ for idx, t in enumerate(pulse_tracks[:10])])
+
+    agenda_cards = "".join([f"""
+    <div style="display: flex; align-items: center; gap: 14px; background: #161616; padding: 12px 14px; border-radius: 8px; border: 1px solid #282828; margin-bottom: 12px; border-left: 3px solid #716d4a;">
+        <img src="{get_full_img_url(a['image_filename'], default_img='assets/agenda_icon.png', band_title=a['title'], sec='Agenda Metalera')}" alt="{a['title']}" style="width: 60px; height: 60px; min-width: 60px; object-fit: contain; background: #080808; border: 1px solid #716d4a; border-radius: 6px; padding: 4px; display: block;" />
+        <div style="flex: 1;">
+            <h4 style="color: #fff; margin: 0 0 4px 0; font-size: 16px; font-weight: bold;">{a['title']}</h4>
+            <div style="font-size: 13px; line-height: 1.4;">
+                <span style="color: #d4af37; font-weight: bold;">📅 {a['author']}</span>
+                <span style="color: #aaa; margin-left: 10px;">📍 {a['short_desc']}</span>
+            </div>
+        </div>
+    </div>
+    """ for a in agenda])
+
+    bandas_eventos_cards = ""
+    if bandas or eventos:
+        b_html = "".join([f"""
+        <div style="background: #181818; border: 1px solid #282828; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
+            <img src="{get_full_img_url(b['imagen'] or b['ultimo_lanzamiento_url'])}" class="card-img" style="width: 100%; max-height: 200px; object-fit: cover; display: block;" />
+            <div style="padding: 14px;">
+                <span style="background: #716d4a; color: #000; font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase;">Banda Destacada</span>
+                <h3 style="color: #fff; margin: 6px 0; font-size: 17px;">{b['nombre']} ({b['pais'] or 'Underground'})</h3>
+                <p style="color: #bbb; font-size: 13px; margin: 0;">{(b['texto_resena'] or b['bio_larga'] or '')[:160]}...</p>
+            </div>
+        </div>
+        """ for b in bandas])
+        e_html = "".join([f"""
+        <div style="background: #181818; border: 1px solid #282828; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
+            <img src="{get_full_img_url(e['img_video_path'])}" class="card-img" style="width: 100%; max-height: 200px; object-fit: cover; display: block;" />
+            <div style="padding: 14px;">
+                <span style="background: #a33; color: #fff; font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase;">Evento Destacado</span>
+                <h3 style="color: #fff; margin: 6px 0; font-size: 17px;">{e['nombre_evento']}</h3>
+                <p style="color: #bbb; font-size: 13px; margin: 0;">📍 {e['ciudad']}, {e['pais']} | 📅 {e['fecha_evento']}</p>
+            </div>
+        </div>
+        """ for e in eventos])
+        bandas_eventos_cards = b_html + e_html
+
+    default_intro = f"¡Saludos, Berserkers! Bienvenidos a la edición oficial de {month_label}. Les presentamos la recopilación más brutal del mes con los lanzamientos pesados, noticias exclusivas de la escena, reseñas de conciertos, entrevistas under, podcast y la agenda completa para el mosh pit."
+
+    logo_img_url = get_full_img_url('assets/logo.webp')
+    noticiero_icon_url = get_full_img_url('assets/noticiero_icon.png')
+    resenas_icon_url = get_full_img_url('assets/resenas_icon.png')
+    entrevistas_icon_url = get_full_img_url('assets/entrevistas_icon.png')
+    metal_pulse_icon_url = get_full_img_url('assets/metal_pulse_icon.jpg')
+    galeria_icon_url = get_full_img_url('assets/galeria_nocturna_icon.jpg')
+    agenda_icon_url = get_full_img_url('assets/agenda_icon.png')
+    destacados_icon_url = get_full_img_url('assets/destacados_icon.png')
 
     html = f"""
     <!DOCTYPE html>
-    <html>
+    <html lang="es">
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{asunto}</title>
         <style>
-            body {{ font-family: 'Oswald', 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #080808; color: #e0e0e0; margin: 0; padding: 0; }}
-            .container {{ max-width: 650px; margin: 20px auto; background: #121212; border: 1px solid #716d4a; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }}
-            .header {{ background: #000; padding: 25px; text-align: center; border-bottom: 2px solid #716d4a; position: relative; }}
+            body {{ font-family: 'Oswald', 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #080808; color: #e0e0e0; margin: 0; padding: 0; }}
+            .container {{ max-width: 680px; margin: 20px auto; background: #121212; border: 1px solid #716d4a; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.95); }}
+            .top-banner {{ background: linear-gradient(90deg, #151307, #716d4a, #151307); padding: 8px; text-align: center; color: #000; font-weight: 900; letter-spacing: 2px; font-size: 12px; text-transform: uppercase; }}
+            .header {{ background: #000; padding: 25px 20px; text-align: center; border-bottom: 2px solid #716d4a; position: relative; }}
             .header img {{ width: 140px; height: auto; margin-bottom: 10px; }}
-            .header h1 {{ color: #716d4a; margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 2px; }}
-            .intro {{ padding: 20px 25px; background: #181818; border-bottom: 1px solid #2a2a2a; font-size: 15px; line-height: 1.6; color: #ccc; }}
-            .section {{ padding: 20px 25px; border-bottom: 1px solid #222; }}
-            .section-header-box {{ display: flex; align-items: center; gap: 12px; margin-bottom: 15px; border-bottom: 1px solid #716d4a; padding-bottom: 8px; }}
-            .section-icon {{ width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 8px; object-fit: cover; background: #000; }}
-            .section-title {{ color: #716d4a; font-size: 20px; text-transform: uppercase; margin: 0; display: inline-block; vertical-align: middle; }}
-            .card {{ background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #282828; border-left: 4px solid #716d4a; }}
-            .card-img {{ width: 100%; height: 160px; object-fit: cover; border-radius: 6px; margin-bottom: 12px; border: 1px solid #333; }}
-            .card h3 {{ margin: 0 0 6px 0; color: #fff; font-size: 17px; }}
-            .card p {{ margin: 0; color: #bbb; font-size: 13px; line-height: 1.5; }}
-            .track-item {{ padding: 10px 14px; background: #181818; margin-bottom: 8px; border-radius: 6px; font-size: 14px; border: 1px solid #282828; display: flex; justify-content: space-between; align-items: center; }}
-            .btn {{ display: inline-block; padding: 10px 20px; background: #716d4a; color: #000; text-decoration: none; font-weight: bold; border-radius: 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }}
-            .footer {{ background: #050505; padding: 25px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #222; }}
+            .header h1 {{ color: #d4af37; margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 2px; }}
+            .badge-month {{ display: inline-block; background: #1f1b0c; border: 1px solid #716d4a; color: #d4af37; padding: 4px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase; }}
+            .intro {{ padding: 22px 25px; background: #161616; border-bottom: 1px solid #2a2a2a; border-left: 4px solid #716d4a; font-size: 15px; line-height: 1.6; color: #ccc; }}
+            .section {{ padding: 24px 25px; border-bottom: 1px solid #222; }}
+            .section-header-box {{ display: flex; align-items: center; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid #716d4a; padding-bottom: 10px; }}
+            .section-icon {{ width: 34px; height: 34px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover; background: #000; }}
+            .section-title {{ color: #d4af37; font-size: 20px; text-transform: uppercase; margin: 0; letter-spacing: 1px; display: inline-block; vertical-align: middle; }}
+            .btn {{ display: inline-block; padding: 12px 26px; background: linear-gradient(180deg, #8e8958, #716d4a); color: #000; text-decoration: none; font-weight: 900; border-radius: 6px; font-size: 14px; text-transform: uppercase; letter-spacing: 1.5px; box-shadow: 0 4px 15px rgba(113,109,74,0.4); }}
+            .btn:hover {{ background: #d4af37; }}
+            .footer {{ background: #050505; padding: 30px 20px; text-align: center; font-size: 12px; color: #777; border-top: 1px solid #222; }}
+            @media print {{
+                body {{ -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background-color: #080808 !important; margin: 0 !important; padding: 0 !important; }}
+                .container {{ border: none !important; box-shadow: none !important; margin: 0 auto !important; max-width: 100% !important; }}
+                .section, .intro, .header, .footer, .section-header-box {{ page-break-inside: avoid; break-inside: avoid; }}
+            }}
+            .section, .intro, .header, .footer, .section-header-box {{ page-break-inside: avoid; break-inside: avoid; }}
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="header">
-                <img src="{base_url}/assets/logo.png" alt="Goth Prods Logo">
-                <h1>GOTH PRODUCTIONS</h1>
-                <p style="color: #888; margin: 5px 0 0 0; font-size: 13px;">Boletín Oficial de la Horda Metalera</p>
-            </div>
-            {'<div class="intro">' + mensaje_intro + '</div>' if mensaje_intro else ''}
+            <div class="top-banner">⚔️ GOTH PRODUCTIONS &bull; COMUNIDAD BERSERKERS ⚔️</div>
             
-            <!-- RADAR DEL CAOS (BANDAS Y EVENTOS) -->
-            <div class="section">
-                <div class="section-header-box">
-                    <img src="{base_url}/assets/destacados_icon.png" class="section-icon">
-                    <h2 class="section-title">Radar del Caos & El Pit</h2>
-                </div>
-                {''.join([f'<div class="card"><img src="{get_full_img_url(b["imagen"] or b["ultimo_lanzamiento_url"])}" class="card-img"><h3>{b["nombre"]} ({b["pais"] or "Banda"})</h3><p>{(b["texto_resena"] or b["bio_larga"] or "")[:180]}...</p></div>' for b in bandas])}
-                {''.join([f'<div class="card"><img src="{get_full_img_url(e["img_video_path"])}" class="card-img"><h3>{e["nombre_evento"]}</h3><p>📍 {e["ciudad"]}, {e["pais"]} | 📅 {e["fecha_evento"]}</p></div>' for e in eventos])}
+            <div class="header">
+                <img src="{logo_img_url}" alt="Goth Prods Logo">
+                <h1>BOLETÍN MENSUAL BERSERKERS</h1>
+                <div class="badge-month">🔥 EDICIÓN OFICIAL: {month_label.upper()} 🔥</div>
+            </div>
+            
+            <div class="intro">
+                <strong style="color: #fff; font-size: 16px; display: block; margin-bottom: 6px;">¡Saludos, Berserkers! ⚔️</strong>
+                {mensaje_intro if mensaje_intro else default_intro}
             </div>
 
             <!-- EL NOTICIERO NOCTURNO -->
+            {f'''
             <div class="section">
                 <div class="section-header-box">
-                    <img src="{base_url}/assets/noticiero_icon.png" class="section-icon">
+                    <img src="{noticiero_icon_url}" class="section-icon">
                     <h2 class="section-title">El Noticiero Nocturno</h2>
                 </div>
-                {''.join([f'<div class="card"><img src="{get_full_img_url(n["image_filename"])}" class="card-img"><h3>{n["title"]}</h3><p>{(n["short_desc"] or "")[:180]}...</p></div>' for n in noticiero])}
+                {noticiero_cards}
             </div>
+            ''' if noticiero_cards else ''}
 
             <!-- RESEÑAS DE CONCIERTOS -->
+            {f'''
             <div class="section">
                 <div class="section-header-box">
-                    <img src="{base_url}/assets/resenas_icon.png" class="section-icon">
+                    <img src="{resenas_icon_url}" class="section-icon">
                     <h2 class="section-title">Reseñas de Conciertos</h2>
                 </div>
-                {''.join([f'<div class="card"><img src="{get_full_img_url(r["image_filename"])}" class="card-img"><h3>{r["title"]}</h3><p>{(r["short_desc"] or "")[:180]}...</p></div>' for r in reseñas])}
+                {reseñas_cards}
             </div>
+            ''' if reseñas_cards else ''}
+
+            <!-- ENTREVISTAS UNDER -->
+            {f'''
+            <div class="section">
+                <div class="section-header-box">
+                    <img src="{entrevistas_icon_url}" class="section-icon">
+                    <h2 class="section-title">Entrevistas Under</h2>
+                </div>
+                {entrevistas_cards}
+            </div>
+            ''' if entrevistas_cards else ''}
 
             <!-- TOP 10 METAL PULSE -->
+            {f'''
             <div class="section">
                 <div class="section-header-box">
-                    <img src="{base_url}/assets/metal_pulse_icon.jpg" class="section-icon">
-                    <h2 class="section-title">Metal Pulse - Los 10 Favoritos del Mes</h2>
+                    <img src="{metal_pulse_icon_url}" class="section-icon">
+                    <h2 class="section-title">Metal Pulse - Los Favoritos de {month_label}</h2>
                 </div>
-                <div class="track-list">
-                    {''.join([f'<div class="track-item"><div><strong style="color:#fff;">{t["title"]}</strong> <span style="color:#aaa;">- {t["short_desc"]}</span></div><span style="color:#716d4a; font-weight:bold; font-size:12px;">{t["full_desc"]}</span></div>' for t in metalpulse_tracks[:10]])}
+                <div style="margin-bottom: 15px;">
+                    {pulse_items}
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31" style="display: inline-block; padding: 8px 16px; background: #1db954; color: #000; font-weight: bold; font-size: 12px; border-radius: 20px; text-decoration: none; text-transform: uppercase;">
+                        🎧 Escuchar Playlist en Spotify &rarr;
+                    </a>
                 </div>
             </div>
+            ''' if pulse_items else ''}
 
-            <!-- LA GALERÍA NOCTURNA -->
+            <!-- LA GALERÍA NOCTURNA & CAOS SONORO -->
+            {f'''
             <div class="section">
                 <div class="section-header-box">
-                    <img src="{base_url}/assets/galeria_nocturna_icon.jpg" class="section-icon">
+                    <img src="{galeria_icon_url}" class="section-icon">
                     <h2 class="section-title">La Galería Nocturna & Caos Sonoro</h2>
                 </div>
-                {''.join([f'<div class="card"><img src="{get_full_img_url(g["image_filename"])}" class="card-img"><h3>{g["title"]}</h3><p>{(g["short_desc"] or "")[:150]}...</p></div>' for g in galeria])}
+                {galeria_cards}
             </div>
+            ''' if galeria_cards else ''}
 
             <!-- AGENDA METALERA -->
+            {f'''
             <div class="section">
                 <div class="section-header-box">
-                    <img src="{base_url}/assets/agenda_icon.png" class="section-icon">
-                    <h2 class="section-title">Agenda Metalera</h2>
+                    <img src="{agenda_icon_url}" class="section-icon">
+                    <h2 class="section-title">Agenda Metalera ({month_label})</h2>
                 </div>
-                {''.join([f'<div class="card"><h3>{a["title"]}</h3><p>📅 Fecha: {a["author"]}</p><p style="color:#716d4a; font-weight:bold; margin-top:4px;">📍 {a["short_desc"]}</p></div>' for a in agenda])}
+                {agenda_cards}
             </div>
+            ''' if agenda_cards else ''}
 
-            <div style="text-align: center; padding: 25px;">
+            <!-- RADAR DEL CAOS & EL PIT (SI HAY ACTIVOS) -->
+            {f'''
+            <div class="section">
+                <div class="section-header-box">
+                    <img src="{destacados_icon_url}" class="section-icon">
+                    <h2 class="section-title">Radar del Caos & El Pit</h2>
+                </div>
+                {bandas_eventos_cards}
+            </div>
+            ''' if bandas_eventos_cards else ''}
+
+            <div style="text-align: center; padding: 30px 20px; background: #0c0c0c; border-bottom: 1px solid #222;">
                 <a href="https://gothprods.com" class="btn">Visitar GothProds.com &rarr;</a>
             </div>
 
             <div class="footer">
-                <img src="{base_url}/assets/logo.png" style="width: 50px; height: auto; margin-bottom: 10px; opacity: 0.7;">
-                <p>&copy; 2026 Goth Productions. Todos los derechos reservados.</p>
-                <p>Estás recibiendo este correo porque te suscribiste en gothprods.com</p>
+                <img src="{logo_img_url}" style="width: 55px; height: auto; margin-bottom: 12px; opacity: 0.8;">
+                <p style="color: #d4af37; font-weight: bold; margin-bottom: 8px; font-size: 13px; letter-spacing: 1px;">⚔️ ERES PARTE DE LA COMUNIDAD BERSERKERS ⚔️</p>
+                <p style="margin: 4px 0;">&copy; 2026 Goth Productions. Todos los derechos reservados.</p>
+                <p style="margin: 4px 0;">Estás recibiendo este correo oficial porque formas parte de la horda en gothprods.com</p>
             </div>
         </div>
     </body>
@@ -2170,7 +2384,9 @@ def admin_newsletter_preview():
     data = request.get_json() or {}
     asunto = data.get('asunto', 'GothProds Newsletter')
     intro = data.get('intro', '')
-    html = build_newsletter_html(asunto, intro)
+    target_month = data.get('target_month', '2026-07')
+    host_base = request.host_url.rstrip('/') if request.host_url else None
+    html = build_newsletter_html(asunto, intro, target_month=target_month, base_url_override=host_base)
     return html
 
 @app.route('/admin/newsletter/send', methods=['POST'])
@@ -2181,6 +2397,7 @@ def admin_newsletter_send():
 
     asunto = request.form.get('asunto', 'GothProds Newsletter')
     mensaje_intro = request.form.get('mensaje_intro', '')
+    target_month = request.form.get('target_month', '2026-07')
 
     conn = get_db_connection()
     subs = conn.execute("SELECT email, nombre FROM newsletter_subscribers WHERE is_active = 1").fetchall()
@@ -2190,7 +2407,7 @@ def admin_newsletter_send():
         flash('No hay suscriptores activos registrados para enviar el boletín.', 'error')
         return redirect(url_for('admin_dashboard'))
 
-    html_content = build_newsletter_html(asunto, mensaje_intro)
+    html_content = build_newsletter_html(asunto, mensaje_intro, target_month=target_month)
     
     # Simulación/Envío por SMTP configurado
     import os, smtplib
@@ -2258,6 +2475,50 @@ def admin_newsletter_export_csv():
         headers={"Content-Disposition": "attachment;filename=suscriptores_gothprods.csv"}
     )
 
+@app.route('/admin/newsletter/subscriber/add', methods=['POST'])
+def admin_newsletter_subscriber_add():
+    if session.get('role') not in ['admin', 'root']:
+        flash('Acceso denegado', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    nombre = request.form.get('nombre', '').strip()
+    email = request.form.get('email', '').strip().lower()
+
+    if not email or '@' not in email:
+        flash('Por favor ingresa un correo electrónico válido.', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    conn = get_db_connection()
+    try:
+        cur = conn.execute("SELECT id FROM newsletter_subscribers WHERE email = ?", (email,))
+        existing = cur.fetchone()
+        if existing:
+            conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (nombre or 'Berserker', existing['id']))
+            conn.commit()
+            flash(f'Suscriptor {email} reactivado/actualizado exitosamente.', 'success')
+        else:
+            conn.execute("INSERT INTO newsletter_subscribers (nombre, email) VALUES (?, ?)", (nombre or 'Berserker', email))
+            conn.commit()
+            flash(f'Suscriptor {nombre or email} registrado exitosamente.', 'success')
+    except Exception as e:
+        flash(f'Error al registrar suscriptor: {e}', 'error')
+    finally:
+        conn.close()
+
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/newsletter/view', methods=['GET'])
+def admin_newsletter_view():
+    if session.get('role') not in ['admin', 'root']:
+        return redirect(url_for('admin_login'))
+
+    target_month = request.args.get('month', '2026-07')
+    asunto = request.args.get('asunto', f'⚔️ GothProds Newsletter - Resumen Berserkers ({target_month})')
+    intro = request.args.get('intro', '')
+    host_base = request.host_url.rstrip('/') if request.host_url else None
+    html = build_newsletter_html(asunto, intro, target_month=target_month, base_url_override=host_base)
+    return html
+
 @app.route('/admin/newsletter/delete/<int:id>', methods=['POST'])
 def admin_newsletter_delete(id):
     if session.get('role') not in ['admin', 'root']:
@@ -2273,3 +2534,4 @@ def admin_newsletter_delete(id):
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
+
