@@ -2261,23 +2261,23 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
     </div>
     """ for idx, t in enumerate(pulse_tracks[:10])])
 
-    # Agenda Metalera: Solo Bandas (con link directo), Venues y Fecha
+    # Agenda Metalera: Solo Bandas (con link directo), Venues y Fecha (sin emojis)
     agenda_cards = "".join([f"""
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: #0d0d0d; border: 1px solid #716d4a; border-radius: 6px; margin-bottom: 10px;">
         <tr>
             <td style="padding: 12px 16px; vertical-align: middle;">
                 <div style="margin-bottom: 4px;">
                     <a href="https://gothprods.com#agenda" target="_blank" style="color: #ffffff; font-size: 16px; font-weight: bold; text-decoration: underline; text-underline-offset: 3px;">
-                        🎸 {a['title']}
+                        {a['title']}
                     </a>
                 </div>
                 <div style="color: #ffffff; font-size: 13px; line-height: 1.4;">
-                    📍 Venue: <span style="color: #ffffff; font-weight: bold;">{(a['short_desc'] or 'Por confirmar').replace(chr(10), ' - ')}</span>
+                    Venue: <span style="color: #ffffff; font-weight: bold;">{(a['short_desc'] or 'Por confirmar').replace(chr(10), ' - ')}</span>
                 </div>
             </td>
             <td align="right" style="padding: 12px 16px; width: 130px; vertical-align: middle;">
                 <div style="background: #191812; border: 1px solid #716d4a; color: #ffffff; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-align: center; display: inline-block; white-space: nowrap;">
-                    📅 {a['author']}
+                    {a['author']}
                 </div>
             </td>
         </tr>
