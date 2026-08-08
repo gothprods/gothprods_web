@@ -21,6 +21,19 @@ def get_mexico_now_str():
 def get_mexico_today_str():
     """Retorna la fecha actual como YYYY-MM-DD en hora de Mexico."""
     return get_mexico_now().strftime("%Y-%m-%d")
+
+def is_ajax_request(req):
+    """Detecta si la peticion HTTP espera una respuesta JSON (AJAX / fetch / API)."""
+    if not req: return False
+    accept = req.headers.get('Accept', '')
+    x_requested_with = req.headers.get('X-Requested-With', '')
+    return (
+        req.is_json or 
+        'application/json' in accept or 
+        x_requested_with == 'XMLHttpRequest' or
+        req.args.get('format') == 'json'
+    )
+
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -369,6 +382,21 @@ def get_db_connection(live=False):
     except Exception as e:
         print("Schema creation/migration error (comments):", e)
 
+    # Auto-migrate and sanitize performance_analytics
+    try:
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(performance_analytics)")
+        columns = [col[1] for col in cursor.fetchall()]
+        if 'section_times' not in columns:
+            cursor.execute("ALTER TABLE performance_analytics ADD COLUMN section_times TEXT DEFAULT '{}'")
+        # Sanitize inflated historical session times (cap at 300s if distorted)
+        cursor.execute("UPDATE performance_analytics SET time_on_page = 300 WHERE time_on_page > 600")
+        # Normalize Mexico / Unknown to México in Spanish
+        cursor.execute("UPDATE performance_analytics SET country = 'México' WHERE country IN ('Mexico', 'Unknown', 'Detecting', 'Desconocido', '')")
+        conn.commit()
+    except Exception as e_perf:
+        print("Schema migration/cleanup error (performance_analytics):", e_perf)
+
     # Auto-adjust existing UTC timestamps in newsletter_subscribers if they were stored in UTC
     try:
         cursor = conn.cursor()
@@ -406,9 +434,14 @@ def send_goth_email(to_email, subject, html_content, text_content=None, reply_to
     """
     Envio robusto y compatible con RFC/DKIM/SPF para correos de Goth Productions.
     - Adjunta multipart/alternative (text/plain y text/html) para evitar filtros antispam (iCloud, Gmail, Outlook).
-    - Agrega Message-ID, Date, X-Mailer, List-Unsubscribe y Reply-To.
-    - Soporta fallback multinivel: Hostinger SSL (465) -> Hostinger TLS (587) -> Gmail SSL (465) -> Gmail TLS (587).
+    - Agrega Message-ID, Date, X-Mailer, List-Unsubscribe y Reply-To con formato RFC 2822.
+    - Soporta fallback multinivel: Gmail SSL (465) -> Gmail TLS (587) -> Hostinger SSL (465) -> Hostinger TLS (587).
     """
+    to_email = (to_email or '').strip()
+    if not to_email or '@' not in to_email:
+        print(f"[ERROR] Correo de destino invalido: '{to_email}'")
+        return False
+
     if not text_content:
         text_content = f"""¡Bienvenido! Ahora eres un Berserker.
 
@@ -432,7 +465,7 @@ GOTH PRODUCTIONS • MEDIO MEXICANO DE DIVULGACIÓN DEL GÉNERO MÁS FEROZ DEL P
     def _build_mime(from_addr):
         msg = MIMEMultipart('alternative')
         msg['Subject'] = Header(subject, 'utf-8')
-        msg['From'] = f"Goth Productions <{from_addr}>"
+        msg['From'] = email.utils.formataddr(("Goth Productions", from_addr))
         msg['To'] = to_email
         msg['Reply-To'] = reply_to
         msg['Date'] = email.utils.formatdate(localtime=True)
@@ -441,7 +474,7 @@ GOTH PRODUCTIONS • MEDIO MEXICANO DE DIVULGACIÓN DEL GÉNERO MÁS FEROZ DEL P
             msg['Message-ID'] = email.utils.make_msgid(domain=msg_domain)
         else:
             msg['Message-ID'] = email.utils.make_msgid()
-        msg['X-Mailer'] = 'GothProds Mailer/2.0'
+        msg['X-Mailer'] = 'GothProds Mailer/3.0'
         msg['List-Unsubscribe'] = f'<mailto:{reply_to}?subject=Unsubscribe>'
         msg.attach(MIMEText(text_content, 'plain', 'utf-8'))
         msg.attach(MIMEText(html_content, 'html', 'utf-8'))
@@ -462,9 +495,9 @@ GOTH PRODUCTIONS • MEDIO MEXICANO DE DIVULGACIÓN DEL GÉNERO MÁS FEROZ DEL P
         try:
             msg = _build_mime(s_user)
             if is_ssl:
-                server = smtplib.SMTP_SSL(s_host, s_port, timeout=8)
+                server = smtplib.SMTP_SSL(s_host, s_port, timeout=15)
             else:
-                server = smtplib.SMTP(s_host, s_port, timeout=8)
+                server = smtplib.SMTP(s_host, s_port, timeout=15)
                 server.starttls()
             server.login(s_user, s_pass)
             server.sendmail(s_user, [to_email], msg.as_string())
@@ -497,19 +530,48 @@ def send_verification_email(to_email, code, subject="Código de Verificación - 
         print(f"Error sending email: {e}")
         return False
 
-# --- FRONTEND ---
+# --- FRONTEND ANALYTICS ---
+COUNTRY_CODE_MAP = {
+    'MX': 'México', 'US': 'Estados Unidos', 'ES': 'España', 'CO': 'Colombia',
+    'AR': 'Argentina', 'CL': 'Chile', 'PE': 'Perú', 'EC': 'Ecuador',
+    'GT': 'Guatemala', 'CR': 'Costa Rica', 'PA': 'Panamá', 'DE': 'Alemania',
+    'FR': 'Francia', 'GB': 'Reino Unido', 'CA': 'Canadá', 'BR': 'Brasil',
+    'IT': 'Italia', 'SE': 'Suecia', 'NO': 'Noruega', 'FI': 'Finlandia',
+    'UY': 'Uruguay', 'BO': 'Bolivia', 'PY': 'Paraguay', 'VE': 'Venezuela',
+    'SV': 'El Salvador', 'HN': 'Honduras', 'NI': 'Nicaragua', 'DO': 'República Dominicana',
+    'PR': 'Puerto Rico'
+}
+
 @app.route('/api/analytics/init', methods=['POST'])
 def init_analytics():
-    data = request.json
+    data = request.get_json(force=True, silent=True)
+    if not data and request.data:
+        try:
+            import json
+            data = json.loads(request.data.decode('utf-8'))
+        except Exception:
+            data = {}
+    data = data or {}
+
     session_id = data.get('session_id')
     user_id = data.get('user_id')
     page_url = data.get('page_url')
     device_type = data.get('device_type')
-    country = data.get('country', 'Unknown')
+    country = data.get('country', '').strip()
     referrer = data.get('referrer')
     is_new_user = 1 if data.get('is_new_user') else 0
     
-    if not country or country == 'Unknown':
+    # Check headers for Cloudflare / proxy country code
+    cf_country = request.headers.get('CF-IPCountry') or request.headers.get('X-Country-Code') or request.headers.get('X-Appengine-Country')
+    if cf_country and cf_country.upper() in COUNTRY_CODE_MAP:
+        country = COUNTRY_CODE_MAP[cf_country.upper()]
+    elif cf_country and cf_country not in ('XX', 'T1', 'ZZ'):
+        country = cf_country
+
+    if country == 'Mexico':
+        country = 'México'
+
+    if not country or country in ('Unknown', 'Detecting', 'Desconocido', ''):
         client_ip = request.headers.get('CF-Connecting-IP') or \
                     request.headers.get('X-Real-IP') or \
                     request.headers.get('X-Forwarded-For', request.remote_addr)
@@ -519,13 +581,18 @@ def init_analytics():
                 try:
                     import urllib.request, json
                     req = urllib.request.Request(f'http://ip-api.com/json/{client_ip}', headers={'User-Agent': 'Mozilla/5.0'})
-                    with urllib.request.urlopen(req, timeout=2) as response:
+                    with urllib.request.urlopen(req, timeout=1.5) as response:
                         ip_data = json.loads(response.read().decode())
                         if ip_data.get('status') == 'success':
-                            country = ip_data.get('country', 'Unknown')
+                            raw_c = ip_data.get('country', 'México')
+                            country = 'México' if raw_c == 'Mexico' else raw_c
                 except Exception:
-                    pass
-    
+                    country = 'México'
+            else:
+                country = 'México'
+        else:
+            country = 'México'
+
     conn = get_db_connection(live=True)
     cursor = conn.cursor()
     cursor.execute('''
@@ -537,15 +604,27 @@ def init_analytics():
     conn.commit()
     conn.close()
     
-    return jsonify({"success": True, "record_id": record_id})
+    return jsonify({"success": True, "record_id": record_id, "country": country})
 
 @app.route('/api/analytics/update', methods=['POST'])
 def update_analytics():
-    data = request.json or {}
+    data = request.get_json(force=True, silent=True)
+    if not data and request.data:
+        try:
+            import json
+            data = json.loads(request.data.decode('utf-8'))
+        except Exception:
+            data = {}
+    data = data or {}
+
     record_id = data.get('record_id')
-    scroll_depth = data.get('scroll_depth', 0)
-    time_on_page = data.get('time_on_page', 0)
+    scroll_depth = int(data.get('scroll_depth', 0) or 0)
+    time_on_page = int(data.get('time_on_page', 0) or 0)
+    time_on_page = min(max(time_on_page, 0), 600) # Cap at 10 min to avoid corrupted or abandoned tabs
     section_times = data.get('section_times', {})
+    country = data.get('country', '').strip()
+    if country == 'Mexico':
+        country = 'México'
     
     if not record_id:
         return jsonify({"success": False}), 400
@@ -554,19 +633,39 @@ def update_analytics():
     cursor = conn.cursor()
     
     import json
-    section_times_str = json.dumps(section_times)
+    # Filter and cap section times
+    clean_section_times = {}
+    if isinstance(section_times, dict):
+        for sec, t in section_times.items():
+            try:
+                clean_section_times[str(sec)] = min(max(int(t), 0), 600)
+            except Exception:
+                pass
+    section_times_str = json.dumps(clean_section_times)
     
-    # Only update if the new values are greater (e.g., they scrolled further or spent more time)
-    cursor.execute('''
-        UPDATE performance_analytics 
-        SET scroll_depth = MAX(scroll_depth, ?), time_on_page = MAX(time_on_page, ?), section_times = ?
-        WHERE id = ?
-    ''', (scroll_depth, time_on_page, section_times_str, record_id))
+    if country and country not in ('Unknown', 'Detecting', 'Desconocido', ''):
+        cursor.execute('''
+            UPDATE performance_analytics 
+            SET scroll_depth = MIN(MAX(scroll_depth, ?), 100), 
+                time_on_page = MIN(MAX(time_on_page, ?), 600), 
+                section_times = ?,
+                country = CASE WHEN country IN ('Detecting', 'Unknown', 'Desconocido', '', 'Mexico') THEN ? ELSE country END
+            WHERE id = ?
+        ''', (scroll_depth, time_on_page, section_times_str, country, record_id))
+    else:
+        cursor.execute('''
+            UPDATE performance_analytics 
+            SET scroll_depth = MIN(MAX(scroll_depth, ?), 100), 
+                time_on_page = MIN(MAX(time_on_page, ?), 600), 
+                section_times = ?
+            WHERE id = ?
+        ''', (scroll_depth, time_on_page, section_times_str, record_id))
     
     conn.commit()
     conn.close()
     
     return jsonify({"success": True})
+
 @app.route('/api/track_view/<int:item_id>', methods=['POST'])
 def track_view(item_id):
     item_type = request.args.get('type', 'content')
@@ -849,6 +948,9 @@ def index():
 def view_banda(id, slug=None):
     is_preview = request.args.get('preview') == '1'
     conn = get_db_connection(live=not is_preview)
+    if not is_preview:
+        conn.execute("UPDATE banda_semana SET views = COALESCE(views, 0) + 1 WHERE id = ?", (id,))
+        conn.commit()
     banda = conn.execute("SELECT * FROM banda_semana WHERE id = ?", (id,)).fetchone()
     conn.close()
     
@@ -863,6 +965,9 @@ def view_banda(id, slug=None):
 def view_evento(id, slug=None):
     is_preview = request.args.get('preview') == '1'
     conn = get_db_connection(live=not is_preview)
+    if not is_preview:
+        conn.execute("UPDATE eventos_semana SET views = COALESCE(views, 0) + 1 WHERE id = ?", (id,))
+        conn.commit()
     evento = conn.execute("SELECT * FROM eventos_semana WHERE id = ?", (id,)).fetchone()
     conn.close()
     
@@ -891,6 +996,9 @@ def view_mexapedia(id, slug=None):
 def view_articulo(id, slug=None):
     is_preview = request.args.get('preview') == '1'
     conn = get_db_connection(live=not is_preview)
+    if not is_preview:
+        conn.execute("UPDATE content_items SET views = COALESCE(views, 0) + 1 WHERE id = ?", (id,))
+        conn.commit()
     item = conn.execute("SELECT * FROM content_items WHERE id = ?", (id,)).fetchone()
     conn.close()
     
@@ -1137,15 +1245,15 @@ def admin_dashboard():
     perf_start = request.args.get('start', '')
     perf_end = request.args.get('end', '')
     
-    perf_query = "SELECT * FROM performance_analytics WHERE page_url NOT LIKE '%localhost%' AND page_url NOT LIKE '%127.0.0.1%'"
+    perf_query = "SELECT * FROM performance_analytics WHERE page_url NOT LIKE '%/admin%'"
     perf_params = []
     
     if perf_range == '7':
-        perf_query += " AND created_at >= date('now', '-7 days')"
+        perf_query += " AND created_at >= datetime('now', '-7 days')"
     elif perf_range == '30':
-        perf_query += " AND created_at >= date('now', '-30 days')"
+        perf_query += " AND created_at >= datetime('now', '-30 days')"
     elif perf_range == '90':
-        perf_query += " AND created_at >= date('now', '-90 days')"
+        perf_query += " AND created_at >= datetime('now', '-90 days')"
     elif perf_range == 'custom' and perf_start and perf_end:
         perf_query += " AND created_at >= ? AND created_at <= ?"
         perf_params = [perf_start + ' 00:00:00', perf_end + ' 23:59:59']
@@ -1155,35 +1263,42 @@ def admin_dashboard():
     analytics_rows = conn_live.execute(perf_query, perf_params).fetchall()
     
     interactions_query = '''
-    SELECT section, title, views, likes, 
-           (SELECT COUNT(*) FROM comments WHERE item_id = content_items.id AND item_type = 'content') as comments_count
+    SELECT id, section, title, COALESCE(views, 0) as views, COALESCE(likes, 0) as likes, 
+           (SELECT COUNT(*) FROM comments WHERE item_id = content_items.id AND item_type = 'content') as comments_count,
+           created_at, 'content' as item_type
     FROM content_items 
-    WHERE views > 0 OR likes > 0 OR (SELECT COUNT(*) FROM comments WHERE item_id = content_items.id AND item_type = 'content') > 0
     
     UNION ALL
     
-    SELECT 'Banda de la Semana' as section, nombre as title, views, likes,
-           (SELECT COUNT(*) FROM comments WHERE item_id = banda_semana.id AND item_type = 'banda') as comments_count
+    SELECT id, 'Banda de la Semana' as section, nombre as title, COALESCE(views, 0) as views, COALESCE(likes, 0) as likes,
+           (SELECT COUNT(*) FROM comments WHERE item_id = banda_semana.id AND item_type = 'banda') as comments_count,
+           created_at, 'banda' as item_type
     FROM banda_semana
-    WHERE views > 0 OR likes > 0 OR (SELECT COUNT(*) FROM comments WHERE item_id = banda_semana.id AND item_type = 'banda') > 0
     
     UNION ALL
     
-    SELECT 'Agenda Metalera' as section, titulo_articulo as title, views, likes,
-           (SELECT COUNT(*) FROM comments WHERE item_id = eventos_semana.id AND item_type = 'evento') as comments_count
+    SELECT id, 'Agenda Metalera' as section, titulo_articulo as title, COALESCE(views, 0) as views, COALESCE(likes, 0) as likes,
+           (SELECT COUNT(*) FROM comments WHERE item_id = eventos_semana.id AND item_type = 'evento') as comments_count,
+           created_at, 'evento' as item_type
     FROM eventos_semana
-    WHERE views > 0 OR likes > 0 OR (SELECT COUNT(*) FROM comments WHERE item_id = eventos_semana.id AND item_type = 'evento') > 0
     
-    ORDER BY views DESC, likes DESC
+    UNION ALL
+    
+    SELECT id, 'Colectivo Mexapedia' as section, titulo as title, 0 as views, 0 as likes,
+           0 as comments_count,
+           created_at, 'mexapedia' as item_type
+    FROM colectivo_mexapedia
+    
+    ORDER BY id DESC, created_at DESC
     '''
-    interactions_rows = conn_live.execute(interactions_query).fetchall()
+    interactions_rows = conn.execute(interactions_query).fetchall()
     
     conn_live.close()
     
     analytics_data = [dict(row) for row in analytics_rows]
     interactions_data = [dict(row) for row in interactions_rows]
-    # Cargar suscriptores de Newsletter
-    suscriptores = conn.execute("SELECT * FROM newsletter_subscribers WHERE is_active = 1 ORDER BY id DESC").fetchall()
+    # Cargar suscriptores de Newsletter (todos, ordenados por los mas recientes)
+    suscriptores = conn.execute("SELECT * FROM newsletter_subscribers ORDER BY id DESC").fetchall()
 
     conn.close()
 
@@ -2255,7 +2370,7 @@ def subscribe_newsletter():
             active_name = existing['nombre'] if existing['nombre'] and existing['nombre'] != 'Berserker' else (nombre or 'Berserker')
             if existing['is_active'] == 1:
                 conn.close()
-                send_newsletter_welcome_email(email, active_name)
+                threading.Thread(target=send_newsletter_welcome_email, args=(email, active_name), daemon=True).start()
                 nombre_text = f", {active_name}" if active_name and active_name != 'Berserker' else ""
                 return jsonify({
                     'success': True,
@@ -2266,7 +2381,7 @@ def subscribe_newsletter():
                 conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (active_name, existing['id']))
                 conn.commit()
                 conn.close()
-                send_newsletter_welcome_email(email, active_name)
+                threading.Thread(target=send_newsletter_welcome_email, args=(email, active_name), daemon=True).start()
                 return jsonify({
                     'success': True,
                     'is_existing': False,
@@ -2277,7 +2392,7 @@ def subscribe_newsletter():
         conn.commit()
         conn.close()
         
-        send_newsletter_welcome_email(email, nombre or 'Berserker')
+        threading.Thread(target=send_newsletter_welcome_email, args=(email, nombre or 'Berserker'), daemon=True).start()
 
         nombre_saludo = f", {nombre}" if nombre else ""
         return jsonify({
@@ -2927,15 +3042,25 @@ def admin_newsletter_export_csv():
 @app.route('/admin/newsletter/subscriber/add', methods=['POST'])
 def admin_newsletter_subscriber_add():
     if session.get('role') not in ['admin', 'root']:
+        if is_ajax_request(request):
+            return jsonify({'status': 'error', 'message': 'Acceso denegado'}), 403
         flash('Acceso denegado', 'error')
         return redirect(url_for('admin_dashboard'))
 
-    nombre = request.form.get('nombre', '').strip()
-    email = request.form.get('email', '').strip().lower()
+    if request.is_json:
+        data = request.get_json() or {}
+        nombre = data.get('nombre', '').strip()
+        email = data.get('email', '').strip().lower()
+    else:
+        nombre = request.form.get('nombre', '').strip()
+        email = request.form.get('email', '').strip().lower()
 
     if not email or '@' not in email:
-        flash('Por favor ingresa un correo electrónico válido.', 'error')
-        return redirect(url_for('admin_dashboard'))
+        msg = 'Por favor ingresa un correo electrónico válido.'
+        if is_ajax_request(request):
+            return jsonify({'status': 'error', 'message': msg}), 400
+        flash(msg, 'error')
+        return redirect(url_for('admin_dashboard') + '#tab-newsletter')
 
     conn = get_db_connection()
     try:
@@ -2944,19 +3069,99 @@ def admin_newsletter_subscriber_add():
         if existing:
             conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (nombre or 'Berserker', existing['id']))
             conn.commit()
-            flash(f'Suscriptor {email} reactivado/actualizado exitosamente.', 'success')
+            sub_id = existing['id']
+            msg = f'Suscriptor {email} reactivado/actualizado exitosamente.'
         else:
-            conn.execute("INSERT INTO newsletter_subscribers (nombre, email, created_at) VALUES (?, ?, ?)", (nombre or 'Berserker', email, get_mexico_now_str()))
+            cur = conn.execute("INSERT INTO newsletter_subscribers (nombre, email, created_at) VALUES (?, ?, ?)", (nombre or 'Berserker', email, get_mexico_now_str()))
             conn.commit()
-            flash(f'Suscriptor {nombre or email} registrado exitosamente.', 'success')
+            sub_id = cur.lastrowid
+            msg = f'Suscriptor {nombre or email} registrado exitosamente.'
         
-        send_newsletter_welcome_email(email, nombre or 'Berserker')
+        threading.Thread(target=send_newsletter_welcome_email, args=(email, nombre or 'Berserker'), daemon=True).start()
+
+        if is_ajax_request(request):
+            return jsonify({
+                'status': 'success',
+                'message': msg,
+                'subscriber': {
+                    'id': sub_id,
+                    'nombre': nombre or 'Berserker',
+                    'email': email,
+                    'is_active': 1,
+                    'created_at': get_mexico_now_str()[:10]
+                }
+            })
+        flash(msg, 'success')
     except Exception as e:
-        flash(f'Error al registrar suscriptor: {e}', 'error')
+        msg = f'Error al registrar suscriptor: {e}'
+        if is_ajax_request(request):
+            return jsonify({'status': 'error', 'message': msg}), 500
+        flash(msg, 'error')
     finally:
         conn.close()
 
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('admin_dashboard') + '#tab-newsletter')
+
+@app.route('/admin/newsletter/subscriber/edit/<int:id>', methods=['POST'])
+def admin_newsletter_subscriber_edit(id):
+    if session.get('role') not in ['admin', 'root']:
+        if is_ajax_request(request):
+            return jsonify({'status': 'error', 'message': 'Acceso denegado'}), 403
+        flash('Acceso denegado', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    if request.is_json:
+        data = request.get_json() or {}
+        nombre = data.get('nombre', '').strip()
+        email = data.get('email', '').strip().lower()
+        is_active = 1 if data.get('is_active', 1) in [1, '1', True, 'true', 'on'] else 0
+    else:
+        nombre = request.form.get('nombre', '').strip()
+        email = request.form.get('email', '').strip().lower()
+        is_active = 1 if request.form.get('is_active') in ['1', 'on', 'true', True] else 0
+
+    if not email or '@' not in email:
+        msg = 'Por favor ingresa un correo electrónico válido.'
+        if is_ajax_request(request):
+            return jsonify({'status': 'error', 'message': msg}), 400
+        flash(msg, 'error')
+        return redirect(url_for('admin_dashboard') + '#tab-newsletter')
+
+    conn = get_db_connection()
+    try:
+        # Check if email is already taken by another subscriber
+        existing = conn.execute("SELECT id FROM newsletter_subscribers WHERE email = ? AND id != ?", (email, id)).fetchone()
+        if existing:
+            msg = 'Este correo electrónico ya está registrado en otro suscriptor.'
+            if is_ajax_request(request):
+                return jsonify({'status': 'error', 'message': msg}), 400
+            flash(msg, 'error')
+            return redirect(url_for('admin_dashboard') + '#tab-newsletter')
+
+        conn.execute("UPDATE newsletter_subscribers SET nombre = ?, email = ?, is_active = ? WHERE id = ?", (nombre or 'Berserker', email, is_active, id))
+        conn.commit()
+        msg = f'Suscriptor {email} actualizado exitosamente.'
+        if is_ajax_request(request):
+            return jsonify({
+                'status': 'success',
+                'message': msg,
+                'subscriber': {
+                    'id': id,
+                    'nombre': nombre or 'Berserker',
+                    'email': email,
+                    'is_active': is_active
+                }
+            })
+        flash(msg, 'success')
+    except Exception as e:
+        msg = f'Error al actualizar suscriptor: {e}'
+        if is_ajax_request(request):
+            return jsonify({'status': 'error', 'message': msg}), 500
+        flash(msg, 'error')
+    finally:
+        conn.close()
+
+    return redirect(url_for('admin_dashboard') + '#tab-newsletter')
 
 @app.route('/admin/newsletter/view', methods=['GET'])
 def admin_newsletter_view():
@@ -2967,10 +3172,14 @@ def admin_newsletter_view():
     asunto = request.args.get('asunto', f'⚔️ GothProds Newsletter - Resumen Berserkers ({target_month})')
     intro = request.args.get('intro', '')
     host_base = request.host_url.rstrip('/') if request.host_url else None
+    
+    html_content = build_newsletter_html(asunto, intro, target_month=target_month, live=False, base_url_override=host_base)
+    return html_content
+
 @app.route('/admin/newsletter/resend_welcome/<int:id>', methods=['POST'])
 def admin_newsletter_resend_welcome(id):
     if session.get('role') not in ['admin', 'root']:
-        if request.is_json or request.headers.get('Accept') == 'application/json':
+        if is_ajax_request(request):
             return jsonify({'status': 'error', 'message': 'Acceso denegado'}), 403
         flash('Acceso denegado', 'error')
         return redirect(url_for('admin_dashboard'))
@@ -2980,7 +3189,7 @@ def admin_newsletter_resend_welcome(id):
     conn.close()
 
     if not sub:
-        if request.is_json or request.headers.get('Accept') == 'application/json':
+        if is_ajax_request(request):
             return jsonify({'status': 'error', 'message': 'Suscriptor no encontrado.'}), 404
         flash('Suscriptor no encontrado.', 'error')
         return redirect(url_for('admin_dashboard'))
@@ -2988,21 +3197,21 @@ def admin_newsletter_resend_welcome(id):
     success = send_newsletter_welcome_email(sub['email'], sub['nombre'] or 'Berserker')
     if success:
         msg = f"⚔️ Correo oficial de bienvenida reenviado exitosamente a {sub['email']}."
-        if request.is_json or request.headers.get('Accept') == 'application/json':
+        if is_ajax_request(request):
             return jsonify({'status': 'success', 'message': msg})
         flash(msg, 'success')
     else:
         msg = f"No se pudo entregar el correo de bienvenida a {sub['email']}. Revisa la configuración SMTP."
-        if request.is_json or request.headers.get('Accept') == 'application/json':
-            return jsonify({'status': 'error', 'message': msg})
+        if is_ajax_request(request):
+            return jsonify({'status': 'error', 'message': msg}), 500
         flash(msg, 'error')
 
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('admin_dashboard') + '#tab-newsletter')
 
 @app.route('/admin/newsletter/delete/<int:id>', methods=['POST'])
 def admin_newsletter_delete(id):
     if session.get('role') not in ['admin', 'root']:
-        if request.is_json or request.headers.get('Accept') == 'application/json':
+        if is_ajax_request(request):
             return jsonify({'status': 'error', 'message': 'Acceso denegado'}), 403
         flash('Acceso denegado', 'error')
         return redirect(url_for('admin_dashboard'))
@@ -3012,16 +3221,16 @@ def admin_newsletter_delete(id):
     conn.commit()
     conn.close()
     
-    if request.is_json or request.headers.get('Accept') == 'application/json':
+    if is_ajax_request(request):
         return jsonify({'status': 'success', 'message': 'Suscriptor eliminado correctamente.', 'deleted_id': id})
 
     flash('Suscriptor eliminado correctamente.', 'success')
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('admin_dashboard') + '#tab-newsletter')
 
 @app.route('/admin/newsletter/delete_bulk', methods=['POST'])
 def admin_newsletter_delete_bulk():
     if session.get('role') not in ['admin', 'root']:
-        if request.is_json or request.headers.get('Accept') == 'application/json':
+        if is_ajax_request(request):
             return jsonify({'status': 'error', 'message': 'Acceso denegado'}), 403
         flash('Acceso denegado', 'error')
         return redirect(url_for('admin_dashboard'))
@@ -3038,10 +3247,10 @@ def admin_newsletter_delete_bulk():
     clean_ids = [int(i) for i in ids if str(i).isdigit()]
     if not clean_ids:
         msg = 'No se seleccionó ningún suscriptor para eliminar.'
-        if request.is_json or request.headers.get('Accept') == 'application/json':
+        if is_ajax_request(request):
             return jsonify({'status': 'error', 'message': msg}), 400
         flash(msg, 'error')
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin_dashboard') + '#tab-newsletter')
 
     conn = get_db_connection()
     placeholders = ','.join(['?'] * len(clean_ids))
@@ -3050,11 +3259,41 @@ def admin_newsletter_delete_bulk():
     conn.close()
 
     msg = f'Se eliminaron {len(clean_ids)} suscriptor(es) correctamente.'
-    if request.is_json or request.headers.get('Accept') == 'application/json':
+    if is_ajax_request(request):
         return jsonify({'status': 'success', 'message': msg, 'deleted_count': len(clean_ids), 'deleted_ids': clean_ids})
 
     flash(msg, 'success')
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('admin_dashboard') + '#tab-newsletter')
+
+@app.route('/admin/newsletter/test_smtp', methods=['POST'])
+def admin_newsletter_test_smtp():
+    if session.get('role') not in ['admin', 'root']:
+        return jsonify({'status': 'error', 'message': 'Acceso denegado'}), 403
+
+    data = request.get_json(silent=True) or {}
+    test_email = (data.get('test_email') or session.get('user_email') or 'goth.prods@gmail.com').strip()
+    
+    if not test_email or '@' not in test_email:
+        return jsonify({'status': 'error', 'message': 'Ingresa un correo destino válido para la prueba.'}), 400
+
+    subject = "🧪 [DIAGNÓSTICO] Prueba de Conexión SMTP - Goth Productions"
+    html_content = f"""
+    <div style="background:#0a0a0a; color:#f0f0f0; padding:25px; font-family:Arial,sans-serif; border:1px solid #cca85b; border-radius:8px;">
+        <h2 style="color:#cca85b; margin-top:0;">⚡ Diagnóstico de Conexión SMTP Exitoso</h2>
+        <p>Este correo confirma que el servidor de correo de <strong>Goth Productions</strong> está transmitiendo correctamente.</p>
+        <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
+        <p style="font-size:0.9rem; color:#aaa;"><strong>Servidor:</strong> smtp.gmail.com:465 / 587<br><strong>Fecha (CDMX):</strong> {get_mexico_now_str()}<br><strong>Destinatario:</strong> {test_email}</p>
+        <p style="margin-top:20px; font-size:0.8rem; color:#888;">GOTH PRODUCTIONS • SISTEMA AUTOMATIZADO</p>
+    </div>
+    """
+    text_content = f"Prueba SMTP Goth Productions exitosa para {test_email} a las {get_mexico_now_str()}."
+
+    success = send_goth_email(test_email, subject, html_content, text_content)
+    if success:
+        return jsonify({'status': 'success', 'message': f'¡Prueba exitosa! Correo de diagnóstico entregado correctamente a {test_email}.'})
+    else:
+        return jsonify({'status': 'error', 'message': f'Falló el envío de prueba hacia {test_email}. Revisa las credenciales SMTP.'}), 500
+
 
 @app.route('/api/sync/subscribers', methods=['GET', 'POST'])
 def api_sync_subscribers():

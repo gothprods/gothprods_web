@@ -1,4 +1,4 @@
-// analytics.js
+// gp_metrics.js - Goth Productions Analytics v6.0
 (function() {
     // Generate UUID
     function generateUUID() {
@@ -9,8 +9,8 @@
     }
 
     // Get or Create User ID (Persistent)
-    let userId = localStorage.getItem('gp_user_id');
-    let isNewUser = false;
+    var userId = localStorage.getItem('gp_user_id');
+    var isNewUser = false;
     if (!userId) {
         userId = generateUUID();
         localStorage.setItem('gp_user_id', userId);
@@ -18,43 +18,71 @@
     }
 
     // Get or Create Session ID (Session length)
-    let sessionId = sessionStorage.getItem('gp_session_id');
+    var sessionId = sessionStorage.getItem('gp_session_id');
     if (!sessionId) {
         sessionId = generateUUID();
         sessionStorage.setItem('gp_session_id', sessionId);
     }
 
     // Detect Device Type
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const deviceType = isMobile ? 'mobile' : 'desktop';
+    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    var deviceType = isMobile ? 'mobile' : 'desktop';
 
     // Get Referrer
-    const referrer = document.referrer;
+    var referrer = document.referrer || '';
 
     // Analytics State
-    let recordId = null;
-    let maxScrollDepth = 0;
-    let startTime = Date.now();
-    let timeOnPage = 0;
+    var recordId = null;
+    var maxScrollDepth = 0;
+    var activeSeconds = 0;
+    var lastActivityTime = Date.now();
+    var MAX_ALLOWED_SECONDS = 600; // Cap at 10 minutes to prevent background/idle tab inflation
     
     // Section Time Tracking
-    let sectionTimes = {};
-    let currentVisibleSections = new Set();
-    
+    var sectionTimes = {};
+    var currentVisibleSections = new Set();
+
+    // Determine default fallback section based on URL path if no DOM sections trigger
+    var path = window.location.pathname.toLowerCase();
+    var defaultSection = null;
+    if (path.indexOf('/articulo/') !== -1) {
+        defaultSection = 'articulo-lectura';
+    } else if (path.indexOf('/banda/') !== -1) {
+        defaultSection = 'banda-semana';
+    } else if (path.indexOf('/evento/') !== -1) {
+        defaultSection = 'agenda';
+    } else if (path.indexOf('/mexapedia/') !== -1) {
+        defaultSection = 'mexapedia';
+    }
+
+    // Track user interaction to detect active engagement
+    function recordActivity() {
+        lastActivityTime = Date.now();
+    }
+
+    ['mousemove', 'keydown', 'touchstart', 'scroll', 'click'].forEach(function(evt) {
+        window.addEventListener(evt, recordActivity, { passive: true });
+    });
+
+    // IntersectionObserver for Section Time / Heatmap
     if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    currentVisibleSections.add(entry.target.id);
-                } else {
-                    currentVisibleSections.delete(entry.target.id);
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                var secId = entry.target.id || entry.target.getAttribute('data-metric-section');
+                if (secId) {
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.05) {
+                        currentVisibleSections.add(secId);
+                    } else {
+                        currentVisibleSections.delete(secId);
+                    }
                 }
             });
-        }, { threshold: 0.3 });
+        }, { threshold: [0.05, 0.2] });
         
         function observeSections() {
-            document.querySelectorAll('section').forEach(sec => {
-                if (sec.id) observer.observe(sec);
+            var sections = document.querySelectorAll('section[id], header[id], div[id^="section-"], article[id], main[id], [data-metric-section]');
+            sections.forEach(function(sec) {
+                observer.observe(sec);
             });
         }
         
@@ -65,43 +93,53 @@
         }
     }
 
-    setInterval(() => {
+    // 1-second active timer tick
+    setInterval(function() {
         if (document.visibilityState !== 'hidden') {
-            currentVisibleSections.forEach(id => {
-                sectionTimes[id] = (sectionTimes[id] || 0) + 1;
-            });
+            // Only count if active within last 30 seconds (prevents background/idle tab inflation)
+            if (Date.now() - lastActivityTime < 30000 && activeSeconds < MAX_ALLOWED_SECONDS) {
+                activeSeconds++;
+                if (currentVisibleSections.size > 0) {
+                    currentVisibleSections.forEach(function(id) {
+                        sectionTimes[id] = Math.min((sectionTimes[id] || 0) + 1, MAX_ALLOWED_SECONDS);
+                    });
+                } else if (defaultSection) {
+                    sectionTimes[defaultSection] = Math.min((sectionTimes[defaultSection] || 0) + 1, MAX_ALLOWED_SECONDS);
+                }
+            }
         }
     }, 1000);
 
-    // Track scroll
-    window.addEventListener('scroll', () => {
-        // Calculate scroll percentage
-        let h = document.documentElement, 
+    // Track scroll depth
+    function checkScroll() {
+        var h = document.documentElement, 
             b = document.body,
             st = 'scrollTop',
             sh = 'scrollHeight';
-        let percent = Math.round((h[st]||b[st]) / ((h[sh]||b[sh]) - h.clientHeight) * 100);
-        
-        if (percent >= 25 && maxScrollDepth < 25) maxScrollDepth = 25;
-        if (percent >= 50 && maxScrollDepth < 50) maxScrollDepth = 50;
-        if (percent >= 75 && maxScrollDepth < 75) maxScrollDepth = 75;
-        if (percent >= 90 && maxScrollDepth < 100) maxScrollDepth = 100;
-    });
+        var scrollHeight = (h[sh] || b[sh]) - h.clientHeight;
+        if (scrollHeight > 0) {
+            var percent = Math.round(((h[st] || b[st]) / scrollHeight) * 100);
+            if (percent >= 25 && maxScrollDepth < 25) maxScrollDepth = 25;
+            if (percent >= 50 && maxScrollDepth < 50) maxScrollDepth = 50;
+            if (percent >= 75 && maxScrollDepth < 75) maxScrollDepth = 75;
+            if (percent >= 90 && maxScrollDepth < 100) maxScrollDepth = 100;
+        }
+    }
+    window.addEventListener('scroll', checkScroll, { passive: true });
 
     // Send payload function
-    function sendUpdate(isFinal = false) {
+    function sendUpdate(isFinal) {
         if (!recordId) return;
-        timeOnPage = Math.round((Date.now() - startTime) / 1000);
         
-        const payload = JSON.stringify({
+        var payload = JSON.stringify({
             record_id: recordId,
-            scroll_depth: maxScrollDepth,
-            time_on_page: timeOnPage,
+            scroll_depth: Math.min(maxScrollDepth, 100),
+            time_on_page: Math.min(activeSeconds, MAX_ALLOWED_SECONDS),
             section_times: sectionTimes
         });
 
         if (isFinal && navigator.sendBeacon) {
-            const blob = new Blob([payload], { type: 'application/json' });
+            var blob = new Blob([payload], { type: 'application/json' });
             navigator.sendBeacon('/api/analytics/update', blob);
         } else {
             fetch('/api/analytics/update', {
@@ -109,12 +147,12 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: payload,
                 keepalive: true
-            }).catch(e => console.error(e));
+            }).catch(function(e) {});
         }
     }
 
-    // Initialize analytics
-    function initAnalytics(country = "Unknown") {
+    // Initialize analytics immediately
+    function initAnalytics(clientCountry) {
         fetch('/api/analytics/init', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -123,55 +161,63 @@
                 user_id: userId,
                 page_url: window.location.href,
                 device_type: deviceType,
-                country: country,
+                country: clientCountry || "Detecting",
                 referrer: referrer,
                 is_new_user: isNewUser
             })
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data && data.success) {
                 recordId = data.record_id;
+                // If we already accumulated initial seconds, send an update
+                if (activeSeconds > 0) {
+                    sendUpdate(false);
+                }
             }
         })
-        .catch(err => console.error("Analytics Init Error:", err));
+        .catch(function(err) {});
     }
 
-    // Fetch country and init
-    fetch('https://get.geojs.io/v1/ip/geo.json')
-        .then(res => res.json())
-        .then(data => {
-            if (data.country) {
-                initAnalytics(data.country);
-            } else {
-                throw new Error("No country");
-            }
-        })
-        .catch(() => {
-            // Fallback to ipapi
-            fetch('https://ipapi.co/json/')
-                .then(res => res.json())
-                .then(data => {
-                    initAnalytics(data.country_name || "Unknown");
-                })
-                .catch(() => {
-                    initAnalytics("Unknown");
-                });
-        });
+    // Call init immediately without waiting for external geo APIs
+    initAnalytics("Detecting");
 
-    // Periodically update (every 15 seconds)
-    setInterval(() => {
+    // Asynchronously try to get client-side country as supplemental hint (non-blocking)
+    try {
+        fetch('https://get.geojs.io/v1/ip/geo.json', { cache: 'force-cache' })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data && data.country && recordId) {
+                    var cName = data.country;
+                    if (cName === 'Mexico') cName = 'México';
+                    fetch('/api/analytics/update', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ record_id: recordId, country: cName }),
+                        keepalive: true
+                    }).catch(function() {});
+                }
+            })
+            .catch(function() {});
+    } catch(e) {}
+
+    // Periodically update (every 8 seconds)
+    setInterval(function() {
         sendUpdate(false);
-    }, 15000);
+    }, 8000);
 
-    // Update on page unload/hide
-    document.addEventListener('visibilitychange', () => {
+    // Update on page unload/visibility change
+    document.addEventListener('visibilitychange', function() {
         if (document.visibilityState === 'hidden') {
             sendUpdate(true);
         }
     });
 
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener('pagehide', function() {
+        sendUpdate(true);
+    });
+
+    window.addEventListener('beforeunload', function() {
         sendUpdate(true);
     });
 

@@ -86,7 +86,7 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <main style="padding-top: 100px; min-height: 100vh; background: #000;">
+    <main id="articulo-contenido" data-metric-section="{% if 'Noticiero' in item.section %}news{% elif 'Reseña' in item.section %}reviews{% elif 'Entrevistas' in item.section %}under-interviews{% elif 'Tracks' in item.section or 'Pulse' in item.section %}metal-pulse{% else %}news{% endif %}" style="padding-top: 100px; min-height: 100vh; background: #000;">
         <div style="max-width: 800px; margin: 0 auto; background: #111; position: relative; padding: 40px; border: 1px solid var(--accent-color); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
             
             {% if is_preview %}<a href="/admin/dashboard?edit_type=content&edit_id={{ item.id }}" target="_parent" class="preview-edit-btn" style="top: 20px; right: 20px;"><i class="fa-solid fa-pen"></i> Corregir Artículo en Panel</a>{% endif %}
@@ -183,7 +183,7 @@
     });
     observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
     </script>
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script src="/gp_metrics.js?v=5"></script>
     <script src="/app.js"></script>
 </body>
 </html>

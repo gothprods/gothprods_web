@@ -141,15 +141,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Check URL for direct link to an item
+    // Check URL or Hash for direct link to an item
     const urlParams = new URLSearchParams(window.location.search);
-    const directItemId = urlParams.get('item');
+    let directItemId = urlParams.get('item');
+    let directType = urlParams.get('type') || 'content';
+    
+    if (!directItemId && window.location.hash.startsWith('#article-')) {
+        directItemId = window.location.hash.replace('#article-', '');
+    }
+
     if (directItemId) {
-        const directModal = document.getElementById('dynNewsModal' + directItemId);
+        let directModal = document.getElementById('dynNewsModal' + directItemId);
+        if (!directModal && directType === 'banda') directModal = document.getElementById('banda-modal-' + directItemId);
+        if (!directModal && directType === 'evento') directModal = document.getElementById('evento-modal-' + directItemId);
+        if (!directModal && directType === 'mexapedia') directModal = document.getElementById('mexapedia-modal-' + directItemId);
+        
         if (directModal) {
             directModal.classList.add('show');
             document.body.style.overflow = 'hidden';
-            loadComments(directItemId);
+            loadComments(directItemId, directType);
+            fetch('/api/track_view/' + directItemId + '?type=' + directType, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.success) {
+                        document.querySelectorAll('.view-count-' + directItemId + '[data-type="' + directType + '"]').forEach(el => {
+                            el.innerText = data.views;
+                        });
+                    }
+                })
+                .catch(err => console.error('Error tracking view:', err));
         }
     }
 
