@@ -843,60 +843,60 @@ input:checked + .slider:before { transform: translateX(20px); }
             </div>
 
             <!-- PASO 3: GESTIÓN DE SUSCRIPTORES BERSERKERS -->
-            <div style="background: #121212; border: 1px solid #242424; border-radius: 12px; padding: 22px 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.25);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+            <div style="background: #121212; border: 1px solid #242424; border-radius: 8px; padding: 18px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.25);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="background: rgba(255, 255, 255, 0.08); color: #bbb; border: 1px solid #383838; font-size: 0.72rem; font-weight: 800; padding: 3px 9px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Paso 3</span>
-                        <h3 style="margin: 0; color: #fff; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: rgba(255, 255, 255, 0.08); color: #bbb; border: 1px solid #383838; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Paso 3</span>
+                        <h3 style="margin: 0; color: #fff; font-size: 1.05rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
                             <i class="fa-solid fa-users" style="color: var(--accent-color);"></i> Lista de Suscriptores Berserkers (<span id="subs-total-count">{{ suscriptores|length if suscriptores else 0 }}</span>)
                         </h3>
                     </div>
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <div id="bulk-actions-bar" style="display: none; align-items: center; gap: 8px;">
-                            <span id="bulk-selected-label" style="font-size: 0.82rem; color: #aaa; font-weight: 600;">0 seleccionados</span>
-                            <button type="button" onclick="deleteSelectedSubscribers()" id="btn-bulk-delete" style="padding: 7px 14px; background: #d92525; color: #fff; border: none; border-radius: 6px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(217,37,37,0.35);">
-                                <i class="fa-solid fa-trash-can"></i> Eliminar Seleccionados (<span id="bulk-count">0</span>)
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <div id="bulk-actions-bar" style="display: none; align-items: center; gap: 6px;">
+                            <span id="bulk-selected-label" style="font-size: 0.8rem; color: var(--accent-color); font-weight: 600; background: #222; padding: 4px 8px; border-radius: 4px; border: 1px solid #444; white-space: nowrap;">0 seleccionados</span>
+                            <button type="button" onclick="deleteSelectedSubscribers()" id="btn-bulk-delete" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: #ff3b3b; color: #fff; border: none; border-radius: 4px; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto; margin: 0; line-height: 1.2; white-space: nowrap;">
+                                <i class="fa-solid fa-trash"></i> Eliminar seleccionados (<span id="bulk-count">0</span>)
                             </button>
-                            <button type="button" onclick="deselectAllSubscribers()" style="padding: 7px 12px; background: #222; color: #ccc; border: 1px solid #383838; border-radius: 6px; font-size: 0.8rem; cursor: pointer;">
-                                Cancelar
+                            <button type="button" onclick="deselectAllSubscribers()" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: #333; color: #fff; border: none; border-radius: 4px; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto; margin: 0; line-height: 1.2; white-space: nowrap;">
+                                <i class="fa-solid fa-xmark"></i> Cancelar
                             </button>
                         </div>
-                        <a href="/admin/newsletter/export_csv" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px 14px; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 6px; font-size: 0.84rem; font-weight: 600; transition: all 0.2s;">
+                        <a href="/admin/newsletter/export_csv" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; padding: 5px 10px; background: #222; border: 1px solid #444; color: #ddd; border-radius: 4px; font-size: 0.8rem; font-weight: 500; text-transform: none; margin: 0; line-height: 1.2; white-space: nowrap;">
                             <i class="fa-solid fa-file-csv" style="color: var(--accent-color);"></i> Exportar CSV
                         </a>
                     </div>
                 </div>
 
-                <div style="overflow-x: auto; border: 1px solid #222; border-radius: 8px;">
-                    <table id="table-subscribers" style="width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left;">
+                <div style="overflow-x: auto;">
+                    <table id="table-subscribers" style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
                         <thead>
-                            <tr style="border-bottom: 1px solid #282828; background: #181818;">
-                                <th style="padding: 12px; width: 40px; text-align: center;">
-                                    <input type="checkbox" id="selectAllSubs" onchange="toggleSelectAllSubscribers(this)" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--accent-color);">
+                            <tr style="border-bottom: 1px solid #444;">
+                                <th style="padding: 10px 8px; width: 35px; text-align: center;">
+                                    <input type="checkbox" id="selectAllSubs" onchange="toggleSelectAllSubscribers(this)" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--accent-color); margin: 0;">
                                 </th>
-                                <th style="padding: 12px; width: 70px;">ID</th>
-                                <th style="padding: 12px;">Nombre / Berserker</th>
-                                <th style="padding: 12px;">Correo Electrónico</th>
-                                <th style="padding: 12px;">Fecha Registro</th>
-                                <th style="padding: 12px; text-align: right;">Acciones</th>
+                                <th style="padding: 10px 8px; width: 55px;">ID</th>
+                                <th style="padding: 10px 8px;">Nombre / Berserker</th>
+                                <th style="padding: 10px 8px;">Correo Electrónico</th>
+                                <th style="padding: 10px 8px; width: 110px;">Fecha Registro</th>
+                                <th style="padding: 10px 8px; text-align: right; width: 170px;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="subscribers-tbody">
                             {% if suscriptores %}
                             {% for sub in suscriptores %}
-                            <tr id="sub-row-{{ sub.id }}" style="border-bottom: 1px solid #292929; transition: background 0.15s;">
-                                <td style="padding: 12px; text-align: center;">
-                                    <input type="checkbox" class="sub-checkbox" value="{{ sub.id }}" onchange="handleSubCheckboxChange()" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--accent-color);">
+                            <tr id="sub-row-{{ sub.id }}" style="border-bottom: 1px solid #333;">
+                                <td style="padding: 8px; text-align: center;">
+                                    <input type="checkbox" class="sub-checkbox" value="{{ sub.id }}" onchange="handleSubCheckboxChange()" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--accent-color); margin: 0;">
                                 </td>
-                                <td style="padding: 12px; color: #888;">#{{ sub.id }}</td>
-                                <td style="padding: 12px; color: #fff;"><strong>{{ sub.nombre or 'Berserker' }}</strong></td>
-                                <td style="padding: 12px; color: var(--accent-color); font-weight: 500;">{{ sub.email }}</td>
-                                <td style="padding: 12px; color: #aaa;">{{ sub.created_at[:10] if sub.created_at else '' }}</td>
-                                <td style="padding: 12px; text-align: right; white-space: nowrap;">
-                                    <button type="button" onclick="resendWelcomeEmail({{ sub.id }}, '{{ sub.email }}', this)" title="Reenviar correo oficial de bienvenida" style="padding: 6px 10px; background: rgba(212, 175, 55, 0.12); color: #d4af37; border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; margin-right: 6px; transition: all 0.2s;">
-                                        <i class="fa-solid fa-paper-plane"></i> Reenviar Bienvenida
+                                <td style="padding: 8px; color: #888;">#{{ sub.id }}</td>
+                                <td style="padding: 8px; color: #fff;"><strong>{{ sub.nombre or 'Berserker' }}</strong></td>
+                                <td style="padding: 8px; color: var(--accent-color); font-weight: 500;">{{ sub.email }}</td>
+                                <td style="padding: 8px; color: #888;">{{ sub.created_at[:10] if sub.created_at else '' }}</td>
+                                <td style="padding: 8px; text-align: right; white-space: nowrap;">
+                                    <button type="button" onclick="resendWelcomeEmail({{ sub.id }}, '{{ sub.email }}', this)" title="Reenviar correo oficial de bienvenida" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: #333; color: white; border: none; border-radius: 4px; margin: 0 5px 0 0; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto; line-height: 1.2; white-space: nowrap;">
+                                        <i class="fa-solid fa-paper-plane" style="color: var(--accent-color);"></i> Reenviar
                                     </button>
-                                    <button type="button" onclick="deleteSingleSubscriber({{ sub.id }}, '{{ sub.email }}')" style="padding: 6px 10px; background: rgba(255, 59, 59, 0.12); color: #ff6b6b; border: 1px solid rgba(255, 59, 59, 0.3); border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;">
+                                    <button type="button" onclick="deleteSingleSubscriber({{ sub.id }}, '{{ sub.email }}')" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: #ff3b3b; color: white; border: none; border-radius: 4px; margin: 0; font-size: 0.8rem; cursor: pointer; text-transform: none; width: auto; line-height: 1.2; white-space: nowrap;">
                                         <i class="fa-solid fa-trash"></i> Eliminar
                                     </button>
                                 </td>
