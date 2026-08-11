@@ -35,6 +35,25 @@
         href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@300;400;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .article-floated-img {
+            float: left;
+            margin: 5px 25px 15px 0;
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        @media (max-width: 768px) {
+            .article-floated-img {
+                float: none;
+                display: block;
+                margin: 0 auto 20px auto;
+                max-width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -102,13 +121,12 @@
             <div style="margin-bottom: 30px;"></div>
             {% endif %}
 
-            {% if item.image_filename %}
-            <div style="text-align: center; margin-bottom: 30px;">
-                <img loading="lazy" src="/{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
+            <div class="article-content" style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">
+                {% if item.image_filename %}
+                <img loading="lazy" src="/{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" class="article-floated-img">
+                {% endif %}
+                {{ item.full_desc | safe }}
             </div>
-            {% endif %}
-
-            <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">{{ item.full_desc | safe }}</div>
 
             {% if item.yt_link or item.sp_link or item.ap_link %}
             <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 30px;">
