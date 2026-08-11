@@ -2388,7 +2388,7 @@ def subscribe_newsletter():
             active_name = existing['nombre'] if existing['nombre'] and existing['nombre'] != 'Berserker' else (nombre or 'Berserker')
             if existing['is_active'] == 1:
                 conn.close()
-                threading.Thread(target=send_newsletter_welcome_email, args=(email, active_name), daemon=True).start()
+                send_newsletter_welcome_email(email, active_name)
                 nombre_text = f", {active_name}" if active_name and active_name != 'Berserker' else ""
                 return jsonify({
                     'success': True,
@@ -2399,7 +2399,7 @@ def subscribe_newsletter():
                 conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (active_name, existing['id']))
                 conn.commit()
                 conn.close()
-                threading.Thread(target=send_newsletter_welcome_email, args=(email, active_name), daemon=True).start()
+                send_newsletter_welcome_email(email, active_name)
                 return jsonify({
                     'success': True,
                     'is_existing': False,
@@ -2410,7 +2410,7 @@ def subscribe_newsletter():
         conn.commit()
         conn.close()
         
-        threading.Thread(target=send_newsletter_welcome_email, args=(email, nombre or 'Berserker'), daemon=True).start()
+        send_newsletter_welcome_email(email, nombre or 'Berserker')
 
         nombre_saludo = f", {nombre}" if nombre else ""
         return jsonify({
@@ -3095,7 +3095,7 @@ def admin_newsletter_subscriber_add():
             sub_id = cur.lastrowid
             msg = f'Suscriptor {nombre or email} registrado exitosamente.'
         
-        threading.Thread(target=send_newsletter_welcome_email, args=(email, nombre or 'Berserker'), daemon=True).start()
+        send_newsletter_welcome_email(email, nombre or 'Berserker')
 
         if is_ajax_request(request):
             return jsonify({
