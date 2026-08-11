@@ -1432,7 +1432,6 @@ def go_live():
         'eventos_semana': {},
         'comments': [],
         'performance_analytics': [],
-        'newsletter_subscribers': [],
         'settings': {}
     }
     
@@ -1453,10 +1452,6 @@ def go_live():
             perf_rows = live_conn.execute("SELECT * FROM performance_analytics").fetchall()
             if perf_rows:
                 live_data['performance_analytics'] = [dict(r) for r in perf_rows]
-                
-            nl_rows = live_conn.execute("SELECT * FROM newsletter_subscribers").fetchall()
-            if nl_rows:
-                live_data['newsletter_subscribers'] = [dict(r) for r in nl_rows]
                 
             # Preserve poster_likes and poster_views
             try:
@@ -1502,15 +1497,6 @@ def go_live():
                 conn_obj.execute(
                     f"INSERT INTO performance_analytics ({cols}) VALUES ({placeholders})",
                     tuple(perf.values())
-                )
-
-            conn_obj.execute("DELETE FROM newsletter_subscribers")
-            for sub in live_data['newsletter_subscribers']:
-                cols = ', '.join(sub.keys())
-                placeholders = ', '.join(['?' for _ in sub.values()])
-                conn_obj.execute(
-                    f"INSERT INTO newsletter_subscribers ({cols}) VALUES ({placeholders})",
-                    tuple(sub.values())
                 )
                 
             for k, v in live_data['settings'].items():
@@ -3235,7 +3221,7 @@ def admin_newsletter_delete(id):
         return redirect(url_for('admin_dashboard'))
 
     conn = get_db_connection()
-    conn.execute("DELETE FROM newsletter_subscribers WHERE id = ?", (id,))
+    conn.execute("UPDATE newsletter_subscribers SET is_active = -1 WHERE id = ?", (id,))
     conn.commit()
     conn.close()
     
@@ -3272,7 +3258,7 @@ def admin_newsletter_delete_bulk():
 
     conn = get_db_connection()
     placeholders = ','.join(['?'] * len(clean_ids))
-    conn.execute(f"DELETE FROM newsletter_subscribers WHERE id IN ({placeholders})", tuple(clean_ids))
+    conn.execute(f"UPDATE newsletter_subscribers SET is_active = -1 WHERE id IN ({placeholders})", tuple(clean_ids))
     conn.commit()
     conn.close()
 
@@ -3480,10 +3466,13 @@ def admin_newsletter_sync_remote():
         is_active = sub.get('is_active', 1)
         created_at = sub.get('created_at')
 
-        cur = conn.execute("SELECT id FROM newsletter_subscribers WHERE email = ?", (email,))
+        cur = conn.execute("SELECT id, is_active FROM newsletter_subscribers WHERE email = ?", (email,))
         existing = cur.fetchone()
         if existing:
-            conn.execute("UPDATE newsletter_subscribers SET nombre = ?, is_active = ? WHERE id = ?", (nombre, is_active, existing['id']))
+            if existing['is_active'] == -1:
+                conn.execute("UPDATE newsletter_subscribers SET nombre = ? WHERE id = ?", (nombre, existing['id']))
+            else:
+                conn.execute("UPDATE newsletter_subscribers SET nombre = ?, is_active = ? WHERE id = ?", (nombre, is_active, existing['id']))
             updated += 1
         else:
             if created_at:
