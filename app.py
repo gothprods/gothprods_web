@@ -1432,6 +1432,7 @@ def go_live():
         'eventos_semana': {},
         'comments': [],
         'performance_analytics': [],
+        'newsletter_subscribers': [],
         'settings': {}
     }
     
@@ -1453,6 +1454,10 @@ def go_live():
             if perf_rows:
                 live_data['performance_analytics'] = [dict(r) for r in perf_rows]
                 
+            nl_rows = live_conn.execute("SELECT * FROM newsletter_subscribers").fetchall()
+            if nl_rows:
+                live_data['newsletter_subscribers'] = [dict(r) for r in nl_rows]
+                
             # Preserve poster_likes and poster_views
             try:
                 settings_rows = live_conn.execute("SELECT key, value FROM settings WHERE key IN ('poster_likes', 'poster_views')").fetchall()
@@ -1465,7 +1470,9 @@ def go_live():
         except Exception as e:
             print(f"Error extrayendo datos en vivo: {e}")
             
-    shutil.copyfile(DB_FILE, DB_LIVE_FILE)
+    temp_live_file = DB_LIVE_FILE + ".tmp"
+    shutil.copyfile(DB_FILE, temp_live_file)
+    os.replace(temp_live_file, DB_LIVE_FILE)
     
     try:
         new_live_conn = sqlite3.connect(DB_LIVE_FILE)
@@ -1496,6 +1503,15 @@ def go_live():
                     f"INSERT INTO performance_analytics ({cols}) VALUES ({placeholders})",
                     tuple(perf.values())
                 )
+
+            conn_obj.execute("DELETE FROM newsletter_subscribers")
+            for sub in live_data['newsletter_subscribers']:
+                cols = ', '.join(sub.keys())
+                placeholders = ', '.join(['?' for _ in sub.values()])
+                conn_obj.execute(
+                    f"INSERT INTO newsletter_subscribers ({cols}) VALUES ({placeholders})",
+                    tuple(sub.values())
+                )
                 
             for k, v in live_data['settings'].items():
                 conn_obj.execute("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (k, v))
@@ -1511,7 +1527,9 @@ def go_live():
 @app.route('/admin/discard_drafts', methods=['POST'])
 def discard_drafts():
     if 'user_id' not in session: return redirect(url_for('admin_login'))
-    shutil.copyfile(DB_LIVE_FILE, DB_FILE)
+    temp_file = DB_FILE + ".tmp"
+    shutil.copyfile(DB_LIVE_FILE, temp_file)
+    os.replace(temp_file, DB_FILE)
     flash("Borradores descartados. El panel vuelve a estar sincronizado con la versión en vivo.", "success")
     return redirect(url_for('admin_dashboard'))
 
