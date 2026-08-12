@@ -164,10 +164,38 @@
                             <div style="background: rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; align-self: flex-start; margin-bottom: 10px; font-family: 'Oswald', sans-serif;">Banda de la semana</div>
                             
                             <h3 class="notranslate" style="font-size: 1.5rem; color: #fff; font-weight: bold; margin-top: 0; margin-bottom: 5px; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ banda_semana.nombre }}</h3>
-                            <p style="font-size: 0.95rem; color: var(--accent-color); font-weight: bold; margin-bottom: 15px;"><i class="fa-solid fa-location-dot"></i> {{ banda_semana.ciudad }}, {{ banda_semana.pais }}</p>
+                            {% if banda_semana.titulo_resena %}
+                            <h4 style="font-size: 1.1rem; color: var(--accent-color); font-weight: bold; margin-top: 0; margin-bottom: 10px; font-style: italic;">"{{ banda_semana.titulo_resena }}"</h4>
+                            {% endif %}
+                            <p style="font-size: 0.95rem; color: var(--accent-color); font-weight: bold; margin-bottom: 10px;"><i class="fa-solid fa-location-dot"></i> {{ banda_semana.ciudad }}, {{ banda_semana.pais }} {% if banda_semana.ano_formacion %}| <i class="fa-solid fa-calendar-days"></i> {{ banda_semana.ano_formacion }}{% endif %}</p>
                             
-                            <div style="font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px; color: #ccc; text-align: justify; white-space: pre-wrap; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;">{{ banda_semana.bio_corta | safe }}</div>
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                {% if banda_semana.ig_link %}<a href="{{ banda_semana.ig_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-instagram"></i></a>{% endif %}
+                                {% if banda_semana.fb_link %}<a href="{{ banda_semana.fb_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
+                                {% if banda_semana.tk_link %}<a href="{{ banda_semana.tk_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-tiktok"></i></a>{% endif %}
+                                {% if banda_semana.yt_link %}<a href="{{ banda_semana.yt_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-youtube"></i></a>{% endif %}
+                                {% if banda_semana.sp_link %}<a href="{{ banda_semana.sp_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-spotify"></i></a>{% endif %}
+                                {% if banda_semana.ap_link %}<a href="{{ banda_semana.ap_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-apple"></i></a>{% endif %}
+                            </div>
+
+                            <div style="font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px; color: #ccc; text-align: justify; white-space: pre-wrap; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;">{{ banda_semana.bio_corta | safe }}</div>
                             
+                            {% if banda_semana.ultimo_lanzamiento_sp_link or banda_semana.ultimo_lanzamiento_ap_link %}
+                            <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+                                <span style="color: #aaa; font-size: 0.85rem; font-weight: bold; text-transform: uppercase;">
+                                    <i class="fa-solid fa-compact-disc" style="margin-right: 4px;"></i> 
+                                    {{ banda_semana.ultimo_lanzamiento_titulo if banda_semana.ultimo_lanzamiento_titulo else 'Último Lanzamiento' }}
+                                    {% if banda_semana.ultimo_lanzamiento_tipo %}<span style="font-weight: normal; color: #888;">({{ banda_semana.ultimo_lanzamiento_tipo }})</span>{% endif %}:
+                                </span>
+                                {% if banda_semana.ultimo_lanzamiento_sp_link %}
+                                <a href="{{ banda_semana.ultimo_lanzamiento_sp_link | replace('embed/track/', 'track/') | replace('embed/album/', 'album/') | replace('open.spotify.com/embed/', 'open.spotify.com/') }}" target="_blank" style="color: #1DB954; font-size: 1.5rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';"><i class="fa-brands fa-spotify"></i></a>
+                                {% endif %}
+                                {% if banda_semana.ultimo_lanzamiento_ap_link %}
+                                <a href="{{ banda_semana.ultimo_lanzamiento_ap_link | replace('embed.music.apple.com', 'music.apple.com') }}" target="_blank" style="color: #FA243C; font-size: 1.5rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';"><i class="fa-brands fa-apple"></i></a>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
                             <button class="open-review-modal" data-target="banda-modal-{{ banda_semana.id }}" data-id="{{ banda_semana.id }}" data-type="banda" style="margin-top: auto; display: block; width: 100%; text-align: center; background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 8px 12px; font-size: 0.95rem; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; border-radius: 4px; cursor: pointer; letter-spacing: 1px; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-book-open"></i> Leer historia completa</button>
                             <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px; font-size: 0.9rem;">
                                 <span style="color: #888;"><i class="fa-regular fa-eye"></i> <span class="view-count-{{ banda_semana.id }}" data-type="banda">{{ banda_semana.views if banda_semana.views else 0 }}</span> vistas</span>
@@ -348,6 +376,15 @@
                             <div style="font-size: 1.1rem; line-height: 1.8; color: #ddd; margin: 0; text-align: justify; white-space: pre-wrap;">{{ banda_semana.texto_resena | safe }}</div>
                         </div>
                         {% endif %}
+                        
+                        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
+                            {% if banda_semana.ig_link %}<a href="{{ banda_semana.ig_link }}" target="_blank" style="color: #716d4a; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-instagram"></i></a>{% endif %}
+                            {% if banda_semana.fb_link %}<a href="{{ banda_semana.fb_link }}" target="_blank" style="color: #716d4a; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
+                            {% if banda_semana.tk_link %}<a href="{{ banda_semana.tk_link }}" target="_blank" style="color: #716d4a; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-tiktok"></i></a>{% endif %}
+                            {% if banda_semana.yt_link %}<a href="{{ banda_semana.yt_link }}" target="_blank" style="color: #716d4a; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-youtube"></i></a>{% endif %}
+                            {% if banda_semana.sp_link %}<a href="{{ banda_semana.sp_link }}" target="_blank" style="color: #716d4a; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-spotify"></i></a>{% endif %}
+                            {% if banda_semana.ap_link %}<a href="{{ banda_semana.ap_link }}" target="_blank" style="color: #716d4a; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-apple"></i></a>{% endif %}
+                        </div>
                         
                         <div style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;">
                             <button class="like-btn" data-id="{{ banda_semana.id }}" data-type="banda" style="background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 1.2rem; padding: 8px 25px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Oswald', sans-serif; text-transform: uppercase;" onmouseover="if(!this.disabled){this.style.background='var(--accent-color)'; this.style.color='#000';}" onmouseout="if(!this.disabled){this.style.background='transparent'; this.style.color='var(--accent-color)';}">
