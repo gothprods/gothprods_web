@@ -141,28 +141,46 @@ def process_images_filter(text, images_json):
                 paragraphs.append(temp)
                 
         if len(paragraphs) > 1:
+            # Encontrar el índice donde empiezan las "Fuentes Consultadas"
+            fuentes_idx = len(paragraphs)
+            for i, p in enumerate(paragraphs):
+                if "fuentes consultadas" in p.lower():
+                    fuentes_idx = i
+                    break
+            
+            # Solo intercalamos imágenes en los párrafos ANTES de las fuentes
+            paragraphs_for_images = paragraphs[:fuentes_idx]
+            paragraphs_after = paragraphs[fuentes_idx:]
+            
             new_paragraphs = []
             img_idx = 0
             
-            gap_count = len(paragraphs) - 1
-            gap_step = max(1, gap_count // len(unused_list))
+            if len(paragraphs_for_images) > 0:
+                gap_count = max(1, len(paragraphs_for_images) - 1)
+                gap_step = max(1, gap_count // len(unused_list))
+                
+                for i, p in enumerate(paragraphs_for_images):
+                    new_paragraphs.append(p)
+                    # No añadimos imagen si estamos en el último párrafo antes de las fuentes, para evitar que flote a un lado
+                    if i < len(paragraphs_for_images) - 1 and img_idx < len(unused_list) and (i + 1) % gap_step == 0:
+                        img = unused_list[img_idx]
+                        img_path = img if img.startswith('http') or img.startswith('assets') else 'updates/' + img
+                        
+                        float_dir = "right" if img_idx % 2 == 0 else "left"
+                        margin_dir = "margin: 10px 0px 10px 20px;" if float_dir == "right" else "margin: 10px 20px 10px 0px;"
+                        
+                        img_html = f'<img loading="lazy" src="{img_path}" style="float: {float_dir}; width: 45%; max-width: 350px; {margin_dir} border-radius: 8px; border: 1px solid #333;" alt="Imagen de artículo">'
+                        new_paragraphs.append(img_html)
+                        
+                        original_idx = images.index(img)
+                        used_indices.add(original_idx)
+                        img_idx += 1
+                        
+            # Añadimos clear both antes de las fuentes para asegurar que no haya solapamiento
+            if paragraphs_after:
+                new_paragraphs.append('<div style="clear: both; padding-top: 20px;"></div>')
+            new_paragraphs.extend(paragraphs_after)
             
-            for i, p in enumerate(paragraphs):
-                new_paragraphs.append(p)
-                if i < len(paragraphs) - 1 and img_idx < len(unused_list) and (i + 1) % gap_step == 0:
-                    img = unused_list[img_idx]
-                    img_path = img if img.startswith('http') or img.startswith('assets') else 'updates/' + img
-                    
-                    float_dir = "right" if img_idx % 2 == 0 else "left"
-                    margin_dir = "margin: 10px 0px 10px 20px;" if float_dir == "right" else "margin: 10px 20px 10px 0px;"
-                    
-                    img_html = f'<img loading="lazy" src="{img_path}" style="float: {float_dir}; width: 45%; max-width: 350px; {margin_dir} border-radius: 8px; border: 1px solid #333;" alt="Imagen de artículo">'
-                    new_paragraphs.append(img_html)
-                    
-                    original_idx = images.index(img)
-                    used_indices.add(original_idx)
-                    img_idx += 1
-                    
             processed_text = ''.join(new_paragraphs)
             processed_text += '<div style="clear: both;"></div>'
             
