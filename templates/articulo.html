@@ -200,6 +200,21 @@
         });
     });
     observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
+    
+    // Evitar que las "Fuentes Consultadas" floten al lado de la imagen ilustrativa
+    document.addEventListener("DOMContentLoaded", function() {
+        const elements = document.querySelectorAll('.article-content p, .article-content span, .article-content div');
+        for (let el of elements) {
+            if (el.textContent.trim().toLowerCase().includes("fuentes consultadas")) {
+                let parentBlock = el.closest('p') || el.closest('div') || el;
+                parentBlock.style.clear = 'both';
+                parentBlock.style.display = 'block';
+                parentBlock.style.paddingTop = '20px';
+                // Dejamos de iterar al encontrar el primer título de fuentes
+                break;
+            }
+        }
+    });
     </script>
     <script src="/gp_metrics.js?v=5"></script>
     <script src="/app.js"></script>
