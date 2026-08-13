@@ -829,17 +829,16 @@ def index():
     mexico_tz = datetime.timezone(datetime.timedelta(hours=-6))
     current_date = datetime.datetime.now(mexico_tz).strftime("%Y-%m-%d")
 
+    radar_items = []
+    seen_bands = set()
+    
     # Query for the latest Banda de la Semana
     raw_bandas = conn.execute("SELECT * FROM banda_semana ORDER BY id DESC").fetchall()
-    bandas_semana = []
-    seen_bands = set()
     for b in raw_bandas:
-        # Check if the band is active (default 1 if column just added, but could be 0)
-        is_active = b['is_active'] if 'is_active' in b.keys() else 1
-        
-        # Check dates
-        fecha_inicio = b['fecha_inicio'] if 'fecha_inicio' in b.keys() and b['fecha_inicio'] else None
-        fecha_fin = b['fecha_fin'] if 'fecha_fin' in b.keys() and b['fecha_fin'] else None
+        b = dict(b) # Convert sqlite3.Row to dict to add new keys
+        is_active = b.get('is_active', 1)
+        fecha_inicio = b.get('fecha_inicio')
+        fecha_fin = b.get('fecha_fin')
         
         in_date_range = True
         if not is_preview:
@@ -850,18 +849,17 @@ def index():
             
         if is_active == 1 and in_date_range and b['nombre'] not in seen_bands:
             seen_bands.add(b['nombre'])
-            bandas_semana.append(b)
-            if len(bandas_semana) == 5:
-                break
+            b['radar_type'] = 'banda'
+            b['sort_date'] = fecha_inicio or "1970-01-01"
+            radar_items.append(b)
                 
     # Query for Eventos de la Semana
     raw_eventos = conn.execute("SELECT * FROM eventos_semana ORDER BY id DESC").fetchall()
-    eventos_semana = []
     for e in raw_eventos:
-        is_active = e['is_active'] if 'is_active' in e.keys() else 1
-        
-        fecha_inicio = e['fecha_inicio_pub'] if 'fecha_inicio_pub' in e.keys() and e['fecha_inicio_pub'] else None
-        fecha_fin = e['fecha_fin_pub'] if 'fecha_fin_pub' in e.keys() and e['fecha_fin_pub'] else None
+        e = dict(e)
+        is_active = e.get('is_active', 1)
+        fecha_inicio = e.get('fecha_inicio_pub')
+        fecha_fin = e.get('fecha_fin_pub')
         
         in_date_range = True
         if not is_preview:
@@ -871,10 +869,30 @@ def index():
                 in_date_range = False
             
         if is_active == 1 and in_date_range:
-            eventos_semana.append(e)
+            e['radar_type'] = 'evento'
+            e['sort_date'] = fecha_inicio or "1970-01-01"
+            radar_items.append(e)
     
     # Query for Colectivo Mexapedia (Latest active)
     mexapedia_record = conn.execute("SELECT * FROM colectivo_mexapedia WHERE is_active = 1 ORDER BY id DESC LIMIT 1").fetchone()
+    if mexapedia_record:
+        m = dict(mexapedia_record)
+        m['radar_type'] = 'mexapedia'
+        m['sort_date'] = "2099-12-31" # Always first? Or maybe use current date so it mixes in? Actually, the prompt says 5 eventos o/y bandas. Mexapedia is separate or included? Let's give it the current date.
+        m['sort_date'] = current_date
+        # Wait, the user said "5 eventos o/y bandas". Let's let Mexapedia be handled separately in the template as it was, to not break its logic, OR put it in radar_items. 
+        # The template has a separate block for Mexapedia at the end. Let's keep Mexapedia separate.
+        pass
+
+    # Sort all radar items descending by sort_date, then id
+    radar_items.sort(key=lambda x: (x['sort_date'], x['id']), reverse=True)
+    
+    # Limit to 15 items so there is enough content to scroll through
+    radar_items = radar_items[:15]
+    
+    # Re-extract the lists for the modals to use
+    bandas_semana = [item for item in radar_items if item.get('radar_type') == 'banda']
+    eventos_semana = [item for item in radar_items if item.get('radar_type') == 'evento']
     
     # Existing content queries
     noticiero_items = conn.execute("SELECT * FROM content_items WHERE section = 'El Noticiero Nocturno' ORDER BY created_at DESC").fetchall()
@@ -957,6 +975,7 @@ def index():
                            upcoming_agenda=upcoming_agenda,
                            current_date=current_date,
                            settings=get_settings(live=not is_preview),
+                           radar_items=radar_items,
                            bandas_semana=bandas_semana,
                            eventos_semana=eventos_semana,
                            mexapedia_record=mexapedia_record, is_preview=is_preview)

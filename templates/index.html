@@ -150,92 +150,93 @@
             </div>
 
             <!-- Carousel Container -->
-            <div class="radar-carousel" style="display: flex; justify-content: center; gap: 20px; overflow-x: auto; padding-bottom: 20px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; width: 100%; max-width: 100%;">
+            <div class="radar-carousel" style="display: flex; justify-content: flex-start; gap: 20px; overflow-x: auto; padding-bottom: 20px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; width: 100%; max-width: 100%;">
                 
-                <!-- BANDAS -->
-                {% for banda_semana in bandas_semana %}
-                <div class="radar-card" style="scroll-snap-align: start; display: flex; flex-direction: column;">
-                    <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--accent-color); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.8); display: flex; flex-direction: column; height: 100%; position: relative;">
-                        {% if is_preview %}<a href="/admin/dashboard?edit_type=banda&edit_id={{ banda_semana.id }}" target="_parent" class="preview-edit-btn" style="z-index: 10;"><i class="fa-solid fa-pen"></i> Corregir Banda</a>{% endif %}
-                        
-                        <img loading="lazy" src="{{ banda_semana.img_video_path }}" alt="{{ banda_semana.nombre }}" style="width: 100%; height: 160px; object-fit: cover; object-position: center top; display: block; margin: 0;">
-                        
-                        <div style="padding: 20px; flex: 1; display: flex; flex-direction: column; color: #ddd;">
-                            <div style="background: rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; align-self: flex-start; margin-bottom: 10px; font-family: 'Oswald', sans-serif;">Banda de la semana</div>
+                <!-- RADAR ITEMS (Merged and Chronological) -->
+                {% for item in radar_items %}
+                    {% if item.radar_type == 'banda' %}
+                    {% set banda_semana = item %}
+                    <div class="radar-card" style="scroll-snap-align: start; display: flex; flex-direction: column; flex: 0 0 calc((100% - 80px) / 5); min-width: 280px; max-width: 380px;">
+                        <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--accent-color); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.8); display: flex; flex-direction: column; height: 100%; position: relative;">
+                            {% if is_preview %}<a href="/admin/dashboard?edit_type=banda&edit_id={{ banda_semana.id }}" target="_parent" class="preview-edit-btn" style="z-index: 10;"><i class="fa-solid fa-pen"></i> Corregir Banda</a>{% endif %}
                             
-                            <h3 class="notranslate" style="font-size: 1.5rem; color: #fff; font-weight: bold; margin-top: 0; margin-bottom: 5px; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ banda_semana.nombre }}</h3>
-                            {% if banda_semana.titulo_resena %}
-                            <h4 style="font-size: 1.1rem; color: var(--accent-color); font-weight: bold; margin-top: 0; margin-bottom: 10px; font-style: italic;">"{{ banda_semana.titulo_resena }}"</h4>
-                            {% endif %}
-                            <p style="font-size: 0.95rem; color: var(--accent-color); font-weight: bold; margin-bottom: 10px;"><i class="fa-solid fa-location-dot"></i> {{ banda_semana.ciudad }}, {{ banda_semana.pais }} {% if banda_semana.ano_formacion %}| <i class="fa-solid fa-calendar-days"></i> {{ banda_semana.ano_formacion }}{% endif %}</p>
+                            <img loading="lazy" src="{{ banda_semana.img_video_path }}" alt="{{ banda_semana.nombre }}" style="width: 100%; height: 160px; object-fit: cover; object-position: center top; display: block; margin: 0;">
                             
-                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                                {% if banda_semana.ig_link %}<a href="{{ banda_semana.ig_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-instagram"></i></a>{% endif %}
-                                {% if banda_semana.fb_link %}<a href="{{ banda_semana.fb_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
-                                {% if banda_semana.tk_link %}<a href="{{ banda_semana.tk_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-tiktok"></i></a>{% endif %}
-                                {% if banda_semana.yt_link %}<a href="{{ banda_semana.yt_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-youtube"></i></a>{% endif %}
-                                {% if banda_semana.sp_link %}<a href="{{ banda_semana.sp_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-spotify"></i></a>{% endif %}
-                                {% if banda_semana.ap_link %}<a href="{{ banda_semana.ap_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-apple"></i></a>{% endif %}
-                            </div>
-
-                            <div style="font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px; color: #ccc; text-align: justify; white-space: pre-wrap; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;">{{ banda_semana.bio_corta | safe }}</div>
-                            
-                            {% if banda_semana.ultimo_lanzamiento_sp_link or banda_semana.ultimo_lanzamiento_ap_link %}
-                            <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
-                                <span style="color: #aaa; font-size: 0.85rem; font-weight: bold; text-transform: uppercase;">
-                                    <i class="fa-solid fa-compact-disc" style="margin-right: 4px;"></i> 
-                                    {{ banda_semana.ultimo_lanzamiento_titulo if banda_semana.ultimo_lanzamiento_titulo else 'Último Lanzamiento' }}
-                                    {% if banda_semana.ultimo_lanzamiento_tipo %}<span style="font-weight: normal; color: #888;">({{ banda_semana.ultimo_lanzamiento_tipo }})</span>{% endif %}:
-                                </span>
-                                {% if banda_semana.ultimo_lanzamiento_sp_link %}
-                                <a href="{{ banda_semana.ultimo_lanzamiento_sp_link | replace('embed/track/', 'track/') | replace('embed/album/', 'album/') | replace('open.spotify.com/embed/', 'open.spotify.com/') }}" target="_blank" style="color: #1DB954; font-size: 1.5rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';"><i class="fa-brands fa-spotify"></i></a>
+                            <div style="padding: 20px; flex: 1; display: flex; flex-direction: column; color: #ddd;">
+                                <div style="background: rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; align-self: flex-start; margin-bottom: 10px; font-family: 'Oswald', sans-serif;">Banda de la semana</div>
+                                
+                                <h3 class="notranslate" style="font-size: 1.5rem; color: #fff; font-weight: bold; margin-top: 0; margin-bottom: 5px; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ banda_semana.nombre }}</h3>
+                                {% if banda_semana.titulo_resena %}
+                                <h4 style="font-size: 1.1rem; color: var(--accent-color); font-weight: bold; margin-top: 0; margin-bottom: 10px; font-style: italic;">"{{ banda_semana.titulo_resena }}"</h4>
                                 {% endif %}
-                                {% if banda_semana.ultimo_lanzamiento_ap_link %}
-                                <a href="{{ banda_semana.ultimo_lanzamiento_ap_link | replace('embed.music.apple.com', 'music.apple.com') }}" target="_blank" style="color: #FA243C; font-size: 1.5rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';"><i class="fa-brands fa-apple"></i></a>
+                                <p style="font-size: 0.95rem; color: var(--accent-color); font-weight: bold; margin-bottom: 10px;"><i class="fa-solid fa-location-dot"></i> {{ banda_semana.ciudad }}, {{ banda_semana.pais }} {% if banda_semana.ano_formacion %}| <i class="fa-solid fa-calendar-days"></i> {{ banda_semana.ano_formacion }}{% endif %}</p>
+                                
+                                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                    {% if banda_semana.ig_link %}<a href="{{ banda_semana.ig_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-instagram"></i></a>{% endif %}
+                                    {% if banda_semana.fb_link %}<a href="{{ banda_semana.fb_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
+                                    {% if banda_semana.tk_link %}<a href="{{ banda_semana.tk_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-tiktok"></i></a>{% endif %}
+                                    {% if banda_semana.yt_link %}<a href="{{ banda_semana.yt_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-youtube"></i></a>{% endif %}
+                                    {% if banda_semana.sp_link %}<a href="{{ banda_semana.sp_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-spotify"></i></a>{% endif %}
+                                    {% if banda_semana.ap_link %}<a href="{{ banda_semana.ap_link }}" target="_blank" style="color: #716d4a; font-size: 1.2rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-apple"></i></a>{% endif %}
+                                </div>
+    
+                                <div style="font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px; color: #ccc; text-align: justify; white-space: pre-wrap; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;">{{ banda_semana.bio_corta | safe }}</div>
+                                
+                                {% if banda_semana.ultimo_lanzamiento_sp_link or banda_semana.ultimo_lanzamiento_ap_link %}
+                                <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+                                    <span style="color: #aaa; font-size: 0.85rem; font-weight: bold; text-transform: uppercase;">
+                                        <i class="fa-solid fa-compact-disc" style="margin-right: 4px;"></i> 
+                                        {{ banda_semana.ultimo_lanzamiento_titulo if banda_semana.ultimo_lanzamiento_titulo else 'Último Lanzamiento' }}
+                                        {% if banda_semana.ultimo_lanzamiento_tipo %}<span style="font-weight: normal; color: #888;">({{ banda_semana.ultimo_lanzamiento_tipo }})</span>{% endif %}:
+                                    </span>
+                                    {% if banda_semana.ultimo_lanzamiento_sp_link %}
+                                    <a href="{{ banda_semana.ultimo_lanzamiento_sp_link | replace('embed/track/', 'track/') | replace('embed/album/', 'album/') | replace('open.spotify.com/embed/', 'open.spotify.com/') }}" target="_blank" style="color: #1DB954; font-size: 1.5rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';"><i class="fa-brands fa-spotify"></i></a>
+                                    {% endif %}
+                                    {% if banda_semana.ultimo_lanzamiento_ap_link %}
+                                    <a href="{{ banda_semana.ultimo_lanzamiento_ap_link | replace('embed.music.apple.com', 'music.apple.com') }}" target="_blank" style="color: #FA243C; font-size: 1.5rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';"><i class="fa-brands fa-apple"></i></a>
+                                    {% endif %}
+                                </div>
                                 {% endif %}
-                            </div>
-                            {% endif %}
-
-                            <button class="open-review-modal" data-target="banda-modal-{{ banda_semana.id }}" data-id="{{ banda_semana.id }}" data-type="banda" style="margin-top: auto; display: block; width: 100%; text-align: center; background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 8px 12px; font-size: 0.95rem; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; border-radius: 4px; cursor: pointer; letter-spacing: 1px; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-book-open"></i> Leer historia completa</button>
-                            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px; font-size: 0.9rem;">
-                                <span style="color: #888;"><i class="fa-regular fa-eye"></i> <span class="view-count-{{ banda_semana.id }}" data-type="banda">{{ banda_semana.views if banda_semana.views else 0 }}</span> vistas</span>
-                                <span style="color: var(--accent-color);"><i class="fa-solid fa-heart"></i> <span class="like-count-{{ banda_semana.id }}" data-type="banda">{{ banda_semana.likes if banda_semana.likes else 0 }}</span></span>
+    
+                                <button class="open-review-modal" data-target="banda-modal-{{ banda_semana.id }}" data-id="{{ banda_semana.id }}" data-type="banda" style="margin-top: auto; display: block; width: 100%; text-align: center; background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 8px 12px; font-size: 0.95rem; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; border-radius: 4px; cursor: pointer; letter-spacing: 1px; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-book-open"></i> Leer historia completa</button>
+                                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px; font-size: 0.9rem;">
+                                    <span style="color: #888;"><i class="fa-regular fa-eye"></i> <span class="view-count-{{ banda_semana.id }}" data-type="banda">{{ banda_semana.views if banda_semana.views else 0 }}</span> vistas</span>
+                                    <span style="color: var(--accent-color);"><i class="fa-solid fa-heart"></i> <span class="like-count-{{ banda_semana.id }}" data-type="banda">{{ banda_semana.likes if banda_semana.likes else 0 }}</span></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                {% endfor %}
-
-                <!-- EVENTOS -->
-                {% for evento in eventos_semana %}
-                <div class="radar-card" style="scroll-snap-align: start; display: flex; flex-direction: column;">
-                    <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--accent-color); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.8); display: flex; flex-direction: column; height: 100%; position: relative;">
-                        {% if is_preview %}<a href="/admin/dashboard?edit_type=evento&edit_id={{ evento.id }}" target="_parent" class="preview-edit-btn" style="z-index: 10;"><i class="fa-solid fa-pen"></i> Corregir Evento</a>{% endif %}
-                        
-                        <img loading="lazy" src="{{ evento.img_video_path }}" alt="{{ evento.nombre_evento }}" style="width: 100%; height: 160px; object-fit: cover; object-position: center top; display: block; margin: 0;">
-                        
-                        <div style="padding: 20px; flex: 1; display: flex; flex-direction: column; color: #ddd;">
-                            <div style="background: rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; align-self: flex-start; margin-bottom: 10px; font-family: 'Oswald', sans-serif;">Evento Destacado</div>
+                    {% elif item.radar_type == 'evento' %}
+                    {% set evento = item %}
+                    <div class="radar-card" style="scroll-snap-align: start; display: flex; flex-direction: column; flex: 0 0 calc((100% - 80px) / 5); min-width: 280px; max-width: 380px;">
+                        <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--accent-color); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.8); display: flex; flex-direction: column; height: 100%; position: relative;">
+                            {% if is_preview %}<a href="/admin/dashboard?edit_type=evento&edit_id={{ evento.id }}" target="_parent" class="preview-edit-btn" style="z-index: 10;"><i class="fa-solid fa-pen"></i> Corregir Evento</a>{% endif %}
                             
-                            <h3 class="notranslate" style="font-size: 1.5rem; color: #fff; font-weight: bold; margin-top: 0; margin-bottom: 5px; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ evento.titulo_articulo }}</h3>
-                            <p style="font-size: 0.95rem; color: var(--accent-color); font-weight: bold; margin-bottom: 5px;">{{ evento.nombre_evento }}</p>
-                            <p style="font-size: 0.85rem; color: var(--accent-color); font-weight: bold; margin-bottom: 15px;"><i class="fa-solid fa-calendar-day"></i> {{ evento.fecha_evento }} | <i class="fa-solid fa-location-dot"></i> {{ evento.ciudad }}, {{ evento.pais }}</p>
+                            <img loading="lazy" src="{{ evento.img_video_path }}" alt="{{ evento.nombre_evento }}" style="width: 100%; height: 160px; object-fit: cover; object-position: center top; display: block; margin: 0;">
                             
-                            <div style="font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px; color: #ccc; text-align: justify; white-space: pre-wrap; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;">{{ evento.bio_corta | safe }}</div>
-                            
-                            <button class="open-review-modal" data-target="evento-modal-{{ evento.id }}" data-id="{{ evento.id }}" data-type="evento" style="margin-top: auto; display: block; width: 100%; text-align: center; background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 8px 12px; font-size: 0.95rem; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; border-radius: 4px; cursor: pointer; letter-spacing: 1px; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-book-open"></i> Leer nota completa</button>
-                            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px; font-size: 0.9rem;">
-                                <span style="color: #888;"><i class="fa-regular fa-eye"></i> <span class="view-count-{{ evento.id }}" data-type="evento">{{ evento.views if evento.views else 0 }}</span> vistas</span>
-                                <span style="color: var(--accent-color);"><i class="fa-solid fa-heart"></i> <span class="like-count-{{ evento.id }}" data-type="evento">{{ evento.likes if evento.likes else 0 }}</span></span>
+                            <div style="padding: 20px; flex: 1; display: flex; flex-direction: column; color: #ddd;">
+                                <div style="background: rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; align-self: flex-start; margin-bottom: 10px; font-family: 'Oswald', sans-serif;">Evento Destacado</div>
+                                
+                                <h3 class="notranslate" style="font-size: 1.5rem; color: #fff; font-weight: bold; margin-top: 0; margin-bottom: 5px; font-family: 'Oswald', sans-serif; text-transform: uppercase;">{{ evento.titulo_articulo }}</h3>
+                                <p style="font-size: 0.95rem; color: var(--accent-color); font-weight: bold; margin-bottom: 5px;">{{ evento.nombre_evento }}</p>
+                                <p style="font-size: 0.85rem; color: var(--accent-color); font-weight: bold; margin-bottom: 15px;"><i class="fa-solid fa-calendar-day"></i> {{ evento.fecha_evento }} | <i class="fa-solid fa-location-dot"></i> {{ evento.ciudad }}, {{ evento.pais }}</p>
+                                
+                                <div style="font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px; color: #ccc; text-align: justify; white-space: pre-wrap; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;">{{ evento.bio_corta | safe }}</div>
+                                
+                                <button class="open-review-modal" data-target="evento-modal-{{ evento.id }}" data-id="{{ evento.id }}" data-type="evento" style="margin-top: auto; display: block; width: 100%; text-align: center; background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 8px 12px; font-size: 0.95rem; font-weight: bold; font-family: 'Oswald', sans-serif; text-transform: uppercase; border-radius: 4px; cursor: pointer; letter-spacing: 1px; transition: all 0.3s;" onmouseover="this.style.background='var(--accent-color)'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='var(--accent-color)';"><i class="fa-solid fa-book-open"></i> Leer nota completa</button>
+                                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px; font-size: 0.9rem;">
+                                    <span style="color: #888;"><i class="fa-regular fa-eye"></i> <span class="view-count-{{ evento.id }}" data-type="evento">{{ evento.views if evento.views else 0 }}</span> vistas</span>
+                                    <span style="color: var(--accent-color);"><i class="fa-solid fa-heart"></i> <span class="like-count-{{ evento.id }}" data-type="evento">{{ evento.likes if evento.likes else 0 }}</span></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    {% endif %}
                 {% endfor %}
 
                 <!-- MEXAPEDIA -->
                 {% if settings.get('show_mexapedia', '0') == '1' and mexapedia_record %}
-                <div class="radar-card" style="scroll-snap-align: start; display: flex; flex-direction: column;">
+                <div class="radar-card" style="scroll-snap-align: start; display: flex; flex-direction: column; flex: 0 0 calc((100% - 80px) / 5); min-width: 280px; max-width: 380px;">
                     <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--accent-color); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.8); display: flex; flex-direction: column; height: 100%;">
                         {% if mexapedia_record.img_path %}
                             <img loading="lazy" src="{{ mexapedia_record.img_path if mexapedia_record.img_path.startswith('http') else '/static/' ~ mexapedia_record.img_path }}" style="width: 100%; height: 160px; object-fit: cover; object-position: center top; display: block; margin: 0;">
