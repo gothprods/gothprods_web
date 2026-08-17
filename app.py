@@ -1705,6 +1705,10 @@ def add_banda():
     pais = request.form['pais']
     ciudad = request.form['ciudad']
     bio_corta = request.form['bio_corta']
+    
+    if not nombre.strip():
+        flash('El nombre de la banda es obligatorio.', 'error')
+        return redirect(url_for('admin_dashboard'))
     ano_formacion = request.form.get('ano_formacion', '')
     line_up = request.form.get('line_up', '')
     ig_link = request.form.get('ig_link', '')
@@ -1858,6 +1862,10 @@ def add_evento():
     texto_articulo = request.form.get('texto_articulo', '')
     fb_link = request.form.get('fb_link', '')
     ig_link = request.form.get('ig_link', '')
+    
+    if not nombre_evento.strip() or not titulo_articulo.strip():
+        flash('El título y el nombre del evento son obligatorios.', 'error')
+        return redirect(url_for('admin_dashboard'))
     
     file = request.files.get('img_video_path')
     filename = ''

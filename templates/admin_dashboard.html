@@ -90,7 +90,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <h3 id="form-title"><i class="fa-solid fa-pen-nib"></i> Crear Nuevo Registro</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">Llena este formulario para actualizar la web y generar automáticamente tus copys e imágenes para redes sociales.</p>
         
-        <form id="main-form" method="POST" action="/admin/dashboard" enctype="multipart/form-data" onsubmit="syncAllEditorsToTextareas()" novalidate>
+        <form id="main-form" method="POST" action="/admin/dashboard" enctype="multipart/form-data" onsubmit="syncAllEditorsToTextareas()">
     <label><i class="fa-solid fa-layer-group"></i> Sección de la Página</label>
     <select name="section" required>
         <option value="Reseñas de Conciertos">Reseñas de Conciertos</option>
@@ -1442,7 +1442,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <h3><i class="fa-solid fa-paint-roller"></i> Personalización (Look & Feel)</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Personaliza los textos principales, menús y activa/desactiva secciones completas de la página.</p>
         
-        <form method="POST" action="/admin/settings" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()" novalidate>
+        <form method="POST" action="/admin/settings" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()">
             <h4 style="color: var(--accent-color); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px;"><i class="fa-solid fa-image"></i> Imágenes</h4>
             <label>Fondo Principal (Hero Video/Imagen)</label>
             <input type="file" name="hero_bg" accept="video/*, image/*" style="background: #222; padding: 10px; border-radius: 4px; border: 1px solid #444; width: 100%; margin-bottom: 20px; color: #fff;">
@@ -2561,7 +2561,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <h3 id="form-banda-title"><i class="fa-solid fa-star"></i> Gestión Radar del Caos: Bandas</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Agrega la banda destacada que aparecerá en el sitio.</p>
         
-        <form id="banda-form" method="POST" action="/admin/banda" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()" novalidate>
+        <form id="banda-form" method="POST" action="/admin/banda" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()">
             <label>Título de la Reseña</label>
             <input type="text" name="titulo_resena" placeholder="Ej. Una obra maestra del Death Metal" required style="margin-bottom: 15px;">
 
@@ -2772,7 +2772,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <h3 id="form-eventos-title"><i class="fa-solid fa-calendar-star"></i> Gestión Radar del Caos: Eventos</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Agrega los eventos relevantes a los cuales daremos difusión.</p>
         
-        <form id="eventos-form" method="POST" action="/admin/eventos" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()" novalidate>
+        <form id="eventos-form" method="POST" action="/admin/eventos" enctype="multipart/form-data" style="max-width: 800px; margin: 0 auto; background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333;" onsubmit="syncAllEditorsToTextareas()">
             <label>Título del Artículo</label>
             <input type="text" name="titulo_articulo" placeholder="Ej. El Festival de Metal Más Esperado" required style="margin-bottom: 15px;">
 
