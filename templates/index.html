@@ -15,14 +15,18 @@
     <meta property="og:url" content="{{ request.url }}">
     <meta property="og:title" content="{% if request.args.get('poster') %}Agenda Metalera | Goth Prods{% else %}Goth Prods | Medio Mexicano de divulgación del género más feroz del planeta{% endif %}">
     <meta property="og:description" content="{% if request.args.get('poster') %}¡Revisa los próximos eventos en nuestra Agenda Metalera!{% else %}Goth Prods es la productora de contenidos de Metal más imponente. Encuentra noticias, reseñas exclusivas y el podcast Metal Pulse.{% endif %}">
-    <meta property="og:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/assets/viking.jpg{% endif %}">
+    {% set share_image = settings.get('hero_bg', 'assets/viking.jpg') %}
+    {% if share_image.endswith('.mp4') or share_image.endswith('.webm') %}
+        {% set share_image = settings.get('header_logo', 'assets/dock_header_icon.png') %}
+    {% endif %}
+    <meta property="og:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/{{ share_image }}{% endif %}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ request.url }}">
     <meta property="twitter:title" content="{% if request.args.get('poster') %}Agenda Metalera | Goth Prods{% else %}Goth Prods | Medio Mexicano de divulgación del género más feroz del planeta{% endif %}">
     <meta property="twitter:description" content="{% if request.args.get('poster') %}¡Revisa los próximos eventos en nuestra Agenda Metalera!{% else %}Goth Prods es la productora de contenidos de Metal más imponente. Encuentra noticias, reseñas exclusivas y el podcast Metal Pulse.{% endif %}">
-    <meta property="twitter:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/assets/viking.jpg{% endif %}">
+    <meta property="twitter:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/{{ share_image }}{% endif %}">
 
     <!-- Favicons -->
     <link rel="icon" href="assets/viking.webp" type="image/jpeg">

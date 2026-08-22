@@ -841,10 +841,10 @@ def index():
         fecha_fin = b.get('fecha_fin')
         
         in_date_range = True
+        if fecha_fin and current_date > fecha_fin:
+            in_date_range = False
         if not is_preview:
             if fecha_inicio and current_date < fecha_inicio:
-                in_date_range = False
-            if fecha_fin and current_date > fecha_fin:
                 in_date_range = False
             
         if is_active == 1 and in_date_range and b['nombre'] not in seen_bands:
@@ -862,10 +862,10 @@ def index():
         fecha_fin = e.get('fecha_fin_pub')
         
         in_date_range = True
+        if fecha_fin and current_date > fecha_fin:
+            in_date_range = False
         if not is_preview:
             if fecha_inicio and current_date < fecha_inicio:
-                in_date_range = False
-            if fecha_fin and current_date > fecha_fin:
                 in_date_range = False
             
         if is_active == 1 and in_date_range:
@@ -884,8 +884,8 @@ def index():
         # The template has a separate block for Mexapedia at the end. Let's keep Mexapedia separate.
         pass
 
-    # Sort all radar items descending by sort_date, then id
-    radar_items.sort(key=lambda x: (x['sort_date'], x['id']), reverse=True)
+    # Sort all radar items descending by created_at (most recently posted first)
+    radar_items.sort(key=lambda x: (x.get('created_at', x['sort_date']), x['id']), reverse=True)
     
     # Limit to 15 items so there is enough content to scroll through
     radar_items = radar_items[:15]
