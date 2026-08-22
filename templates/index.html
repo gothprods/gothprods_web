@@ -51,50 +51,50 @@
         <ul class="dock-menu">
             {% if settings.get('show_banda_semana', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_destacados', 'Radar del Caos') }}">
-                <a href="#radar-del-caos"><img src="{{ settings.get('icon_destacados', 'assets/destacados_icon.png') }}" alt="{{ settings.get('title_destacados', 'Radar del Caos') }}" style="width: 32px; height: 32px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_destacados', 'Radar del Caos') }}</span></a>
+                <a href="#radar-del-caos"><img src="{{ settings.get('icon_destacados', 'assets/destacados_icon.png') }}" alt="{{ settings.get('title_destacados', 'Radar del Caos') }}" ><span class="dock-text">{{ settings.get('title_destacados', 'Radar del Caos') }}</span></a>
             </li>
             {% endif %}
 
             {% if settings.get('show_el_pit', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_el_pit', 'El Pit') }}">
-                <a href="#highlights"><img src="{{ settings.get('icon_el_pit', 'assets/el_pit_icon.png') }}" alt="{{ settings.get('title_el_pit', 'El Pit') }}" style="width: 32px; height: 32px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_el_pit', 'El Pit') }}</span></a>
+                <a href="#highlights"><img src="{{ settings.get('icon_el_pit', 'assets/el_pit_icon.png') }}" alt="{{ settings.get('title_el_pit', 'El Pit') }}" ><span class="dock-text">{{ settings.get('title_el_pit', 'El Pit') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_galeria_nocturna', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_galeria', 'La Galería Nocturna') }}">
-                <a href="#shows"><img src="{{ settings.get('icon_galeria', 'assets/galeria_nocturna_icon.jpg') }}" alt="{{ settings.get('title_galeria', 'La Galería Nocturna') }}" style="width: 32px; height: 32px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_galeria', 'La Galería Nocturna') }}</span></a>
+                <a href="#shows"><img src="{{ settings.get('icon_galeria', 'assets/galeria_nocturna_icon.jpg') }}" alt="{{ settings.get('title_galeria', 'La Galería Nocturna') }}" ><span class="dock-text">{{ settings.get('title_galeria', 'La Galería Nocturna') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_metalpulse', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_metalpulse', 'Metal Pulse') }}">
-                <a href="#metal-pulse"><img src="{{ settings.get('icon_metalpulse', 'assets/metal_pulse_icon.jpg') }}" alt="{{ settings.get('title_metalpulse', 'Metal Pulse') }}" style="width: 32px; height: 32px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_metalpulse', 'Metal Pulse') }}</span></a>
+                <a href="#metal-pulse"><img src="{{ settings.get('icon_metalpulse', 'assets/metal_pulse_icon.jpg') }}" alt="{{ settings.get('title_metalpulse', 'Metal Pulse') }}" ><span class="dock-text">{{ settings.get('title_metalpulse', 'Metal Pulse') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_reviews', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}">
-                <a href="#reviews"><img src="{{ settings.get('icon_reviews', 'assets/resenas_icon.png') }}" alt="{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}" style="width: 32px; height: 32px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}</span></a>
+                <a href="#reviews"><img src="{{ settings.get('icon_reviews', 'assets/resenas_icon.png') }}" alt="{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}" ><span class="dock-text">{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_noticiero', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_news', 'El Noticiero Nocturno') }}">
-                <a href="#news"><img src="{{ settings.get('icon_news', 'assets/noticiero_icon.png') }}" alt="{{ settings.get('title_news', 'El Noticiero Nocturno') }}" style="width: 32px; height: 32px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_news', 'El Noticiero Nocturno') }}</span></a>
+                <a href="#news"><img src="{{ settings.get('icon_news', 'assets/noticiero_icon.png') }}" alt="{{ settings.get('title_news', 'El Noticiero Nocturno') }}" ><span class="dock-text">{{ settings.get('title_news', 'El Noticiero Nocturno') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_entrevistas', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_interviews', 'Entrevistas Under') }}">
-                <a href="#under-interviews"><img src="{{ settings.get('icon_interviews', 'assets/entrevistas_icon.png') }}" alt="{{ settings.get('title_interviews', 'Entrevistas Under') }}" style="width: 32px; height: 32px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_interviews', 'Entrevistas Under') }}</span></a>
+                <a href="#under-interviews"><img src="{{ settings.get('icon_interviews', 'assets/entrevistas_icon.png') }}" alt="{{ settings.get('title_interviews', 'Entrevistas Under') }}" ><span class="dock-text">{{ settings.get('title_interviews', 'Entrevistas Under') }}</span></a>
             </li>
             {% endif %}
             <li class="dock-item" data-title="{{ settings.get('title_agenda', 'Agenda Metalera') }}">
-                <a href="#agenda"><img src="{{ settings.get('icon_agenda', 'assets/agenda_icon.png') }}" alt="{{ settings.get('title_agenda', 'Agenda Metalera') }}" style="width: 32px; height: 32px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_agenda', 'Agenda Metalera') }}</span></a>
+                <a href="#agenda"><img src="{{ settings.get('icon_agenda', 'assets/agenda_icon.png') }}" alt="{{ settings.get('title_agenda', 'Agenda Metalera') }}" ><span class="dock-text">{{ settings.get('title_agenda', 'Agenda Metalera') }}</span></a>
             </li>
             {% if settings.get('show_equipo_menu', '0') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_equipo', 'El Equipo, La Historia') }}">
-                <a href="#equipo"><img src="{{ settings.get('icon_equipo', 'assets/equipo_icon.png') }}" alt="{{ settings.get('title_equipo', 'El Equipo, La Historia') }}" style="width: 32px; height: 32px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_equipo', 'El Equipo, La Historia') }}</span></a>
+                <a href="#equipo"><img src="{{ settings.get('icon_equipo', 'assets/equipo_icon.png') }}" alt="{{ settings.get('title_equipo', 'El Equipo, La Historia') }}" ><span class="dock-text">{{ settings.get('title_equipo', 'El Equipo, La Historia') }}</span></a>
             </li>
             {% endif %}
             <li class="dock-item" data-title="{{ settings.get('title_contacto', 'Contáctanos') }}">
-                <a href="#contacto-medios"><img src="{{ settings.get('icon_contacto', 'assets/contacto_icon.png') }}" alt="{{ settings.get('title_contacto', 'Contáctanos') }}" style="width: 32px; height: 32px; object-fit: contain; background: #000; border: 1px solid rgba(113, 109, 74, 0.4); filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5)); border-radius: 50%;"><span class="dock-text">{{ settings.get('title_contacto', 'Contáctanos') }}</span></a>
+                <a href="#contacto-medios"><img src="{{ settings.get('icon_contacto', 'assets/contacto_icon.png') }}" alt="{{ settings.get('title_contacto', 'Contáctanos') }}" ><span class="dock-text">{{ settings.get('title_contacto', 'Contáctanos') }}</span></a>
             </li>
         </ul>
         
