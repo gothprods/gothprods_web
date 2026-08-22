@@ -1335,7 +1335,7 @@ def admin_dashboard():
     analytics_data = [dict(row) for row in analytics_rows]
     interactions_data = [dict(row) for row in interactions_rows]
     # Cargar suscriptores de Newsletter (todos, ordenados por los mas recientes)
-    suscriptores = conn.execute("SELECT * FROM newsletter_subscribers ORDER BY id DESC").fetchall()
+    suscriptores = conn.execute("SELECT * FROM newsletter_subscribers WHERE is_active >= 0 ORDER BY id DESC").fetchall()
 
     conn.close()
 
@@ -2419,7 +2419,7 @@ def subscribe_newsletter():
             active_name = existing['nombre'] if existing['nombre'] and existing['nombre'] != 'Berserker' else (nombre or 'Berserker')
             if existing['is_active'] == 1:
                 conn.close()
-                send_newsletter_welcome_email(email, active_name)
+                threading.Thread(target=send_newsletter_welcome_email, args=(email, active_name)).start()
                 nombre_text = f", {active_name}" if active_name and active_name != 'Berserker' else ""
                 return jsonify({
                     'success': True,
@@ -2430,7 +2430,7 @@ def subscribe_newsletter():
                 conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (active_name, existing['id']))
                 conn.commit()
                 conn.close()
-                send_newsletter_welcome_email(email, active_name)
+                threading.Thread(target=send_newsletter_welcome_email, args=(email, active_name)).start()
                 return jsonify({
                     'success': True,
                     'is_existing': False,
@@ -2441,7 +2441,7 @@ def subscribe_newsletter():
         conn.commit()
         conn.close()
         
-        send_newsletter_welcome_email(email, nombre or 'Berserker')
+        threading.Thread(target=send_newsletter_welcome_email, args=(email, nombre or 'Berserker')).start()
 
         nombre_saludo = f", {nombre}" if nombre else ""
         return jsonify({
@@ -3111,7 +3111,7 @@ def admin_newsletter_subscriber_add():
             sub_id = cur.lastrowid
             msg = f'Suscriptor {nombre or email} registrado exitosamente.'
         
-        send_newsletter_welcome_email(email, nombre or 'Berserker')
+        threading.Thread(target=send_newsletter_welcome_email, args=(email, nombre or 'Berserker')).start()
 
         if is_ajax_request(request):
             return jsonify({
@@ -3228,17 +3228,11 @@ def admin_newsletter_resend_welcome(id):
         flash('Suscriptor no encontrado.', 'error')
         return redirect(url_for('admin_dashboard'))
 
-    success = send_newsletter_welcome_email(sub['email'], sub['nombre'] or 'Berserker')
-    if success:
-        msg = f"⚔️ Correo oficial de bienvenida reenviado exitosamente a {sub['email']}."
-        if is_ajax_request(request):
-            return jsonify({'status': 'success', 'message': msg})
-        flash(msg, 'success')
-    else:
-        msg = f"No se pudo entregar el correo de bienvenida a {sub['email']}. Revisa la configuración SMTP."
-        if is_ajax_request(request):
-            return jsonify({'status': 'error', 'message': msg}), 500
-        flash(msg, 'error')
+    threading.Thread(target=send_newsletter_welcome_email, args=(sub['email'], sub['nombre'] or 'Berserker')).start()
+    msg = f"⚔️ El envío del correo oficial de bienvenida a {sub['email']} se ha iniciado en segundo plano."
+    if is_ajax_request(request):
+        return jsonify({'status': 'success', 'message': msg})
+    flash(msg, 'success')
 
     return redirect(url_for('admin_dashboard') + '#tab-newsletter')
 
