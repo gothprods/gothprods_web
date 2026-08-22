@@ -3493,10 +3493,8 @@ def admin_newsletter_sync_remote():
         cur = conn.execute("SELECT id, is_active FROM newsletter_subscribers WHERE email = ?", (email,))
         existing = cur.fetchone()
         if existing:
-            if existing['is_active'] == -1:
-                conn.execute("UPDATE newsletter_subscribers SET nombre = ? WHERE id = ?", (nombre, existing['id']))
-            else:
-                conn.execute("UPDATE newsletter_subscribers SET nombre = ?, is_active = ? WHERE id = ?", (nombre, is_active, existing['id']))
+            # Always respect the remote's is_active status so re-subscriptions are synced back correctly
+            conn.execute("UPDATE newsletter_subscribers SET nombre = ?, is_active = ? WHERE id = ?", (nombre, is_active, existing['id']))
             updated += 1
         else:
             if created_at:
