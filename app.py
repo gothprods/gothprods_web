@@ -245,13 +245,15 @@ def get_db_connection(live=False):
             'discografia', 'ultimo_lanzamiento_titulo', 'ultimo_lanzamiento_tipo', 
             'ultimo_lanzamiento_url', 'ultimo_lanzamiento_plataforma', 
             'ultimo_lanzamiento_sp_link', 'ultimo_lanzamiento_ap_link',
-            'bio_larga', 'is_active', 'fecha_inicio', 'fecha_fin'
+            'bio_larga', 'is_active', 'fecha_inicio', 'fecha_fin', 'updated_at'
         ]
         
         for col in required_columns:
             if col not in columns:
                 if col == 'is_active':
                     cursor.execute(f"ALTER TABLE banda_semana ADD COLUMN {col} INTEGER DEFAULT 1")
+                elif col == 'updated_at':
+                    cursor.execute(f"ALTER TABLE banda_semana ADD COLUMN {col} TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
                 else:
                     cursor.execute(f"ALTER TABLE banda_semana ADD COLUMN {col} TEXT")
         conn.commit()
@@ -302,7 +304,8 @@ def get_db_connection(live=False):
                 fb_link TEXT,
                 ig_link TEXT,
                 is_active INTEGER DEFAULT 1,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
         
@@ -884,8 +887,8 @@ def index():
         # The template has a separate block for Mexapedia at the end. Let's keep Mexapedia separate.
         pass
 
-    # Sort all radar items descending by created_at (most recently posted first)
-    radar_items.sort(key=lambda x: (x.get('created_at', x['sort_date']), x['id']), reverse=True)
+    # Sort all radar items descending by updated_at or created_at (most recently posted first)
+    radar_items.sort(key=lambda x: (x.get('updated_at') or x.get('created_at') or x['sort_date'], x['id']), reverse=True)
     
     # Limit to 15 items so there is enough content to scroll through
     radar_items = radar_items[:15]
@@ -1795,12 +1798,12 @@ def edit_banda(id):
         optimized_name = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="banda_")
         filename = f"updates/{optimized_name}"
         conn.execute('''
-            UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, img_video_path=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?, titulo_resena=?, texto_resena=?, discografia=?, ultimo_lanzamiento_titulo=?, ultimo_lanzamiento_tipo=?, ultimo_lanzamiento_sp_link=?, ultimo_lanzamiento_ap_link=?, fecha_inicio=?, fecha_fin=?
+            UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, img_video_path=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?, titulo_resena=?, texto_resena=?, discografia=?, ultimo_lanzamiento_titulo=?, ultimo_lanzamiento_tipo=?, ultimo_lanzamiento_sp_link=?, ultimo_lanzamiento_ap_link=?, fecha_inicio=?, fecha_fin=?, updated_at=CURRENT_TIMESTAMP
             WHERE id=?
         ''', (nombre, pais, ciudad, bio_corta, filename, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link, fecha_inicio, fecha_fin, id))
     else:
         conn.execute('''
-            UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?, titulo_resena=?, texto_resena=?, discografia=?, ultimo_lanzamiento_titulo=?, ultimo_lanzamiento_tipo=?, ultimo_lanzamiento_sp_link=?, ultimo_lanzamiento_ap_link=?, fecha_inicio=?, fecha_fin=?
+            UPDATE banda_semana SET nombre=?, pais=?, ciudad=?, bio_corta=?, ig_link=?, fb_link=?, tk_link=?, sp_link=?, ap_link=?, yt_link=?, ano_formacion=?, line_up=?, titulo_resena=?, texto_resena=?, discografia=?, ultimo_lanzamiento_titulo=?, ultimo_lanzamiento_tipo=?, ultimo_lanzamiento_sp_link=?, ultimo_lanzamiento_ap_link=?, fecha_inicio=?, fecha_fin=?, updated_at=CURRENT_TIMESTAMP
             WHERE id=?
         ''', (nombre, pais, ciudad, bio_corta, ig_link, fb_link, tk_link, sp_link, ap_link, yt_link, ano_formacion, line_up, titulo_resena, texto_resena, discografia, ultimo_lanzamiento_titulo, ultimo_lanzamiento_tipo, ultimo_lanzamiento_sp_link, ultimo_lanzamiento_ap_link, fecha_inicio, fecha_fin, id))
         
@@ -1817,7 +1820,7 @@ def toggle_banda(id):
     b = conn.execute("SELECT is_active FROM banda_semana WHERE id = ?", (id,)).fetchone()
     if b:
         new_status = 0 if b['is_active'] == 1 else 1
-        conn.execute("UPDATE banda_semana SET is_active = ? WHERE id = ?", (new_status, id))
+        conn.execute("UPDATE banda_semana SET is_active = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", (new_status, id))
         conn.commit()
     conn.close()
     return jsonify({"success": True})
@@ -1911,12 +1914,12 @@ def edit_evento(id):
         optimized_name = optimize_and_save_image(file, app.config['UPLOAD_FOLDER'], prefix="evento_")
         filename = f"updates/{optimized_name}"
         conn.execute('''
-            UPDATE eventos_semana SET titulo_articulo=?, fecha_inicio_pub=?, fecha_fin_pub=?, nombre_evento=?, promotor=?, img_video_path=?, pais=?, ciudad=?, fecha_evento=?, bio_corta=?, texto_articulo=?, fb_link=?, ig_link=?
+            UPDATE eventos_semana SET titulo_articulo=?, fecha_inicio_pub=?, fecha_fin_pub=?, nombre_evento=?, promotor=?, img_video_path=?, pais=?, ciudad=?, fecha_evento=?, bio_corta=?, texto_articulo=?, fb_link=?, ig_link=?, updated_at=CURRENT_TIMESTAMP
             WHERE id=?
         ''', (titulo_articulo, fecha_inicio_pub, fecha_fin_pub, nombre_evento, promotor, filename, pais, ciudad, fecha_evento, bio_corta, texto_articulo, fb_link, ig_link, id))
     else:
         conn.execute('''
-            UPDATE eventos_semana SET titulo_articulo=?, fecha_inicio_pub=?, fecha_fin_pub=?, nombre_evento=?, promotor=?, pais=?, ciudad=?, fecha_evento=?, bio_corta=?, texto_articulo=?, fb_link=?, ig_link=?
+            UPDATE eventos_semana SET titulo_articulo=?, fecha_inicio_pub=?, fecha_fin_pub=?, nombre_evento=?, promotor=?, pais=?, ciudad=?, fecha_evento=?, bio_corta=?, texto_articulo=?, fb_link=?, ig_link=?, updated_at=CURRENT_TIMESTAMP
             WHERE id=?
         ''', (titulo_articulo, fecha_inicio_pub, fecha_fin_pub, nombre_evento, promotor, pais, ciudad, fecha_evento, bio_corta, texto_articulo, fb_link, ig_link, id))
         
@@ -1933,7 +1936,7 @@ def toggle_evento(id):
     e = conn.execute("SELECT is_active FROM eventos_semana WHERE id = ?", (id,)).fetchone()
     if e:
         new_status = 0 if e['is_active'] == 1 else 1
-        conn.execute("UPDATE eventos_semana SET is_active = ? WHERE id = ?", (new_status, id))
+        conn.execute("UPDATE eventos_semana SET is_active = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", (new_status, id))
         conn.commit()
     conn.close()
     return jsonify({"success": True})
