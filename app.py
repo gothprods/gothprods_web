@@ -2492,41 +2492,26 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
     next_month_label = f"{next_month_name} {next_y}"
     
     # 1. Bandas y Eventos (Radar del Caos & El Pit)
-    bandas = conn.execute("SELECT * FROM banda_semana WHERE is_active = 1 ORDER BY id DESC LIMIT 2").fetchall()
-    eventos = conn.execute("SELECT * FROM eventos_semana WHERE is_active = 1 ORDER BY id DESC LIMIT 2").fetchall()
+    bandas = conn.execute("SELECT * FROM banda_semana WHERE is_active = 1 AND created_at LIKE ? ORDER BY id DESC LIMIT 2", (f"{target_month}%",)).fetchall()
+    eventos = conn.execute("SELECT * FROM eventos_semana WHERE is_active = 1 AND created_at LIKE ? ORDER BY id DESC LIMIT 2", (f"{target_month}%",)).fetchall()
     
     # 2. El Noticiero Nocturno (Filtrado por mes objetivo)
     noticiero = conn.execute("SELECT * FROM content_items WHERE section = 'El Noticiero Nocturno' AND created_at LIKE ? ORDER BY created_at DESC, id DESC", (f"{target_month}%",)).fetchall()
-    if not noticiero:
-        noticiero = conn.execute("SELECT * FROM content_items WHERE section = 'El Noticiero Nocturno' ORDER BY created_at DESC, id DESC LIMIT 6").fetchall()
         
     # 3. Reseñas de Conciertos (Filtrado por mes objetivo)
     reseñas = conn.execute("SELECT * FROM content_items WHERE section = 'Reseñas de Conciertos' AND created_at LIKE ? ORDER BY created_at DESC, id DESC", (f"{target_month}%",)).fetchall()
-    if not reseñas:
-        reseñas = conn.execute("SELECT * FROM content_items WHERE section = 'Reseñas de Conciertos' ORDER BY created_at DESC, id DESC LIMIT 4").fetchall()
         
     # 4. Entrevistas Under (Filtrado por mes objetivo)
     entrevistas = conn.execute("SELECT * FROM content_items WHERE section = 'Entrevistas Under' AND created_at LIKE ? ORDER BY created_at DESC, id DESC", (f"{target_month}%",)).fetchall()
-    if not entrevistas:
-        entrevistas = conn.execute("SELECT * FROM content_items WHERE section = 'Entrevistas Under' ORDER BY created_at DESC, id DESC LIMIT 4").fetchall()
         
     # 5. La Galería Nocturna & Caos Sonoro (Filtrado por mes objetivo)
     galeria = conn.execute("SELECT * FROM content_items WHERE section IN ('La Galería Nocturna', 'Caos Sonoro') AND created_at LIKE ? ORDER BY created_at DESC, id DESC", (f"{target_month}%",)).fetchall()
-    if not galeria:
-        galeria = conn.execute("SELECT * FROM content_items WHERE section IN ('La Galería Nocturna', 'Caos Sonoro') ORDER BY created_at DESC, id DESC LIMIT 4").fetchall()
         
     # 6. Metal Pulse Tracks (Filtrado por mes objetivo)
     pulse_tracks = conn.execute("SELECT * FROM content_items WHERE section = 'Metal Pulse Tracks' AND (full_desc LIKE ? OR full_desc LIKE ?) ORDER BY id DESC", (f"%{month_name}%", f"%{target_month}%")).fetchall()
-    if not pulse_tracks:
-        pulse_tracks = conn.execute("SELECT * FROM content_items WHERE section = 'Metal Pulse Tracks' AND full_desc != '.' ORDER BY id DESC LIMIT 10").fetchall()
         
     # 7. Agenda Metalera (Conciertos en el MES SIGUIENTE)
     agenda = conn.execute("SELECT * FROM content_items WHERE section = 'Agenda Metalera' AND author LIKE ? ORDER BY author ASC", (f"{next_month_str}%",)).fetchall()
-    if not agenda:
-        today_str = now_mx.strftime("%Y-%m-%d")
-        agenda = conn.execute("SELECT * FROM content_items WHERE section = 'Agenda Metalera' AND author >= ? ORDER BY author ASC LIMIT 8", (today_str,)).fetchall()
-        if not agenda:
-            agenda = conn.execute("SELECT * FROM content_items WHERE section = 'Agenda Metalera' ORDER BY author DESC LIMIT 8").fetchall()
             
     conn.close()
 
@@ -2710,7 +2695,7 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
         <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
             <tr>
                 <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
-                    <img src="{get_full_img_url(b['imagen'] or b['ultimo_lanzamiento_url'])}" style="width: 100%; max-height: 200px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+                    <img src="{get_full_img_url(b['img_video_path'] or b['ultimo_lanzamiento_url'])}" style="width: 100%; max-height: 200px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
                 </td>
             </tr>
             <tr>
