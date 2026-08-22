@@ -354,16 +354,20 @@ main {
 
     .dock-menu {
         flex-direction: row;
+        flex-wrap: nowrap;
         gap: 0.5rem;
         align-items: flex-start;
-        flex-shrink: 0;
+        flex: 0 0 auto;
+        min-width: max-content;
     }
 
     .dock-item {
         width: 70px;
+        min-width: 70px;
+        max-width: 70px;
         height: auto;
         transform-origin: bottom center;
-        flex-shrink: 0;
+        flex: 0 0 auto;
     }
 
     .dock-item a {
@@ -418,23 +422,30 @@ main {
 
     .dock-controls {
         flex-direction: row;
+        flex-wrap: nowrap;
         margin-top: 0;
         margin-left: 1rem;
         gap: 1rem;
-        flex-shrink: 0;
+        flex: 0 0 auto;
+        min-width: max-content;
     }
 
     .dock-socials {
         display: flex;
         flex-direction: row;
+        flex-wrap: nowrap;
         gap: 0.8rem;
         align-items: center;
-        flex-shrink: 0;
+        flex: 0 0 auto;
+        min-width: max-content;
     }
     
     .dock-lang {
         display: flex;
         flex-direction: row;
+        flex-wrap: nowrap;
+        flex: 0 0 auto;
+        min-width: max-content;
         align-items: center;
         gap: 0.5rem;
     }
