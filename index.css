@@ -343,7 +343,6 @@ main {
         flex-direction: row;
         gap: 0.5rem;
         align-items: center;
-        flex-shrink: 0;
     }
 
     .dock-item {
@@ -401,7 +400,6 @@ main {
         margin-top: 0;
         margin-left: auto;
         gap: 1rem;
-        flex-shrink: 0;
     }
 
     .dock-socials {
