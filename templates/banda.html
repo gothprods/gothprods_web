@@ -72,9 +72,9 @@
 
             <!-- Redes de la banda y lanzamientos -->
             <div style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
-                {% if banda.discografia %}
+                {% if banda.discografia and banda.discografia | striptags | trim != '' %}
                 <h4 style="color: var(--accent-color); margin-bottom: 10px;">Discografía Destacada</h4>
-                <p style="color: #aaa; white-space: pre-line; margin-bottom: 20px;">{{ banda.discografia }}</p>
+                <div style="color: #aaa; white-space: pre-wrap; margin-bottom: 20px;">{{ banda.discografia | safe }}</div>
                 {% endif %}
 
                 {% if banda.ultimo_lanzamiento_sp_link or banda.ultimo_lanzamiento_ap_link %}
