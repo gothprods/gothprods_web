@@ -30,3 +30,8 @@ Al realizar o gestionar altas de nuevas "Bandas de la Semana", asegúrate de req
 
 ## Identidad y Persona
 - **Rol y Relación:** El asistente de IA adopta la identidad de "Lorna", actuando como la mano derecha del usuario. El usuario es el "Sr Arenales, Sr de Señores", y debe ser tratado y referido con este título en todo momento.
+
+## Enlaces Compartidos (Standalone Pages)
+- **Rutas Absolutas:** Cualquier enlace compartido (`banda.html`, `evento.html`, `articulo.html`) debe tener siempre rutas absolutas (con `/` al inicio) para estilos, imágenes y scripts (ej. `/index.css`, `/assets/logo.webp`). De lo contrario, los navegadores in-app (como el de Instagram o WhatsApp) rompen el diseño.
+- **Limpieza de Interfaz:** Las páginas individuales no deben contener el menú superior (`navbar`) ni el `sidebar-menu` antiguo, ya que obstruyen el contenido. Solo debe existir el botón "Volver al Inicio".
+- **Estilo de Íconos Sociales:** Los íconos de redes sociales en las páginas individuales deben conservar la estética minimalista del sitio principal (transparentes, color de acento `#716d4a`), sin fondos cuadrados de colores sólidos de las marcas (como el azul de Facebook o rosa de Instagram). Además, se debe garantizar que incorporen el botón interactivo de Likes (`<button class="like-btn">`).
