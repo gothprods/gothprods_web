@@ -57,55 +57,10 @@
 </head>
 
 <body>
-    <header class="navbar">
-        <div class="left-controls">
-            <img src="/assets/viking.webp" alt="Viking Icon" class="viking-icon">
-            {% if settings.get('hamburger_active', '1') == '1' %}
-            <div class="menu-toggle" id="mobile-menu">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-            {% endif %}
-        </div>
-        <div class="logo">
-            <a href="/"><img src="/assets/logo-new.webp?v=2" alt="Goth Prods Logo" class="logo-img"></a>
-        </div>
-        <nav class="header-socials">
-            <a href="https://www.tiktok.com/@goth_prods" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
-            <a href="https://www.facebook.com/Goth-Prods-104237088306624/" target="_blank"><i
-                    class="fa-brands fa-facebook-f"></i></a>
-            <a href="https://www.instagram.com/goth_prods/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-            <a href="https://www.youtube.com/@gothprods44" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-            <a href="https://podcasts.apple.com/mx/podcast/goth-prods/id1606324255?l=en" target="_blank"><i
-                    class="fa-solid fa-podcast"></i></a>
-            <a href="https://open.spotify.com/show/2hnlgkcGNl9GOAPa0WT9HW?si=7e9b95f203464fe6" target="_blank"><i
-                    class="fa-brands fa-spotify"></i></a>
-            <div class="lang-controls" style="display: flex; gap: 5px; margin-left: 10px; align-items: center; border-left: 1px solid #444; padding-left: 10px;">
-                <i class="fa-solid fa-globe" style="font-size: 1.2rem; color: #fff; margin-right: 2px;" title="Cambiar Idioma"></i>
-                <button class="lang-btn-es" onclick="changeLanguage('es')" style="background: var(--accent-color); color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇲🇽 ES</button>
-                <button class="lang-btn-en" onclick="changeLanguage('en')" style="background: #333; color: #fff; border: 1px solid var(--accent-color); padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; transition: all 0.3s ease;">🇺🇸 EN</button>
-            </div>
-        </nav>
-    </header>
-
-    <div id="sidebar-menu" class="sidebar">
-        <div class="sidebar-header">
-            <img src="/assets/logo.webp?v=2" alt="Goth Prods Logo" class="sidebar-logo">
-            <div class="close-btn" id="close-menu">&times;</div>
-        </div>
-        <ul class="sidebar-links">
-            <li><a href="/#banda-semana">Banda de la Semana</a></li>
-            <li><a href="/#highlights">El Pit</a></li>
-            <li><a href="/#shows">La Galería Nocturna</a></li>
-            <li><a href="/#metal-pulse">Metal Pulse</a></li>
-            <li><a href="/#reviews">Reseñas de Conciertos</a></li>
-            <li><a href="/#news">El Noticiero Nocturno</a></li>
-        </ul>
-    </div>
+    
 
     <!-- MAIN CONTENT -->
-    <main id="articulo-contenido" data-metric-section="{% if 'Noticiero' in item.section %}news{% elif 'Reseña' in item.section %}reviews{% elif 'Entrevistas' in item.section %}under-interviews{% elif 'Tracks' in item.section or 'Pulse' in item.section %}metal-pulse{% else %}news{% endif %}" style="padding-top: 100px; min-height: 100vh; background: #000;">
+    <main id="articulo-contenido" data-metric-section="{% if 'Noticiero' in item.section %}news{% elif 'Reseña' in item.section %}reviews{% elif 'Entrevistas' in item.section %}under-interviews{% elif 'Tracks' in item.section or 'Pulse' in item.section %}metal-pulse{% else %}news{% endif %}" style="padding-top: 40px; min-height: 100vh; background: #000;">
         <div style="max-width: 800px; margin: 0 auto; background: #111; position: relative; padding: 40px; border: 1px solid var(--accent-color); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
             
             {% if is_preview %}<a href="/admin/dashboard?edit_type=content&edit_id={{ item.id }}" target="_parent" class="preview-edit-btn" style="top: 20px; right: 20px;"><i class="fa-solid fa-pen"></i> Corregir Artículo en Panel</a>{% endif %}
