@@ -15,9 +15,9 @@
     <meta property="og:url" content="{{ request.url }}">
     <meta property="og:title" content="{% if request.args.get('poster') %}Agenda Metalera | Goth Prods{% else %}Goth Prods | Medio Mexicano de divulgación del género más feroz del planeta{% endif %}">
     <meta property="og:description" content="{% if request.args.get('poster') %}¡Revisa los próximos eventos en nuestra Agenda Metalera!{% else %}Goth Prods es la productora de contenidos de Metal más imponente. Encuentra noticias, reseñas exclusivas y el podcast Metal Pulse.{% endif %}">
-    {% set share_image = settings.get('hero_bg', 'assets/viking.jpg') %}
+    {% set share_image = settings.get('hero_bg', '/assets/viking.jpg') %}
     {% if share_image.endswith('.mp4') or share_image.endswith('.webm') %}
-        {% set share_image = settings.get('header_logo', 'assets/dock_header_icon.png') %}
+        {% set share_image = settings.get('header_logo', '/assets/dock_header_icon.png') %}
     {% endif %}
     <meta property="og:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/{{ share_image }}{% endif %}">
 
@@ -29,9 +29,9 @@
     <meta property="twitter:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/{{ share_image }}{% endif %}">
 
     <!-- Favicons -->
-    <link rel="icon" href="assets/viking.webp" type="image/jpeg">
-    <link rel="apple-touch-icon" href="assets/viking.webp">
-    <link rel="stylesheet" href="index.css?v=55">
+    <link rel="icon" href="/assets/viking.webp" type="image/jpeg">
+    <link rel="apple-touch-icon" href="/assets/viking.webp">
+    <link rel="stylesheet" href="/index.css?v=55">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -43,7 +43,7 @@
 <body>
     <nav class="floating-dock">
         <div class="dock-logo">
-            <a href="#home"><img src="assets/dock_header_icon.png" alt="Goth Prods Logo" class="logo-img"></a>
+            <a href="#home"><img src="/assets/dock_header_icon.png" alt="Goth Prods Logo" class="logo-img"></a>
         </div>
         
         <hr class="dock-divider">
@@ -51,50 +51,50 @@
         <ul class="dock-menu">
             {% if settings.get('show_banda_semana', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_destacados', 'Radar del Caos') }}">
-                <a href="#radar-del-caos"><img src="{{ settings.get('icon_destacados', 'assets/destacados_icon.png') }}" alt="{{ settings.get('title_destacados', 'Radar del Caos') }}" ><span class="dock-text">{{ settings.get('title_destacados', 'Radar del Caos') }}</span></a>
+                <a href="#radar-del-caos"><img src="{{ settings.get('icon_destacados', '/assets/destacados_icon.png') }}" alt="{{ settings.get('title_destacados', 'Radar del Caos') }}" ><span class="dock-text">{{ settings.get('title_destacados', 'Radar del Caos') }}</span></a>
             </li>
             {% endif %}
 
             {% if settings.get('show_el_pit', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_el_pit', 'El Pit') }}">
-                <a href="#highlights"><img src="{{ settings.get('icon_el_pit', 'assets/el_pit_icon.png') }}" alt="{{ settings.get('title_el_pit', 'El Pit') }}" ><span class="dock-text">{{ settings.get('title_el_pit', 'El Pit') }}</span></a>
+                <a href="#highlights"><img src="{{ settings.get('icon_el_pit', '/assets/el_pit_icon.png') }}" alt="{{ settings.get('title_el_pit', 'El Pit') }}" ><span class="dock-text">{{ settings.get('title_el_pit', 'El Pit') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_galeria_nocturna', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_galeria', 'La Galería Nocturna') }}">
-                <a href="#shows"><img src="{{ settings.get('icon_galeria', 'assets/galeria_nocturna_icon.jpg') }}" alt="{{ settings.get('title_galeria', 'La Galería Nocturna') }}" ><span class="dock-text">{{ settings.get('title_galeria', 'La Galería Nocturna') }}</span></a>
+                <a href="#shows"><img src="{{ settings.get('icon_galeria', '/assets/galeria_nocturna_icon.jpg') }}" alt="{{ settings.get('title_galeria', 'La Galería Nocturna') }}" ><span class="dock-text">{{ settings.get('title_galeria', 'La Galería Nocturna') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_metalpulse', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_metalpulse', 'Metal Pulse') }}">
-                <a href="#metal-pulse"><img src="{{ settings.get('icon_metalpulse', 'assets/metal_pulse_icon.jpg') }}" alt="{{ settings.get('title_metalpulse', 'Metal Pulse') }}" ><span class="dock-text">{{ settings.get('title_metalpulse', 'Metal Pulse') }}</span></a>
+                <a href="#metal-pulse"><img src="{{ settings.get('icon_metalpulse', '/assets/metal_pulse_icon.jpg') }}" alt="{{ settings.get('title_metalpulse', 'Metal Pulse') }}" ><span class="dock-text">{{ settings.get('title_metalpulse', 'Metal Pulse') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_reviews', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}">
-                <a href="#reviews"><img src="{{ settings.get('icon_reviews', 'assets/resenas_icon.png') }}" alt="{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}" ><span class="dock-text">{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}</span></a>
+                <a href="#reviews"><img src="{{ settings.get('icon_reviews', '/assets/resenas_icon.png') }}" alt="{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}" ><span class="dock-text">{{ settings.get('title_reviews', 'Reseñas de Conciertos') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_noticiero', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_news', 'El Noticiero Nocturno') }}">
-                <a href="#news"><img src="{{ settings.get('icon_news', 'assets/noticiero_icon.png') }}" alt="{{ settings.get('title_news', 'El Noticiero Nocturno') }}" ><span class="dock-text">{{ settings.get('title_news', 'El Noticiero Nocturno') }}</span></a>
+                <a href="#news"><img src="{{ settings.get('icon_news', '/assets/noticiero_icon.png') }}" alt="{{ settings.get('title_news', 'El Noticiero Nocturno') }}" ><span class="dock-text">{{ settings.get('title_news', 'El Noticiero Nocturno') }}</span></a>
             </li>
             {% endif %}
             {% if settings.get('show_entrevistas', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_interviews', 'Entrevistas Under') }}">
-                <a href="#under-interviews"><img src="{{ settings.get('icon_interviews', 'assets/entrevistas_icon.png') }}" alt="{{ settings.get('title_interviews', 'Entrevistas Under') }}" ><span class="dock-text">{{ settings.get('title_interviews', 'Entrevistas Under') }}</span></a>
+                <a href="#under-interviews"><img src="{{ settings.get('icon_interviews', '/assets/entrevistas_icon.png') }}" alt="{{ settings.get('title_interviews', 'Entrevistas Under') }}" ><span class="dock-text">{{ settings.get('title_interviews', 'Entrevistas Under') }}</span></a>
             </li>
             {% endif %}
             <li class="dock-item" data-title="{{ settings.get('title_agenda', 'Agenda Metalera') }}">
-                <a href="#agenda"><img src="{{ settings.get('icon_agenda', 'assets/agenda_icon.png') }}" alt="{{ settings.get('title_agenda', 'Agenda Metalera') }}" ><span class="dock-text">{{ settings.get('title_agenda', 'Agenda Metalera') }}</span></a>
+                <a href="#agenda"><img src="{{ settings.get('icon_agenda', '/assets/agenda_icon.png') }}" alt="{{ settings.get('title_agenda', 'Agenda Metalera') }}" ><span class="dock-text">{{ settings.get('title_agenda', 'Agenda Metalera') }}</span></a>
             </li>
             {% if settings.get('show_equipo_menu', '0') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_equipo', 'El Equipo, La Historia') }}">
-                <a href="#equipo"><img src="{{ settings.get('icon_equipo', 'assets/equipo_icon.png') }}" alt="{{ settings.get('title_equipo', 'El Equipo, La Historia') }}" ><span class="dock-text">{{ settings.get('title_equipo', 'El Equipo, La Historia') }}</span></a>
+                <a href="#equipo"><img src="{{ settings.get('icon_equipo', '/assets/equipo_icon.png') }}" alt="{{ settings.get('title_equipo', 'El Equipo, La Historia') }}" ><span class="dock-text">{{ settings.get('title_equipo', 'El Equipo, La Historia') }}</span></a>
             </li>
             {% endif %}
             <li class="dock-item" data-title="{{ settings.get('title_contacto', 'Contáctanos') }}">
-                <a href="#contacto-medios"><img src="{{ settings.get('icon_contacto', 'assets/contacto_icon.png') }}" alt="{{ settings.get('title_contacto', 'Contáctanos') }}" ><span class="dock-text">{{ settings.get('title_contacto', 'Contáctanos') }}</span></a>
+                <a href="#contacto-medios"><img src="{{ settings.get('icon_contacto', '/assets/contacto_icon.png') }}" alt="{{ settings.get('title_contacto', 'Contáctanos') }}" ><span class="dock-text">{{ settings.get('title_contacto', 'Contáctanos') }}</span></a>
             </li>
         </ul>
         
@@ -124,7 +124,7 @@
 
     <main>
         <section id="home" class="hero">
-            {% set hero_bg = settings.get('hero_bg', 'assets/Intro.mp4') %}
+            {% set hero_bg = settings.get('hero_bg', '/assets/Intro.mp4') %}
             {% if hero_bg.endswith('.mp4') or hero_bg.endswith('.webm') %}
             <video autoplay loop muted playsinline class="hero-video">
                 <source src="{{ hero_bg }}" type="video/mp4">
@@ -145,7 +145,7 @@
             {% if bandas_semana or eventos_semana or (settings.get('show_mexapedia', '0') == '1' and mexapedia_record) %}
             <div class="section-header" style="margin-bottom: 20px;">
                 <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
-                    {% set icon_path = settings.get('icon_destacados', 'assets/destacados_icon.png') %}
+                    {% set icon_path = settings.get('icon_destacados', '/assets/destacados_icon.png') %}
                     <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal" width="65" height="65" style="width: 65px; height: 65px; min-width: 65px; min-height: 65px;">
                     <div class="header-text-group" style="text-align: left; margin: 0;">
                         <h2 style="font-size: 2.2rem; font-family: 'Creepster', cursive; font-weight: 400;">Radar del <span>Caos</span></h2>
@@ -600,7 +600,7 @@
         <section id="highlights" class="section highlights-section">
             <div class="section-header">
                 <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
-                    {% set icon_path = settings.get('icon_el_pit', 'assets/el_pit_icon.png') %}
+                    {% set icon_path = settings.get('icon_el_pit', '/assets/el_pit_icon.png') %}
                     <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal" width="65" height="65" style="width: 65px; height: 65px; min-width: 65px; min-height: 65px;">
                     <div class="header-text-group" style="text-align: left; margin: 0;">
                         <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">El <span>Pit</span></h2>
@@ -613,7 +613,7 @@
                 {% if settings.get('show_agenda', '1') == '1' %}
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                     <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
-                        <img loading="lazy" src="assets/banner_new.webp" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
+                        <img loading="lazy" src="/assets/banner_new.webp" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
                             <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Creepster', cursive; font-weight: 400; text-transform: uppercase; letter-spacing: 2px;">Agenda Metalera</h3>
                         </div>
@@ -682,7 +682,7 @@
                 {% if settings.get('show_news', '1') == '1' %}
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                     <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
-                        {% set img = noticiero_items[0].image_filename if noticiero_items else 'assets/reload_2.jpg' %}
+                        {% set img = noticiero_items[0].image_filename if noticiero_items else '/assets/reload_2.jpg' %}
                         <img loading="lazy" src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
                             <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Creepster', cursive; font-weight: 400; text-transform: uppercase; letter-spacing: 2px;">El Noticiero Nocturno</h3>
@@ -711,7 +711,7 @@
                 {% if settings.get('show_reviews', '1') == '1' %}
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                     <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
-                        {% set img = reseñas_items[0].image_filename if reseñas_items else 'assets/dream_theater_horizontal.jpg' %}
+                        {% set img = reseñas_items[0].image_filename if reseñas_items else '/assets/dream_theater_horizontal.jpg' %}
                         <a href="javascript:void(0);" data-target="dynNewsModal{{ reseñas_items[0].id if reseñas_items else '' }}" data-id="{{ reseñas_items[0].id if reseñas_items else '' }}" data-type="content" class="open-review-modal" style="display: block; height: 100%;">
                             <img loading="lazy" src="{{ img if img.startswith('http') or img.startswith('assets') else 'updates/' + img }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; cursor: pointer; filter: brightness(0.6) contrast(1.2);">
                             <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px; pointer-events: none;">
@@ -743,7 +743,7 @@
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                     <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
                         {% set img = entrevistas_items[0].image_filename if entrevistas_items else 'https://img.youtube.com/vi/2GDTVHHIRI8/maxresdefault.jpg' %}
-                        <img loading="lazy" src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else 'assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
+                        <img loading="lazy" src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else '/assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
                             <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Creepster', cursive; font-weight: 400; text-transform: uppercase; letter-spacing: 2px;">Entrevistas Under</h3>
                         </div>
@@ -771,8 +771,8 @@
                 {% if settings.get('show_metalpulse', '1') == '1' %}
                 <div class="card highlight-card" style="padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                     <div style="border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(113, 109, 74, 0.2); border: 1px solid var(--accent-color); position: relative; height: 120px;">
-                        {% set img = metalpulse_items[0].image_filename if metalpulse_items else 'assets/metal_pulse_cover.jpg' %}
-                        <img loading="lazy" src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else 'assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
+                        {% set img = metalpulse_items[0].image_filename if metalpulse_items else '/assets/metal_pulse_cover.jpg' %}
+                        <img loading="lazy" src="{{ img if img and (img.startswith('http') or img.startswith('assets')) else 'updates/' + img if img else '/assets/logo.png' }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; filter: brightness(0.6) contrast(1.2);">
                         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 70%, transparent 100%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;">
                             <h3 style="margin: 0; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,1); font-family: 'Creepster', cursive; font-weight: 400; text-transform: uppercase; letter-spacing: 2px;">Los 10 Favoritos del mes</h3>
                         </div>
@@ -781,7 +781,7 @@
                     <ul class="highlight-list" style="padding-left: 0; list-style: none; font-size: 0.8rem; margin-bottom: 0;">
                         {% for track in metalpulse_tracks[:10]|reverse %}
                         <li style="margin-bottom: 8px; break-inside: avoid; line-height: 1.2; display: flex; align-items: center; gap: 8px;">
-                            <img loading="lazy" class="sp-thumb" data-splink="{{ track.sp_link }}" src="assets/logo.webp" style="width: 30px; height: 30px; border-radius: 4px; object-fit: cover; flex-shrink: 0; background: #222; border: 1px solid #333;">
+                            <img loading="lazy" class="sp-thumb" data-splink="{{ track.sp_link }}" src="/assets/logo.webp" style="width: 30px; height: 30px; border-radius: 4px; object-fit: cover; flex-shrink: 0; background: #222; border: 1px solid #333;">
                             <div style="flex-grow: 1;">
                                 <a href="{{ track.sp_link }}" target="_blank" style="color: #716d4a; font-weight: bold; text-decoration: underline;">{{ track.title }}</a> 
                                 <span style="color: #ccc;">| {{ track.short_desc }}</span>
@@ -820,7 +820,7 @@
             <div class="section-header">
                 <div class="header-titles shows-header-layout">
                     <div style="display: flex; align-items: center; gap: 1rem; justify-content: flex-start;">
-                        {% set icon_path = settings.get('icon_galeria', 'assets/galeria_nocturna_icon.jpg') %}
+                        {% set icon_path = settings.get('icon_galeria', '/assets/galeria_nocturna_icon.jpg') %}
                         <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" alt="La Galería Nocturna Logo" class="section-medal" width="65" height="65" style="width: 65px; height: 65px; min-width: 65px; min-height: 65px;">
                         <div class="header-text-group" style="text-align: left;">
                             <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">La Galería Nocturna <span>Podcast</span></h2>
@@ -857,7 +857,7 @@
                 <div class="news-rail">
                 {% for item in galeria_items %}
                 <div class="news-card">
-                    <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
+                    <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else '/assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
                     <div class="card-content">
                         <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
                         <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
@@ -879,7 +879,7 @@
 
             <div class="section-header">
                 <div class="header-titles">
-                    {% set icon_path = settings.get('icon_metalpulse', 'assets/metal_pulse_icon.jpg') %}
+                    {% set icon_path = settings.get('icon_metalpulse', '/assets/metal_pulse_icon.jpg') %}
                     <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" alt="Metal Pulse Logo" class="section-medal" width="65" height="65" style="width: 65px; height: 65px; min-width: 65px; min-height: 65px;">
                     <div class="header-text-group">
                         <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">Metal <span class="metal-pulse-text">Pulse</span></h2>
@@ -896,7 +896,7 @@
                 <div class="news-rail">
                     {% for item in metalpulse_items %}
                     <div class="news-card">
-                        <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
+                        <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else '/assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
                         <div class="card-content">
                             <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
                             <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
@@ -916,7 +916,7 @@
                 <section id="reviews" class="section reviews-section">
             <div class="section-header">
                 <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
-                    {% set icon_path = settings.get('icon_reviews', 'assets/resenas_icon.png') %}
+                    {% set icon_path = settings.get('icon_reviews', '/assets/resenas_icon.png') %}
                     <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal" width="65" height="65" style="width: 65px; height: 65px; min-width: 65px; min-height: 65px;">
                     <div class="header-text-group" style="text-align: left; margin: 0;">
                         <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">Reseñas de <span>Conciertos</span></h2>
@@ -948,7 +948,7 @@
         <section id="news" class="section news-section">
             <div class="section-header">
                 <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
-                    {% set icon_path = settings.get('icon_news', 'assets/noticiero_icon.png') %}
+                    {% set icon_path = settings.get('icon_news', '/assets/noticiero_icon.png') %}
                     <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal" width="65" height="65" style="width: 65px; height: 65px; min-width: 65px; min-height: 65px;">
                     <div class="header-text-group" style="text-align: left; margin: 0;">
                         <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">El Noticiero <span>Nocturno</span></h2>
@@ -981,7 +981,7 @@
         <section id="under-interviews" class="section interviews-section">
             <div class="section-header">
                 <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
-                    {% set icon_path = settings.get('icon_interviews', 'assets/entrevistas_icon.png') %}
+                    {% set icon_path = settings.get('icon_interviews', '/assets/entrevistas_icon.png') %}
                     <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal" width="65" height="65" style="width: 65px; height: 65px; min-width: 65px; min-height: 65px;">
                     <div class="header-text-group" style="text-align: left; margin: 0;">
                         <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">Entrevistas <span>Under</span></h2>
@@ -1000,7 +1000,7 @@
                 <div class="news-rail">
                     {% for item in entrevistas_items[:20] %}
                 <div class="news-card">
-                    <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else 'assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
+                    <img loading="lazy" src="{{ item.image_filename if item.image_filename and (item.image_filename.startswith('http') or item.image_filename.startswith('assets')) else 'updates/' + item.image_filename if item.image_filename else '/assets/logo.png' }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
                     <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
                     <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
                     <div class="episode-actions" style="margin-top: 15px;">
@@ -1019,7 +1019,7 @@
         <section id="agenda" class="section agenda-section">
             <div class="section-header">
                 <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start; flex-wrap: wrap;">
-                    {% set icon_path = settings.get('icon_agenda', 'assets/agenda_icon.png') %}
+                    {% set icon_path = settings.get('icon_agenda', '/assets/agenda_icon.png') %}
                     <img loading="lazy" src="{{ icon_path if icon_path.startswith('http') or icon_path.startswith('assets') else 'updates/' + icon_path }}" class="section-medal" width="65" height="65" style="width: 65px; height: 65px; min-width: 65px; min-height: 65px;">
                     <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
                         <h2 style="font-family: 'Creepster', cursive; font-weight: 400; margin: 0; white-space: nowrap;">Agenda <span>Metalera</span></h2>
@@ -1046,7 +1046,7 @@
                 <div id="tab-2026-{{ month_name|replace(' ', '-') }}" class="agenda-month-panel news-rail">
                     {% for item in items %}
                     <div class="agenda-card {% if item.author < current_date %}past-event{% endif %}">
-                        <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" onerror="this.src='assets/logo.png';" alt="Logo" class="agenda-logo">
+                        <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" onerror="this.src='/assets/logo.png';" alt="Logo" class="agenda-logo">
                         {% if item.author < current_date %}
                         <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #888; padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #555; font-weight: bold; letter-spacing: 1px;">FINALIZADO</div>
                         {% endif %}
@@ -1069,7 +1069,7 @@
                             </div>
                         {% endif %}
                         {% if item['yt_link'] and item['yt_link']|string|trim|upper in ['Y', 'S', 'SI', 'SÍ'] %}
-                        <img loading="lazy" src="assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
+                        <img loading="lazy" src="/assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
                         {% endif %}
                     </div>
                     {% endfor %}
@@ -1090,7 +1090,7 @@
                 <div id="tab-2027-{{ month_name|replace(' ', '-') }}" class="agenda-month-panel news-rail">
                     {% for item in items %}
                     <div class="agenda-card {% if item.author < current_date %}past-event{% endif %}">
-                        <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" onerror="this.src='assets/logo.png';" alt="Logo" class="agenda-logo">
+                        <img loading="lazy" src="{{ item.image_filename if item.image_filename.startswith('http') or item.image_filename.startswith('assets') else 'updates/' + item.image_filename }}" onerror="this.src='/assets/logo.png';" alt="Logo" class="agenda-logo">
                         {% if item.author < current_date %}
                         <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #888; padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #555; font-weight: bold; letter-spacing: 1px;">FINALIZADO</div>
                         {% endif %}
@@ -1113,7 +1113,7 @@
                             </div>
                         {% endif %}
                         {% if item['yt_link'] and item['yt_link']|string|trim|upper in ['Y', 'S', 'SI', 'SÍ'] %}
-                        <img loading="lazy" src="assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
+                        <img loading="lazy" src="/assets/viking.webp" class="agenda-viking-small" title="Goth Prods Crew">
                         {% endif %}
                     </div>
                     {% endfor %}
@@ -1145,9 +1145,9 @@
                     {% if t_name and t_name.strip() != '' %}
                     <div class="equipo-card">
                         {% if t_img %}
-                        <img src="{{ t_img if t_img.startswith('http') or t_img.startswith('assets') else t_img }}" alt="{{ t_name }}" class="equipo-img" loading="lazy" onerror="this.src='assets/viking.webp';">
+                        <img src="{{ t_img if t_img.startswith('http') or t_img.startswith('assets') else t_img }}" alt="{{ t_name }}" class="equipo-img" loading="lazy" onerror="this.src='/assets/viking.webp';">
                         {% else %}
-                        <img src="assets/viking.webp" alt="{{ t_name }}" class="equipo-img" loading="lazy">
+                        <img src="/assets/viking.webp" alt="{{ t_name }}" class="equipo-img" loading="lazy">
                         {% endif %}
                         <h3 class="equipo-name">{{ t_name }}</h3>
                         {% if t_role %}<div class="equipo-role">{{ t_role }}</div>{% endif %}
@@ -1362,7 +1362,7 @@
     <footer>
         <div class="footer-content">
             <a href="#top" style="text-decoration: none; display: inline-block;">
-                <img loading="lazy" src="assets/logo.webp?v=2" alt="Goth Prods Logo" class="footer-logo">
+                <img loading="lazy" src="/assets/logo.webp?v=2" alt="Goth Prods Logo" class="footer-logo">
             </a>
             <p>Goth Productions es una productora y creadora de contenidos enfocados al género más feroz del planeta.</p>
         </div>
