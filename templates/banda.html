@@ -94,13 +94,20 @@
                 </div>
                 {% endif %}
                 
-                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                    {% if banda.ig_link %}<a href="{{ banda.ig_link }}" target="_blank" class="platform-btn" style="background: #E1306C; padding: 8px 15px; font-size: 1rem;"><i class="fa-brands fa-instagram"></i></a>{% endif %}
-                    {% if banda.fb_link %}<a href="{{ banda.fb_link }}" target="_blank" class="platform-btn" style="background: #4267B2; padding: 8px 15px; font-size: 1rem;"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
-                    {% if banda.tk_link %}<a href="{{ banda.tk_link }}" target="_blank" class="platform-btn" style="background: #000; border: 1px solid #333; padding: 8px 15px; font-size: 1rem;"><i class="fa-brands fa-tiktok"></i></a>{% endif %}
-                    {% if banda.sp_link %}<a href="{{ banda.sp_link }}" target="_blank" class="platform-btn spotify-btn" style="padding: 8px 15px; font-size: 1rem;"><i class="fa-brands fa-spotify"></i></a>{% endif %}
-                    {% if banda.ap_link %}<a href="{{ banda.ap_link }}" target="_blank" class="platform-btn apple-btn" style="padding: 8px 15px; font-size: 1rem;"><i class="fa-solid fa-podcast"></i></a>{% endif %}
-                    {% if banda.yt_link %}<a href="{{ banda.yt_link }}" target="_blank" class="platform-btn" style="background: #FF0000; padding: 8px 15px; font-size: 1rem;"><i class="fa-brands fa-youtube"></i></a>{% endif %}
+                <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
+                    {% if banda.ig_link %}<a href="{{ banda.ig_link }}" target="_blank" style="color: #716d4a; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-instagram"></i></a>{% endif %}
+                    {% if banda.fb_link %}<a href="{{ banda.fb_link }}" target="_blank" style="color: #716d4a; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-facebook-f"></i></a>{% endif %}
+                    {% if banda.tk_link %}<a href="{{ banda.tk_link }}" target="_blank" style="color: #716d4a; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-tiktok"></i></a>{% endif %}
+                    {% if banda.yt_link %}<a href="{{ banda.yt_link }}" target="_blank" style="color: #716d4a; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-youtube"></i></a>{% endif %}
+                    {% if banda.sp_link %}<a href="{{ banda.sp_link }}" target="_blank" style="color: #716d4a; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-spotify"></i></a>{% endif %}
+                    {% if banda.ap_link %}<a href="{{ banda.ap_link }}" target="_blank" style="color: #716d4a; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='#716d4a';"><i class="fa-brands fa-apple"></i></a>{% endif %}
+                </div>
+                
+                <div style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;">
+                    <button class="like-btn" data-id="{{ banda.id }}" data-type="banda" style="background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 1.2rem; padding: 8px 25px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: 'Oswald', sans-serif; text-transform: uppercase;" onmouseover="if(!this.disabled){this.style.background='var(--accent-color)'; this.style.color='#000';}" onmouseout="if(!this.disabled){this.style.background='transparent'; this.style.color='var(--accent-color)';}">
+                        <i class="fa-regular fa-heart"></i>
+                        <span class="like-count-{{ banda.id }}" data-type="banda">{{ banda.likes if banda.likes else 0 }}</span>
+                    </button>
                 </div>
             </div>
 
