@@ -579,14 +579,14 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <label style="display: block; font-size: 0.8rem; font-weight: 600; color: #aaa; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
                             <i class="fa-solid fa-heading" style="color: var(--accent-color); margin-right: 6px;"></i> Asunto del Correo
                         </label>
-                        <input type="text" name="asunto" id="news_asunto" placeholder="Ej. ⚔️ GothProds Newsletter - Resumen Brutal de Julio 2026 (Berserkers)" required style="width: 100%; box-sizing: border-box; padding: 10px 14px; background: #181818; color: #fff; border: 1px solid #2c2c2c; border-radius: 6px; font-size: 0.9rem; outline: none; transition: border-color 0.2s;">
+                        <input type="text" name="asunto" id="news_asunto" placeholder="Ej. ⚔️ GothProds Newsletter - Julio 2026" required style="width: 100%; box-sizing: border-box; padding: 10px 14px; background: #181818; color: #fff; border: 1px solid #2c2c2c; border-radius: 6px; font-size: 0.9rem; outline: none; transition: border-color 0.2s;">
                     </div>
 
                     <div style="margin-bottom: 18px;">
                         <label style="display: block; font-size: 0.8rem; font-weight: 600; color: #aaa; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
                             <i class="fa-solid fa-message" style="color: var(--accent-color); margin-right: 6px;"></i> Mensaje Introductorio para los Berserkers (Opcional)
                         </label>
-                        <textarea name="mensaje_intro" id="news_intro" rows="3" placeholder="¡Saludos, Berserkers! Aquí tienen el resumen mensual exclusivo..." style="width: 100%; box-sizing: border-box; padding: 10px 14px; background: #181818; color: #fff; border: 1px solid #2c2c2c; border-radius: 6px; font-size: 0.9rem; line-height: 1.5; resize: vertical; outline: none; transition: border-color 0.2s;"></textarea>
+                        <textarea name="mensaje_intro" id="news_intro" rows="3" placeholder="Les presentamos la recopilación oficial de Agosto 2026 con lo más destacado de El Noticiero Nocturno, Reseñas de Conciertos, Entrevistas Under, Metal Pulse, La Galería Nocturna y la Agenda Metalera." style="width: 100%; box-sizing: border-box; padding: 10px 14px; background: #181818; color: #fff; border: 1px solid #2c2c2c; border-radius: 6px; font-size: 0.9rem; line-height: 1.5; resize: vertical; outline: none; transition: border-color 0.2s;"></textarea>
                     </div>
 
                     <!-- Barra de Acciones del Newsletter -->
@@ -659,8 +659,8 @@ input:checked + .slider:before { transform: translateX(20px); }
                     const yName = parts[0] || "2026";
                     const monthStr = `${mName} ${yName}`;
 
-                    asunto.value = `⚔️ GothProds Newsletter - Resumen Brutal de ${monthStr} (Berserkers)`;
-                    intro.value = `¡Saludos, Berserkers! Les presentamos la recopilación oficial de ${monthStr} con lo más destacado de El Noticiero Nocturno, Reseñas de Conciertos, Entrevistas Under, Metal Pulse, La Galería Nocturna y la Agenda Metalera.`;
+                    asunto.value = `⚔️ GothProds Newsletter - ${monthStr}`;
+                    intro.value = `Les presentamos la recopilación oficial de ${monthStr} con lo más destacado de El Noticiero Nocturno, Reseñas de Conciertos, Entrevistas Under, Metal Pulse, La Galería Nocturna y la Agenda Metalera.`;
 
                     previewNewsletterHTML();
                 }
@@ -668,7 +668,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 async function previewNewsletterHTML() {
                     updateTargetMonth();
                     const monthVal = document.getElementById('news_target_month').value;
-                    const asunto = document.getElementById('news_asunto').value || `⚔️ GothProds Newsletter - Resumen Brutal (Berserkers)`;
+                    const asunto = document.getElementById('news_asunto').value || `⚔️ GothProds Newsletter - ${monthVal}`;
                     const intro = document.getElementById('news_intro').value;
                     const pane = document.getElementById('newsletter-preview-pane');
                     const iframe = document.getElementById('news-preview-iframe');
@@ -693,7 +693,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 async function exportNewsletterToPDF() {
                     updateTargetMonth();
                     const monthVal = document.getElementById('news_target_month').value;
-                    const asunto = document.getElementById('news_asunto').value || `⚔️ GothProds Newsletter - Resumen Brutal (${monthVal})`;
+                    const asunto = document.getElementById('news_asunto').value || `⚔️ GothProds Newsletter - ${monthVal}`;
                     const intro = document.getElementById('news_intro').value;
                     const btn = document.getElementById('btn-export-pdf');
                     const origHtml = btn ? btn.innerHTML : '';

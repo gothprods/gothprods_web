@@ -2728,7 +2728,7 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
         """ for e in eventos])
         bandas_eventos_cards = b_html + e_html
 
-    default_intro = f"¡Saludos, Berserkers! Bienvenidos a la edición oficial de {month_label}. Les presentamos la recopilación más brutal del mes con los lanzamientos pesados, noticias exclusivas de la escena, reseñas de conciertos, entrevistas under, podcast y la agenda de conciertos para {next_month_label}."
+    default_intro = f"Les presentamos la recopilación oficial de {month_label} con lo más destacado de El Noticiero Nocturno, Reseñas de Conciertos, Entrevistas Under, Metal Pulse, La Galería Nocturna y la Agenda Metalera."
 
     logo_img_url = get_full_img_url('assets/logo.png')
     noticiero_icon_url = get_full_img_url('assets/noticiero_icon.png')
@@ -2821,12 +2821,29 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
                     <!-- INTRO -->
                     <tr>
                         <td bgcolor="#0a0a0a" style="background-color: #0a0a0a !important; padding: 22px 25px; border-bottom: 1px solid #222222; border-left: 4px solid #716d4a; color: #ffffff !important;">
-                            <strong style="color: #716d4a !important; font-size: 16px; display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">¡Saludos, Berserkers! ⚔️</strong>
+                            <strong style="color: #716d4a !important; font-size: 16px; display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">SALUDOS BERSERKERS</strong>
                             <p style="color: #ffffff !important; font-size: 14px; line-height: 1.6; margin: 0;">
                                 {mensaje_intro if mensaje_intro else default_intro}
                             </p>
                         </td>
                     </tr>
+
+                    <!-- RADAR DEL CAOS & EL PIT -->
+                    {f'''
+                    <tr>
+                        <td bgcolor="#080808" style="background-color: #080808 !important; padding: 24px 25px; border-bottom: 1px solid #1a1a1a;">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #716d4a; margin-bottom: 18px; padding-bottom: 10px;">
+                                <tr>
+                                    <td style="vertical-align: middle;">
+                                        <img src="{destacados_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
+                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">Radar del Caos & El Pit</h2>
+                                    </td>
+                                </tr>
+                            </table>
+                            {bandas_eventos_cards}
+                        </td>
+                    </tr>
+                    ''' if bandas_eventos_cards else ''}
 
                     <!-- EL NOTICIERO NOCTURNO -->
                     {f'''
@@ -2862,23 +2879,6 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
                     </tr>
                     ''' if reseñas_cards else ''}
 
-                    <!-- ENTREVISTAS UNDER -->
-                    {f'''
-                    <tr>
-                        <td bgcolor="#080808" style="background-color: #080808 !important; padding: 24px 25px; border-bottom: 1px solid #1a1a1a;">
-                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #716d4a; margin-bottom: 18px; padding-bottom: 10px;">
-                                <tr>
-                                    <td style="vertical-align: middle;">
-                                        <img src="{entrevistas_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
-                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">Entrevistas Under</h2>
-                                    </td>
-                                </tr>
-                            </table>
-                            {entrevistas_cards}
-                        </td>
-                    </tr>
-                    ''' if entrevistas_cards else ''}
-
                     <!-- TOP 10 METAL PULSE -->
                     {f'''
                     <tr>
@@ -2907,22 +2907,22 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
                     </tr>
                     ''' if pulse_items else ''}
 
-                    <!-- LA GALERÍA NOCTURNA & CAOS SONORO -->
+                    <!-- ENTREVISTAS UNDER -->
                     {f'''
                     <tr>
                         <td bgcolor="#080808" style="background-color: #080808 !important; padding: 24px 25px; border-bottom: 1px solid #1a1a1a;">
                             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #716d4a; margin-bottom: 18px; padding-bottom: 10px;">
                                 <tr>
                                     <td style="vertical-align: middle;">
-                                        <img src="{galeria_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
-                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">La Galería Nocturna & Caos Sonoro</h2>
+                                        <img src="{entrevistas_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
+                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">Entrevistas Under</h2>
                                     </td>
                                 </tr>
                             </table>
-                            {galeria_cards}
+                            {entrevistas_cards}
                         </td>
                     </tr>
-                    ''' if galeria_cards else ''}
+                    ''' if entrevistas_cards else ''}
 
                     <!-- AGENDA METALERA (DEL MES SIGUIENTE) -->
                     {f'''
@@ -2941,22 +2941,22 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
                     </tr>
                     ''' if agenda_cards else ''}
 
-                    <!-- RADAR DEL CAOS & EL PIT -->
+                    <!-- LA GALERÍA NOCTURNA & CAOS SONORO -->
                     {f'''
                     <tr>
                         <td bgcolor="#080808" style="background-color: #080808 !important; padding: 24px 25px; border-bottom: 1px solid #1a1a1a;">
                             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #716d4a; margin-bottom: 18px; padding-bottom: 10px;">
                                 <tr>
                                     <td style="vertical-align: middle;">
-                                        <img src="{destacados_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
-                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">Radar del Caos & El Pit</h2>
+                                        <img src="{galeria_icon_url}" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #716d4a; vertical-align: middle; margin-right: 10px; object-fit: cover;" />
+                                        <h2 style="color: #716d4a !important; font-size: 19px; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: 900; display: inline-block; vertical-align: middle;">La Galería Nocturna & Caos Sonoro</h2>
                                     </td>
                                 </tr>
                             </table>
-                            {bandas_eventos_cards}
+                            {galeria_cards}
                         </td>
                     </tr>
-                    ''' if bandas_eventos_cards else ''}
+                    ''' if galeria_cards else ''}
 
                     <!-- CTA WEB -->
                     <tr>
