@@ -854,6 +854,9 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                         <div id="bulk-actions-bar" style="display: none; align-items: center; gap: 6px;">
                             <span id="bulk-selected-label" style="font-size: 0.8rem; color: var(--accent-color); font-weight: 600; background: #222; padding: 5px 10px; border-radius: 6px; border: 1px solid #444; white-space: nowrap;">0 seleccionados</span>
+                            <button type="button" onclick="bulkSendWelcomeEmail()" id="btn-bulk-welcome" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #1e1b12; color: #d4af37; border: 1px solid rgba(212,175,55,0.5); border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; text-transform: none; width: auto; margin: 0; line-height: 1.2; white-space: nowrap;">
+                                <i class="fa-solid fa-paper-plane"></i> Enviar bienvenida
+                            </button>
                             <button type="button" onclick="deleteSelectedSubscribers()" id="btn-bulk-delete" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #ff3b3b; color: #fff; border: none; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; text-transform: none; width: auto; margin: 0; line-height: 1.2; white-space: nowrap;">
                                 <i class="fa-solid fa-trash"></i> Eliminar (<span id="bulk-count">0</span>)
                             </button>
@@ -922,8 +925,8 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     <button type="button" onclick="openEditSubscriberModal({{ sub.id }}, '{{ sub.nombre|replace("'", "\\'") if sub.nombre else "" }}', '{{ sub.email }}', {{ 1 if sub.active != 0 else 0 }})" title="Editar datos" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; background: #262626; color: #eee; border: 1px solid #404040; border-radius: 4px; margin: 0 4px 0 0; font-size: 0.78rem; cursor: pointer; text-transform: none; width: auto; line-height: 1.2; white-space: nowrap;">
                                         <i class="fa-solid fa-pen" style="color: var(--accent-color);"></i> Editar
                                     </button>
-                                    <button type="button" onclick="resendWelcomeEmail({{ sub.id }}, '{{ sub.email }}', this)" title="Reenviar correo oficial de bienvenida" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; background: #1e1b12; color: #d4af37; border: 1px solid rgba(212,175,55,0.3); border-radius: 4px; margin: 0 4px 0 0; font-size: 0.78rem; cursor: pointer; text-transform: none; width: auto; line-height: 1.2; white-space: nowrap;">
-                                        <i class="fa-solid fa-paper-plane"></i> Reenviar
+                                    <button type="button" id="btn-welcome-{{ sub.id }}" {% if sub.welcome_sent == 1 %}disabled{% endif %} onclick="resendWelcomeEmail({{ sub.id }}, '{{ sub.email }}', this)" title="Enviar correo de bienvenida oficial" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; background: #1e1b12; color: #d4af37; border: 1px solid rgba(212,175,55,0.3); border-radius: 4px; margin: 0 4px 0 0; font-size: 0.78rem; cursor: pointer; text-transform: none; width: auto; line-height: 1.2; white-space: nowrap; {% if sub.welcome_sent == 1 %}opacity: 0.5; cursor: not-allowed;{% endif %}">
+                                        <i class="fa-solid fa-paper-plane"></i> {% if sub.welcome_sent == 1 %}Enviado{% else %}Enviar bienvenida{% endif %}
                                     </button>
                                     <button type="button" onclick="deleteSingleSubscriber({{ sub.id }}, '{{ sub.email }}')" title="Eliminar suscriptor" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; background: rgba(255,59,59,0.15); color: #ff6b6b; border: 1px solid rgba(255,59,59,0.3); border-radius: 4px; margin: 0; font-size: 0.78rem; cursor: pointer; text-transform: none; width: auto; line-height: 1.2; white-space: nowrap;">
                                         <i class="fa-solid fa-trash"></i> Eliminar
@@ -1313,7 +1316,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 }
 
                 async function resendWelcomeEmail(id, email, btn) {
-                    if (!confirm(`¿Reenviar correo oficial de bienvenida al Berserker "${email}"?`)) {
+                    if (!confirm(`¿Enviar correo oficial de bienvenida al Berserker "${email}"?`)) {
                         return;
                     }
                     const origHtml = btn ? btn.innerHTML : '';
@@ -1333,13 +1336,20 @@ input:checked + .slider:before { transform: translateX(20px); }
                         const data = await res.json();
                         if (data.status === 'success') {
                             alert(data.message || 'Correo de bienvenida enviado exitosamente.');
+                            if (btn) {
+                                btn.style.opacity = '0.5';
+                                btn.style.cursor = 'not-allowed';
+                                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviado';
+                            }
                         } else {
                             alert(data.message || 'No se pudo enviar el correo de bienvenida.');
+                            if (btn) {
+                                btn.disabled = false;
+                                btn.innerHTML = origHtml;
+                            }
                         }
-                    } catch (e) {
-                        console.error(e);
-                        alert('Hubo un problema de conexión al intentar enviar el correo.');
-                    } finally {
+                    } catch (err) {
+                        alert('Error de red al enviar el correo.');
                         if (btn) {
                             btn.disabled = false;
                             btn.innerHTML = origHtml;
@@ -1382,6 +1392,57 @@ input:checked + .slider:before { transform: translateX(20px); }
                         form.action = `/admin/newsletter/delete/${id}`;
                         document.body.appendChild(form);
                         form.submit();
+                    }
+                }
+
+                async function bulkSendWelcomeEmail() {
+                    const selectedIds = getSelectedSubIds();
+                    if (selectedIds.length === 0) {
+                        alert('Selecciona al menos un suscriptor para enviar el correo.');
+                        return;
+                    }
+
+                    if (!confirm(`¿Estás seguro de enviar el correo oficial de bienvenida a los ${selectedIds.length} suscriptor(es) seleccionados?`)) {
+                        return;
+                    }
+
+                    const btn = document.getElementById('btn-bulk-welcome');
+                    const origHtml = btn ? btn.innerHTML : '';
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+                    }
+
+                    try {
+                        const res = await fetch('/admin/newsletter/bulk_welcome', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ ids: selectedIds })
+                        });
+                        const data = await res.json();
+                        if (data.status === 'success') {
+                            alert(data.message || 'Correos enviados exitosamente.');
+                            // Desactivar botones de enviar bienvenida y actualizar estilo de los rows afectados
+                            selectedIds.forEach(id => {
+                                const btnWelcome = document.getElementById(`btn-welcome-${id}`);
+                                if (btnWelcome) {
+                                    btnWelcome.disabled = true;
+                                    btnWelcome.style.opacity = '0.5';
+                                    btnWelcome.style.cursor = 'not-allowed';
+                                    btnWelcome.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviado';
+                                }
+                            });
+                            deselectAllSubscribers();
+                        } else {
+                            alert(data.message || 'Error al enviar correos.');
+                        }
+                    } catch (err) {
+                        alert('Error de red al enviar correos.');
+                    } finally {
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = origHtml;
+                        }
                     }
                 }
 

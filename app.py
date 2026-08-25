@@ -2422,35 +2422,35 @@ def subscribe_newsletter():
             active_name = existing['nombre'] if existing['nombre'] and existing['nombre'] != 'Berserker' else (nombre or 'Berserker')
             if existing['is_active'] == 1:
                 conn.close()
-                threading.Thread(target=send_newsletter_welcome_email, args=(email, active_name)).start()
+                # threading.Thread(target=send_newsletter_welcome_email, args=(email, active_name)).start()
                 nombre_text = f", {active_name}" if active_name and active_name != 'Berserker' else ""
                 return jsonify({
                     'success': True,
                     'is_existing': True,
-                    'message': f'¡Bienvenido! Ahora eres un Berserker{nombre_text}. Te hemos reenviado tu correo oficial de confirmación y bienvenida a {email}.'
+                    'message': f'¡Bienvenido! Ahora eres un Berserker{nombre_text}. Te enviaremos un correo de bienvenida oficial.'
                 })
             else:
                 conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (active_name, existing['id']))
                 conn.commit()
                 conn.close()
-                threading.Thread(target=send_newsletter_welcome_email, args=(email, active_name)).start()
+                # threading.Thread(target=send_newsletter_welcome_email, args=(email, active_name)).start()
                 return jsonify({
                     'success': True,
                     'is_existing': False,
-                    'message': '¡Tu suscripción ha sido reactivada exitosamente! Te hemos enviado un correo de bienvenida oficial.'
+                    'message': '¡Tu suscripción ha sido reactivada exitosamente! Te enviaremos un correo de bienvenida oficial.'
                 })
         
         conn.execute("INSERT INTO newsletter_subscribers (nombre, email, created_at) VALUES (?, ?, ?)", (nombre or 'Berserker', email, get_mexico_now_str()))
         conn.commit()
         conn.close()
         
-        threading.Thread(target=send_newsletter_welcome_email, args=(email, nombre or 'Berserker')).start()
+        # threading.Thread(target=send_newsletter_welcome_email, args=(email, nombre or 'Berserker')).start()
 
         nombre_saludo = f", {nombre}" if nombre else ""
         return jsonify({
             'success': True,
             'is_existing': False,
-            'message': f'¡Bienvenido! Ahora eres un Berserker{nombre_saludo}. Te has suscrito exitosamente. Revisa tu bandeja de entrada para ver tu correo de bienvenida oficial.'
+            'message': f'¡Bienvenido! Ahora eres un Berserker{nombre_saludo}. Te has suscrito exitosamente. Te enviaremos un correo de bienvenida oficial.'
         })
     except Exception as e:
         conn.close()
@@ -3088,9 +3088,11 @@ def admin_newsletter_subscriber_add():
         data = request.get_json() or {}
         nombre = data.get('nombre', '').strip()
         email = data.get('email', '').strip().lower()
+        send_welcome = data.get('send_welcome', False)
     else:
         nombre = request.form.get('nombre', '').strip()
         email = request.form.get('email', '').strip().lower()
+        send_welcome = request.form.get('send_welcome') == 'on'
 
     if not email or '@' not in email:
         msg = 'Por favor ingresa un correo electrónico válido.'
@@ -3104,17 +3106,19 @@ def admin_newsletter_subscriber_add():
         cur = conn.execute("SELECT id FROM newsletter_subscribers WHERE email = ?", (email,))
         existing = cur.fetchone()
         if existing:
-            conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ? WHERE id = ?", (nombre or 'Berserker', existing['id']))
+            welcome_val = 1 if send_welcome else 0
+            conn.execute("UPDATE newsletter_subscribers SET is_active = 1, nombre = ?, welcome_sent = MAX(welcome_sent, ?) WHERE id = ?", (nombre or 'Berserker', welcome_val, existing['id']))
             conn.commit()
             sub_id = existing['id']
             msg = f'Suscriptor {email} reactivado/actualizado exitosamente.'
         else:
-            cur = conn.execute("INSERT INTO newsletter_subscribers (nombre, email, created_at) VALUES (?, ?, ?)", (nombre or 'Berserker', email, get_mexico_now_str()))
+            cur = conn.execute("INSERT INTO newsletter_subscribers (nombre, email, created_at, welcome_sent) VALUES (?, ?, ?, ?)", (nombre or 'Berserker', email, get_mexico_now_str(), 1 if send_welcome else 0))
             conn.commit()
             sub_id = cur.lastrowid
             msg = f'Suscriptor {nombre or email} registrado exitosamente.'
         
-        threading.Thread(target=send_newsletter_welcome_email, args=(email, nombre or 'Berserker')).start()
+        if send_welcome:
+            threading.Thread(target=send_newsletter_welcome_email, args=(email, nombre or 'Berserker')).start()
 
         if is_ajax_request(request):
             return jsonify({
@@ -3223,13 +3227,17 @@ def admin_newsletter_resend_welcome(id):
 
     conn = get_db_connection()
     sub = conn.execute("SELECT id, nombre, email FROM newsletter_subscribers WHERE id = ?", (id,)).fetchone()
-    conn.close()
 
     if not sub:
+        conn.close()
         if is_ajax_request(request):
             return jsonify({'status': 'error', 'message': 'Suscriptor no encontrado.'}), 404
         flash('Suscriptor no encontrado.', 'error')
         return redirect(url_for('admin_dashboard'))
+
+    conn.execute("UPDATE newsletter_subscribers SET welcome_sent = 1 WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
 
     threading.Thread(target=send_newsletter_welcome_email, args=(sub['email'], sub['nombre'] or 'Berserker')).start()
     msg = f"⚔️ El envío del correo oficial de bienvenida a {sub['email']} se ha iniciado en segundo plano."
@@ -3238,6 +3246,37 @@ def admin_newsletter_resend_welcome(id):
     flash(msg, 'success')
 
     return redirect(url_for('admin_dashboard') + '#tab-newsletter')
+
+@app.route('/admin/newsletter/bulk_welcome', methods=['POST'])
+def admin_newsletter_bulk_welcome():
+    if session.get('role') not in ['admin', 'root']:
+        return jsonify({'status': 'error', 'message': 'Acceso denegado'}), 403
+
+    data = request.get_json()
+    if not data or 'ids' not in data:
+        return jsonify({'status': 'error', 'message': 'Datos inválidos.'}), 400
+
+    ids = data['ids']
+    if not isinstance(ids, list) or not ids:
+        return jsonify({'status': 'error', 'message': 'No se seleccionaron suscriptores.'}), 400
+
+    conn = get_db_connection()
+    subs = conn.execute(f"SELECT id, nombre, email FROM newsletter_subscribers WHERE id IN ({','.join(['?']*len(ids))})", tuple(ids)).fetchall()
+    
+    if not subs:
+        conn.close()
+        return jsonify({'status': 'error', 'message': 'No se encontraron los suscriptores seleccionados.'}), 404
+
+    # Marcar como enviados en BD
+    conn.execute(f"UPDATE newsletter_subscribers SET welcome_sent = 1 WHERE id IN ({','.join(['?']*len(ids))})", tuple(ids))
+    conn.commit()
+    conn.close()
+
+    # Enviar correos
+    for sub in subs:
+        threading.Thread(target=send_newsletter_welcome_email, args=(sub['email'], sub['nombre'] or 'Berserker')).start()
+
+    return jsonify({'status': 'success', 'message': f'Se enviarán {len(subs)} correos de bienvenida en segundo plano.'})
 
 @app.route('/admin/newsletter/delete/<int:id>', methods=['POST'])
 def admin_newsletter_delete(id):
