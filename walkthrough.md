@@ -1,12 +1,13 @@
-# Resumen de Cambios: Recuperación de Entrevistas Under
+# Resumen de Cambios: Problemas de Sincronización y Duplicados Masivos
 
-## El Problema Detectado
-El Sr. Arenales reportó que en la página web solo se visualizaban 3 registros en la sección de *Entrevistas Under*.
-Al analizar la base de datos y la lógica de sincronización (`sync_rss.py`), descubrí que el sistema solo estaba enviando a esa sección los audios y videos que contenían explícitamente la palabra **"Entrevista"** o **"Interview"** en su título. Sin embargo, históricamente, la gran mayoría de las entrevistas se han publicado bajo el formato **"Especial | [Nombre de la Banda] en La Galería Nocturna"** (ej. *Especial | Noumenia en La Galería Nocturna*). Como el sistema no reconocía este formato, las catalogaba incorrectamente dentro de *La Galería Nocturna*.
+## 1. El ciclo de carga infinito (ciclado)
+**Problema:** Al hacer clic en los botones de "Sincronizar" en el panel, el proceso se quedaba girando sin fin y a veces fallaba.
+**Causa:** Había una función antigua (`cleanup_dead_links`) que intentaba verificar, uno por uno, si los enlaces de YouTube de todo el historial seguían vivos enviando solicitudes web. Con más de 200 episodios, esto tomaba tanto tiempo que el servidor mataba el proceso (timeout), dejando la interfaz congelada.
+**Solución:** Desactivé esta función obsoleta. Ahora la sincronización se enfoca únicamente en descargar la información fresca de Ivoox, haciendo que el botón responda al instante.
 
-## Solución Aplicada
-1. **Limpieza y Reasignación en Base de Datos:** Ejecuté un comando para buscar todos los episodios antiguos que cumplieran con el formato de bandas "en La Galería Nocturna" (excluyendo podcasts de opinión como "Doble Filo" o "Lo Que Sucedió") y los moví masivamente a su sección correspondiente. 
-2. **Actualización de Reglas de Sincronización:** Modifiqué el archivo `sync_rss.py` para que, de ahora en adelante, la herramienta de auto-sincronización reconozca automáticamente este patrón de títulos y los envíe siempre a *Entrevistas Under* desde el primer momento.
-
-## Resultados y Validación
-La base de datos de producción (`gothprods_live.db`) ya ha sido actualizada. Pasamos de tener **solo 3 registros** a tener un total de **61 Entrevistas Under** correctamente catalogadas y visibles en la página web.
+## 2. Los Duplicados Históricos
+**Problema:** Los primeros episodios no se repetían, pero todo el catálogo antiguo sí.
+**Causa:** Durante años, la base de datos se alimentó de YouTube. Cuando cambiamos a Ivoox, el sistema intentó emparejarlos por nombre para no duplicarlos, pero descubrí que los títulos en YouTube (ej. `🤘🔥 METALLICA EN FRANKFURT`) eran muy distintos a los de Ivoox (`METALLICA EN FRANKFURT`). Al no ser idénticos, el sistema creyó que los 308 audios de Ivoox eran completamente nuevos y los insertó todos de nuevo.
+**Solución:** 
+- Eliminé masivamente los 308 registros duplicados que se habían insertado desde Ivoox. 
+- Agregué una regla de oro en el código de sincronización (`sync_rss.py`): el sistema de Ivoox **ignorará cualquier episodio publicado antes de Julio de 2026**. De esta forma preservamos intacto su catálogo histórico de YouTube, y evitamos que Ivoox intente volver a inyectar episodios viejos en cada sincronización.

@@ -34,7 +34,6 @@ def is_link_alive(url):
     except Exception:
         return True # Do not delete on random connection issues
 
-def cleanup_dead_links(conn, sections):
     c = conn.cursor()
     placeholders = ','.join(['?']*len(sections))
     c.execute(f"SELECT id, yt_link, ap_link, title FROM content_items WHERE section IN ({placeholders})", sections)
@@ -137,9 +136,7 @@ def sync_youtube(target_section):
     conn.commit()
     
     if target_section == "La Galería Nocturna":
-        cleanup_dead_links(conn, ("La Galería Nocturna", "Caos Sonoro", "Colaboraciones", "Entrevistas Under"))
     else:
-        cleanup_dead_links(conn, (target_section,))
         
     conn.close()
 
@@ -187,7 +184,6 @@ def sync_youtube_playlist(playlist_id, target_section):
                       (target_section, title, short_desc, thumbnail, yt_link, pub_date))
     
     conn.commit()
-    cleanup_dead_links(conn, (target_section,))
     conn.close()
 
 def sync_ivoox(url, default_section):
@@ -225,6 +221,9 @@ def sync_ivoox(url, default_section):
         else:
             pub_date_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+        if pub_date_str < "2026-07-01":
+            continue
+
         section = default_section
         if default_section in ("La Galería Nocturna", "Caos Sonoro", "Colaboraciones", "Entrevistas Under"):
             if "Caos Sonoro" in title:
@@ -251,7 +250,6 @@ def sync_ivoox(url, default_section):
                       (section, title, short_desc, thumbnail, link, pub_date_str))
 
     conn.commit()
-    cleanup_dead_links(conn, (default_section,))
     conn.close()
 
 if __name__ == "__main__":
