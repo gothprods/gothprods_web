@@ -87,7 +87,7 @@ def sync_youtube(target_section):
             section = "Metal Pulse"
         elif "colaboraci" in title_lower or "collab" in title_lower:
             section = "Colaboraciones"
-        elif "entrevista" in title_lower:
+        elif "entrevista" in title_lower or "interview" in title_lower or ("en la galer" in title_lower and "doble filo" not in title_lower and "lo que sucedió" not in title_lower and "día de muertos" not in title_lower) or ("in la galer" in title_lower):
             section = "Entrevistas Under"
 
         if target_section == "La Galería Nocturna":
@@ -229,7 +229,7 @@ def sync_ivoox(url, default_section):
         if default_section in ("La Galería Nocturna", "Caos Sonoro", "Colaboraciones", "Entrevistas Under"):
             if "Caos Sonoro" in title:
                 section = "Caos Sonoro"
-            elif "Entrevista" in title:
+            elif "Entrevista" in title or "Interview" in title or ("en La Galer" in title and "Doble Filo" not in title and "Lo Que Sucedió" not in title and "Día De Muertos" not in title and "Traición" not in title and "El Adiós" not in title) or ("in La Galer" in title):
                 section = "Entrevistas Under"
             elif "Colaboraciones" in title or "Mexapedia" in title:
                 section = "Colaboraciones"

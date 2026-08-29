@@ -1,14 +1,12 @@
-# Resumen de Cambios: Resolución de Duplicados
+# Resumen de Cambios: Recuperación de Entrevistas Under
 
-## 1. Corrección de Duplicados
-Al cambiar la fuente de sincronización de YouTube a Ivoox, el sistema detectó algunos episodios como "nuevos" debido a que tenían títulos distintos en cada plataforma, generando duplicados visuales en el carrusel de *La Galería Nocturna*. 
+## El Problema Detectado
+El Sr. Arenales reportó que en la página web solo se visualizaban 3 registros en la sección de *Entrevistas Under*.
+Al analizar la base de datos y la lógica de sincronización (`sync_rss.py`), descubrí que el sistema solo estaba enviando a esa sección los audios y videos que contenían explícitamente la palabra **"Entrevista"** o **"Interview"** en su título. Sin embargo, históricamente, la gran mayoría de las entrevistas se han publicado bajo el formato **"Especial | [Nombre de la Banda] en La Galería Nocturna"** (ej. *Especial | Noumenia en La Galería Nocturna*). Como el sistema no reconocía este formato, las catalogaba incorrectamente dentro de *La Galería Nocturna*.
 
-Se han unificado los siguientes episodios en la base de datos, fusionando sus enlaces para que no aparezcan dos veces:
-- *LA CRISIS DE LOS CONCIERTOS EN MÉXICO YA EMPEZÓ* (YouTube) se fusionó con *LIVE: Esto ya es grave...* (Ivoox).
-- *3er Aniversario Mexapedia* (YouTube) se fusionó con *LIVE: De enciclopedia a motor...* (Ivoox).
+## Solución Aplicada
+1. **Limpieza y Reasignación en Base de Datos:** Ejecuté un comando para buscar todos los episodios antiguos que cumplieran con el formato de bandas "en La Galería Nocturna" (excluyendo podcasts de opinión como "Doble Filo" o "Lo Que Sucedió") y los moví masivamente a su sección correspondiente. 
+2. **Actualización de Reglas de Sincronización:** Modifiqué el archivo `sync_rss.py` para que, de ahora en adelante, la herramienta de auto-sincronización reconozca automáticamente este patrón de títulos y los envíe siempre a *Entrevistas Under* desde el primer momento.
 
-## 2. Episodios Faltantes
-Dado que YouTube bloqueó nuestro acceso automatizado (RSS), **el botón "Sincronizar" ahora solo puede extraer episodios que ya estén disponibles en el feed de Ivoox**. 
-Si el Live faltante fue transmitido recientemente en YouTube y aún no se ha distribuido al feed de Ivoox, el sistema no podrá detectarlo de forma automática.
-
-Para agregarlo sin tener que esperar a Ivoox, se recomienda utilizar el botón "Agregar" en el Panel de Control.
+## Resultados y Validación
+La base de datos de producción (`gothprods_live.db`) ya ha sido actualizada. Pasamos de tener **solo 3 registros** a tener un total de **61 Entrevistas Under** correctamente catalogadas y visibles en la página web.
