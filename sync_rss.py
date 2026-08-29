@@ -221,7 +221,7 @@ def sync_ivoox(url, default_section):
         else:
             pub_date_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        if pub_date_str < "2026-07-01":
+        if pub_date_str < "2026-08-06":
             continue
 
         section = default_section
