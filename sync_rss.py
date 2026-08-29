@@ -190,8 +190,8 @@ def sync_youtube_playlist(playlist_id, target_section):
     cleanup_dead_links(conn, (target_section,))
     conn.close()
 
-def sync_ivoox(url, section):
-    print(f"Syncing Ivoox for {section}...")
+def sync_ivoox(url, default_section):
+    print(f"Syncing Ivoox for {default_section}...")
     xml_data = fetch_xml(url)
     if not xml_data: return
 
@@ -225,6 +225,17 @@ def sync_ivoox(url, section):
         else:
             pub_date_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+        section = default_section
+        if default_section in ("La Galería Nocturna", "Caos Sonoro", "Colaboraciones", "Entrevistas Under"):
+            if "Caos Sonoro" in title:
+                section = "Caos Sonoro"
+            elif "Entrevista" in title:
+                section = "Entrevistas Under"
+            elif "Colaboraciones" in title or "Mexapedia" in title:
+                section = "Colaboraciones"
+            else:
+                section = "La Galería Nocturna"
+
         c.execute("SELECT id, image_filename FROM content_items WHERE ap_link = ? OR title = ?", (link, title))
         row = c.fetchone()
         if row:
@@ -240,22 +251,19 @@ def sync_ivoox(url, section):
                       (section, title, short_desc, thumbnail, link, pub_date_str))
 
     conn.commit()
-    cleanup_dead_links(conn, (section,))
+    cleanup_dead_links(conn, (default_section,))
     conn.close()
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         target = sys.argv[1]
         if target == "galeria":
-            sync_youtube("La Galería Nocturna")
-            sync_youtube_playlist("PLd5jsuXDl0KA", "Colaboraciones")
+            sync_ivoox("https://feeds.ivoox.com/feed_fg_f11154894_filtro_1.xml", "La Galería Nocturna")
         elif target == "metal_pulse":
             sync_ivoox("https://feeds.ivoox.com/feed_fg_f12064367_filtro_1.xml", "Metal Pulse")
         elif target == "entrevistas":
-            sync_youtube_playlist("PLvx0zBV_ivqAdRE2WhzwUscz1RfR4W9US", "Entrevistas Under")
+            sync_ivoox("https://feeds.ivoox.com/feed_fg_f11154894_filtro_1.xml", "Entrevistas Under")
     else:
-        sync_youtube("La Galería Nocturna")
-        sync_youtube_playlist("PLd5jsuXDl0KA", "Colaboraciones")
+        sync_ivoox("https://feeds.ivoox.com/feed_fg_f11154894_filtro_1.xml", "La Galería Nocturna")
         sync_ivoox("https://feeds.ivoox.com/feed_fg_f12064367_filtro_1.xml", "Metal Pulse")
-        sync_youtube_playlist("PLvx0zBV_ivqAdRE2WhzwUscz1RfR4W9US", "Entrevistas Under")
     print("Sync complete!")

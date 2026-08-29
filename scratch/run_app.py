@@ -1,0 +1,3 @@
+import sys
+from app import app
+app.run(port=5001, debug=False)
