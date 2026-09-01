@@ -1,0 +1,183 @@
+            alt_path = base + alt_ext
+            if os.path.exists(alt_path):
+                return f"{base_url}/{alt_path}"
+                
+        if band_title:
+            title_clean = re.sub(r'[^a-zA-Z0-9]', '', band_title).lower()
+            if os.path.exists('assets/logos'):
+                for lf in os.listdir('assets/logos'):
+                    lf_clean = re.sub(r'[^a-zA-Z0-9]', '', os.path.splitext(lf)[0]).lower()
+                    if lf_clean and (lf_clean == title_clean or lf_clean in title_clean or title_clean in lf_clean):
+                        return f"{base_url}/assets/logos/{lf}"
+                        
+        if sec == 'Agenda Metalera':
+            return f"{base_url}/assets/agenda_icon.png"
+        return f"{base_url}/{default_img}"
+
+    # Tarjetas con estructura de tabla sólida a prueba de clientes de correo
+    noticiero_cards = "".join([f"""
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                <img src="{get_full_img_url(n['image_filename'], band_title=n['title'], sec='El Noticiero Nocturno')}" alt="{n['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 18px; color: #ffffff !important;">
+                <div style="margin-bottom: 8px;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">Noticia</span>
+                    <span style="color: #ffffff !important; font-size: 12px; margin-left: 8px;">📅 {n['created_at'][:10] if n['created_at'] else ''}</span>
+                </div>
+                <h3 style="color: #716d4a !important; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{n['title']}</h3>
+                <p style="color: #ffffff !important; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(n['short_desc'] or n['full_desc'] or '')[:180]}...</p>
+                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Leer Nota Completa en GothProds &rarr;</a>
+            </td>
+        </tr>
+    </table>
+    """ for n in noticiero])
+
+    reseñas_cards = "".join([f"""
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                <img src="{get_full_img_url(r['image_filename'], band_title=r['title'], sec='Reseñas de Conciertos')}" alt="{r['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 18px; color: #ffffff !important;">
+                <div style="margin-bottom: 8px;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">Reseña en Vivo</span>
+                    <span style="color: #ffffff !important; font-size: 12px; margin-left: 8px;">📅 {r['created_at'][:10] if r['created_at'] else ''}</span>
+                </div>
+                <h3 style="color: #716d4a !important; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{r['title']}</h3>
+                <p style="color: #ffffff !important; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(r['short_desc'] or r['full_desc'] or '')[:180]}...</p>
+                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Leer Reseña Completa &rarr;</a>
+            </td>
+        </tr>
+    </table>
+    """ for r in reseñas])
+
+    entrevistas_cards = "".join([f"""
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                <img src="{get_full_img_url(e['image_filename'], band_title=e['title'], sec='Entrevistas Under')}" alt="{e['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 18px; color: #ffffff !important;">
+                <div style="margin-bottom: 8px;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">Entrevista Exclusiva</span>
+                    <span style="color: #ffffff !important; font-size: 12px; margin-left: 8px;">📅 {e['created_at'][:10] if e['created_at'] else ''}</span>
+                </div>
+                <h3 style="color: #716d4a !important; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{e['title']}</h3>
+                <p style="color: #ffffff !important; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(e['short_desc'] or e['full_desc'] or '')[:180]}...</p>
+                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Ver Entrevista en GothProds &rarr;</a>
+            </td>
+        </tr>
+    </table>
+    """ for e in entrevistas])
+
+    galeria_cards = "".join([f"""
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                <img src="{get_full_img_url(g['image_filename'], band_title=g['title'], sec='La Galería Nocturna')}" alt="{g['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 18px; color: #ffffff !important;">
+                <div style="margin-bottom: 8px;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">Podcast & Video</span>
+                    <span style="color: #ffffff !important; font-size: 12px; margin-left: 8px;">📅 {g['created_at'][:10] if g['created_at'] else ''}</span>
+                </div>
+                <h3 style="color: #716d4a !important; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{g['title']}</h3>
+                <p style="color: #ffffff !important; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(g['short_desc'] or g['full_desc'] or '')[:180]}...</p>
+                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Reproducir Episodio &rarr;</a>
+            </td>
+        </tr>
+    </table>
+    """ for g in galeria])
+
+    pulse_items = "".join([f"""
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 6px; margin-bottom: 8px;">
+        <tr>
+            <td style="padding: 10px 14px; vertical-align: middle;">
+                <table role="presentation" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td bgcolor="#716d4a" style="background-color: #716d4a !important; color: #ffffff !important; font-weight: 900; width: 26px; height: 26px; text-align: center; border-radius: 50%; font-size: 12px; padding: 0;">
+                            {idx + 1}
+                        </td>
+                        <td style="padding-left: 12px;">
+                            <strong style="color: #716d4a !important; font-size: 14px; display: block;">{t['title']}</strong>
+                            <span style="color: #ffffff !important; font-size: 12px;">{t['short_desc']}</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td align="right" style="padding: 10px 14px; vertical-align: middle; white-space: nowrap;">
+                <span style="color: #ffffff !important; font-weight: bold; font-size: 11px; background-color: #191812 !important; border: 1px solid #716d4a; padding: 4px 8px; border-radius: 3px; display: inline-block;">{t['full_desc']}</span>
+            </td>
+        </tr>
+    </table>
+    """ for idx, t in enumerate(pulse_tracks[:10])])
+
+    # Agenda Metalera: Solo Bandas (con link directo), Venues y Fecha (sin emojis)
+    agenda_cards = "".join([f"""
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 6px; margin-bottom: 10px;">
+        <tr>
+            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 12px 16px; vertical-align: middle;">
+                <div style="margin-bottom: 4px;">
+                    <a href="https://gothprods.com#agenda" target="_blank" style="color: #ffffff !important; font-size: 16px; font-weight: bold; text-decoration: underline; text-underline-offset: 3px;">
+                        {a['title']}
+                    </a>
+                </div>
+                <div style="color: #ffffff !important; font-size: 13px; line-height: 1.4;">
+                    Venue: <span style="color: #ffffff !important; font-weight: bold;">{(a['short_desc'] or 'Por confirmar').replace(chr(10), ' - ')}</span>
+                </div>
+            </td>
+            <td bgcolor="#0d0d0d" align="right" style="background-color: #0d0d0d !important; padding: 12px 16px; width: 130px; vertical-align: middle;">
+                <div style="background-color: #191812 !important; border: 1px solid #716d4a; color: #ffffff !important; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-align: center; display: inline-block; white-space: nowrap;">
+                    {a['author']}
+                </div>
+            </td>
+        </tr>
+    </table>
+    """ for a in agenda])
+
+    bandas_eventos_cards = ""
+    if bandas or eventos:
+        b_html = "".join([f"""
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
+            <tr>
+                <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                    <img src="{get_full_img_url(b['img_video_path'] or b['ultimo_lanzamiento_url'])}" style="width: 100%; max-height: 200px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 14px; color: #ffffff !important;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; display: inline-block;">Banda Destacada</span>
+                    <h3 style="color: #716d4a !important; margin: 6px 0; font-size: 17px; font-weight: bold;">{b['nombre']} ({b['pais'] or 'Underground'})</h3>
+                    <p style="color: #ffffff !important; font-size: 13px; margin: 0;">{(b['texto_resena'] or b['bio_larga'] or '')[:160]}...</p>
+                </td>
+            </tr>
+        </table>
+        """ for b in bandas])
+        e_html = "".join([f"""
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
+            <tr>
+                <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                    <img src="{get_full_img_url(e['img_video_path'])}" style="width: 100%; max-height: 200px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 14px; color: #ffffff !important;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; display: inline-block;">Evento Destacado</span>
+                    <h3 style="color: #716d4a !important; margin: 6px 0; font-size: 17px; font-weight: bold;">{e['nombre_evento']}</h3>
+                    <p style="color: #ffffff !important; font-size: 13px; margin: 0;">📍 {e['ciudad']}, {e['pais']} | 📅 {e['fecha_evento']}</p>
+                </td>
+            </tr>
+        </table>
+        """ for e in eventos])
+        bandas_eventos_cards = b_html + e_html
+

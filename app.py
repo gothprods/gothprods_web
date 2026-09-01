@@ -1414,7 +1414,7 @@ def update_settings():
         if v is not None:
             queries.append(("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (k, v)))
     
-    file_keys = ['hero_bg', 'header_logo', 'galeria_bg', 'metalpulse_bg', 
+    file_keys = ['hero_bg', 'header_logo', 'icon_home', 'galeria_bg', 'metalpulse_bg', 
                  'icon_destacados', 'icon_el_pit', 'icon_galeria', 'icon_metalpulse',
                  'icon_reviews', 'icon_news', 'icon_interviews', 'icon_agenda', 'icon_contacto', 'icon_equipo',
                  'logo_aliado_1', 'logo_aliado_2', 'logo_aliado_3', 'logo_aliado_4', 'logo_aliado_5',
@@ -2495,8 +2495,8 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
     next_month_label = f"{next_month_name} {next_y}"
     
     # 1. Bandas y Eventos (Radar del Caos & El Pit)
-    bandas = conn.execute("SELECT * FROM banda_semana WHERE is_active = 1 AND created_at LIKE ? ORDER BY id DESC LIMIT 2", (f"{target_month}%",)).fetchall()
-    eventos = conn.execute("SELECT * FROM eventos_semana WHERE is_active = 1 AND created_at LIKE ? ORDER BY id DESC LIMIT 2", (f"{target_month}%",)).fetchall()
+    bandas = conn.execute("SELECT * FROM banda_semana WHERE is_active = 1 AND created_at LIKE ? ORDER BY id DESC ", (f"{target_month}%",)).fetchall()
+    eventos = conn.execute("SELECT * FROM eventos_semana WHERE is_active = 1 AND created_at LIKE ? ORDER BY id DESC ", (f"{target_month}%",)).fetchall()
     
     # 2. El Noticiero Nocturno (Filtrado por mes objetivo)
     noticiero = conn.execute("SELECT * FROM content_items WHERE section = 'El Noticiero Nocturno' AND created_at LIKE ? ORDER BY created_at DESC, id DESC", (f"{target_month}%",)).fetchall()
@@ -2510,8 +2510,28 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
     # 5. La Galería Nocturna & Caos Sonoro (Filtrado por mes objetivo)
     galeria = conn.execute("SELECT * FROM content_items WHERE section IN ('La Galería Nocturna', 'Caos Sonoro') AND created_at LIKE ? ORDER BY created_at DESC, id DESC", (f"{target_month}%",)).fetchall()
         
-    # 6. Metal Pulse Tracks (Filtrado por mes objetivo)
-    pulse_tracks = conn.execute("SELECT * FROM content_items WHERE section = 'Metal Pulse Tracks' AND (full_desc LIKE ? OR full_desc LIKE ?) ORDER BY id DESC", (f"%{month_name}%", f"%{target_month}%")).fetchall()
+    # 6. Metal Pulse Tracks (Tomar la lista activa en la pagina)
+    all_tracks = conn.execute("SELECT * FROM content_items WHERE section = 'Metal Pulse Tracks' AND full_desc != '.' ORDER BY id DESC").fetchall()
+    settings_rows = conn.execute('SELECT key, value FROM settings').fetchall()
+    settings = {row['key']: row['value'] for row in settings_rows}
+    hide_past_mp = settings.get('hide_past_metalpulse', '0') == '1'
+    if hide_past_mp and all_tracks:
+        months_es = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+        cur_year = now_mx.year
+        cur_month_idx = now_mx.month - 1
+        valid_months = set()
+        for i in range(24):
+            m_idx = (cur_month_idx + i) % 12
+            y_i = cur_year + (cur_month_idx + i) // 12
+            valid_months.add(f"{months_es[m_idx]} {y_i}")
+        filtered = [t for t in all_tracks if t['full_desc'] in valid_months]
+        if filtered:
+            pulse_tracks = filtered
+        else:
+            latest_month = all_tracks[0]['full_desc']
+            pulse_tracks = [t for t in all_tracks if t['full_desc'] == latest_month]
+    else:
+        pulse_tracks = all_tracks
         
     # 7. Agenda Metalera (Conciertos en el MES SIGUIENTE)
     agenda = conn.execute("SELECT * FROM content_items WHERE section = 'Agenda Metalera' AND author LIKE ? ORDER BY author ASC", (f"{next_month_str}%",)).fetchall()
@@ -2563,84 +2583,76 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
 
     # Tarjetas con estructura de tabla sólida a prueba de clientes de correo
     noticiero_cards = "".join([f"""
-    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
         <tr>
-            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
-                <img src="{get_full_img_url(n['image_filename'], band_title=n['title'], sec='El Noticiero Nocturno')}" alt="{n['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+            <td width="110" valign="top" bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                <img src="{get_full_img_url(n['image_filename'], band_title=n['title'], sec='El Noticiero Nocturno')}" alt="{n['title']}" style="width: 110px; height: 110px; object-fit: cover; display: block; border-right: 1px solid #716d4a;" />
             </td>
-        </tr>
-        <tr>
-            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 18px; color: #ffffff !important;">
-                <div style="margin-bottom: 8px;">
-                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">Noticia</span>
-                    <span style="color: #ffffff !important; font-size: 12px; margin-left: 8px;">📅 {n['created_at'][:10] if n['created_at'] else ''}</span>
+            <td valign="top" bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 10px 12px; color: #ffffff !important;">
+                <div style="margin-bottom: 4px;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 9px; padding: 2px 5px; border-radius: 2px; text-transform: uppercase;">Noticia</span>
+                    <span style="color: #ffffff !important; font-size: 10px; margin-left: 6px;">📅 {n['created_at'][:10] if n['created_at'] else ''}</span>
                 </div>
-                <h3 style="color: #716d4a !important; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{n['title']}</h3>
-                <p style="color: #ffffff !important; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(n['short_desc'] or n['full_desc'] or '')[:180]}...</p>
-                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Leer Nota Completa en GothProds &rarr;</a>
+                <h3 style="color: #716d4a !important; margin: 0 0 4px 0; font-size: 14px; line-height: 1.2; font-weight: bold;">{n['title']}</h3>
+                <p style="color: #ffffff !important; font-size: 11px; line-height: 1.3; margin: 0 0 6px 0;">{(n['short_desc'] or n['full_desc'] or '')[:90]}...</p>
+                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 11px; font-weight: bold; text-decoration: underline;">Leer Nota &rarr;</a>
             </td>
         </tr>
     </table>
     """ for n in noticiero])
 
     reseñas_cards = "".join([f"""
-    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
         <tr>
-            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
-                <img src="{get_full_img_url(r['image_filename'], band_title=r['title'], sec='Reseñas de Conciertos')}" alt="{r['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+            <td width="110" valign="top" bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                <img src="{get_full_img_url(r['image_filename'], band_title=r['title'], sec='Reseñas de Conciertos')}" alt="{r['title']}" style="width: 110px; height: 110px; object-fit: cover; display: block; border-right: 1px solid #716d4a;" />
             </td>
-        </tr>
-        <tr>
-            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 18px; color: #ffffff !important;">
-                <div style="margin-bottom: 8px;">
-                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">Reseña en Vivo</span>
-                    <span style="color: #ffffff !important; font-size: 12px; margin-left: 8px;">📅 {r['created_at'][:10] if r['created_at'] else ''}</span>
+            <td valign="top" bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 10px 12px; color: #ffffff !important;">
+                <div style="margin-bottom: 4px;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 9px; padding: 2px 5px; border-radius: 2px; text-transform: uppercase;">Reseña</span>
+                    <span style="color: #ffffff !important; font-size: 10px; margin-left: 6px;">📅 {r['created_at'][:10] if r['created_at'] else ''}</span>
                 </div>
-                <h3 style="color: #716d4a !important; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{r['title']}</h3>
-                <p style="color: #ffffff !important; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(r['short_desc'] or r['full_desc'] or '')[:180]}...</p>
-                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Leer Reseña Completa &rarr;</a>
+                <h3 style="color: #716d4a !important; margin: 0 0 4px 0; font-size: 14px; line-height: 1.2; font-weight: bold;">{r['title']}</h3>
+                <p style="color: #ffffff !important; font-size: 11px; line-height: 1.3; margin: 0 0 6px 0;">{(r['short_desc'] or r['full_desc'] or '')[:90]}...</p>
+                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 11px; font-weight: bold; text-decoration: underline;">Leer Reseña &rarr;</a>
             </td>
         </tr>
     </table>
     """ for r in reseñas])
 
     entrevistas_cards = "".join([f"""
-    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
         <tr>
-            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
-                <img src="{get_full_img_url(e['image_filename'], band_title=e['title'], sec='Entrevistas Under')}" alt="{e['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+            <td width="110" valign="top" bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                <img src="{get_full_img_url(e['image_filename'], band_title=e['title'], sec='Entrevistas Under')}" alt="{e['title']}" style="width: 110px; height: 110px; object-fit: cover; display: block; border-right: 1px solid #716d4a;" />
             </td>
-        </tr>
-        <tr>
-            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 18px; color: #ffffff !important;">
-                <div style="margin-bottom: 8px;">
-                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">Entrevista Exclusiva</span>
-                    <span style="color: #ffffff !important; font-size: 12px; margin-left: 8px;">📅 {e['created_at'][:10] if e['created_at'] else ''}</span>
+            <td valign="top" bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 10px 12px; color: #ffffff !important;">
+                <div style="margin-bottom: 4px;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 9px; padding: 2px 5px; border-radius: 2px; text-transform: uppercase;">Entrevista</span>
+                    <span style="color: #ffffff !important; font-size: 10px; margin-left: 6px;">📅 {e['created_at'][:10] if e['created_at'] else ''}</span>
                 </div>
-                <h3 style="color: #716d4a !important; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{e['title']}</h3>
-                <p style="color: #ffffff !important; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(e['short_desc'] or e['full_desc'] or '')[:180]}...</p>
-                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Ver Entrevista en GothProds &rarr;</a>
+                <h3 style="color: #716d4a !important; margin: 0 0 4px 0; font-size: 14px; line-height: 1.2; font-weight: bold;">{e['title']}</h3>
+                <p style="color: #ffffff !important; font-size: 11px; line-height: 1.3; margin: 0 0 6px 0;">{(e['short_desc'] or e['full_desc'] or '')[:90]}...</p>
+                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 11px; font-weight: bold; text-decoration: underline;">Ver Entrevista &rarr;</a>
             </td>
         </tr>
     </table>
     """ for e in entrevistas])
 
     galeria_cards = "".join([f"""
-    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
         <tr>
-            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
-                <img src="{get_full_img_url(g['image_filename'], band_title=g['title'], sec='La Galería Nocturna')}" alt="{g['title']}" style="width: 100%; max-height: 220px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+            <td width="110" valign="top" bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                <img src="{get_full_img_url(g['image_filename'], band_title=g['title'], sec='La Galería Nocturna')}" alt="{g['title']}" style="width: 110px; height: 110px; object-fit: cover; display: block; border-right: 1px solid #716d4a;" />
             </td>
-        </tr>
-        <tr>
-            <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 18px; color: #ffffff !important;">
-                <div style="margin-bottom: 8px;">
-                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">Podcast & Video</span>
-                    <span style="color: #ffffff !important; font-size: 12px; margin-left: 8px;">📅 {g['created_at'][:10] if g['created_at'] else ''}</span>
+            <td valign="top" bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 10px 12px; color: #ffffff !important;">
+                <div style="margin-bottom: 4px;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 9px; padding: 2px 5px; border-radius: 2px; text-transform: uppercase;">Podcast</span>
+                    <span style="color: #ffffff !important; font-size: 10px; margin-left: 6px;">📅 {g['created_at'][:10] if g['created_at'] else ''}</span>
                 </div>
-                <h3 style="color: #716d4a !important; margin: 0 0 8px 0; font-size: 18px; line-height: 1.3; font-weight: bold;">{g['title']}</h3>
-                <p style="color: #ffffff !important; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">{(g['short_desc'] or g['full_desc'] or '')[:180]}...</p>
-                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 13px; font-weight: bold; text-decoration: underline; display: inline-block;">Reproducir Episodio &rarr;</a>
+                <h3 style="color: #716d4a !important; margin: 0 0 4px 0; font-size: 14px; line-height: 1.2; font-weight: bold;">{g['title']}</h3>
+                <p style="color: #ffffff !important; font-size: 11px; line-height: 1.3; margin: 0 0 6px 0;">{(g['short_desc'] or g['full_desc'] or '')[:90]}...</p>
+                <a href="https://gothprods.com" target="_blank" style="color: #716d4a !important; font-size: 11px; font-weight: bold; text-decoration: underline;">Reproducir &rarr;</a>
             </td>
         </tr>
     </table>
@@ -2652,12 +2664,15 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
             <td style="padding: 10px 14px; vertical-align: middle;">
                 <table role="presentation" border="0" cellspacing="0" cellpadding="0">
                     <tr>
-                        <td bgcolor="#716d4a" style="background-color: #716d4a !important; color: #ffffff !important; font-weight: 900; width: 26px; height: 26px; text-align: center; border-radius: 50%; font-size: 12px; padding: 0;">
-                            {idx + 1}
+                        <td width="26" valign="top" style="padding-top: 3px;">
+                            <div style="background-color: #716d4a !important; color: #ffffff !important; font-weight: 900; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 50%; font-size: 12px; margin: 0;">
+                                {idx + 1}
+                            </div>
                         </td>
                         <td style="padding-left: 12px;">
                             <strong style="color: #716d4a !important; font-size: 14px; display: block;">{t['title']}</strong>
-                            <span style="color: #ffffff !important; font-size: 12px;">{t['short_desc']}</span>
+                            <span style="color: #ffffff !important; font-size: 12px; display: block; margin-bottom: 2px;">{t['short_desc']}</span>
+                            {f'''<a href="{t["sp_link"]}" target="_blank" style="color: #1DB954 !important; font-size: 11px; text-decoration: none; font-weight: bold;">Escuchar en Spotify &rarr;</a>''' if t["sp_link"] else ""}
                         </td>
                     </tr>
                 </table>
@@ -2695,33 +2710,31 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
     bandas_eventos_cards = ""
     if bandas or eventos:
         b_html = "".join([f"""
-        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
             <tr>
-                <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
-                    <img src="{get_full_img_url(b['img_video_path'] or b['ultimo_lanzamiento_url'])}" style="width: 100%; max-height: 200px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+                <td width="110" valign="top" bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                    <img src="{get_full_img_url(b['img_video_path'] or b['ultimo_lanzamiento_url'])}" style="width: 110px; height: 100px; object-fit: cover; display: block; border-right: 1px solid #716d4a;" />
                 </td>
-            </tr>
-            <tr>
-                <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 14px; color: #ffffff !important;">
-                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; display: inline-block;">Banda Destacada</span>
-                    <h3 style="color: #716d4a !important; margin: 6px 0; font-size: 17px; font-weight: bold;">{b['nombre']} ({b['pais'] or 'Underground'})</h3>
-                    <p style="color: #ffffff !important; font-size: 13px; margin: 0;">{(b['texto_resena'] or b['bio_larga'] or '')[:160]}...</p>
+                <td valign="top" bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 10px 12px; color: #ffffff !important;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 9px; padding: 2px 5px; border-radius: 2px; text-transform: uppercase; display: inline-block;">Banda Destacada</span>
+                    <h3 style="color: #716d4a !important; margin: 4px 0; font-size: 14px; font-weight: bold;">{b['nombre']} ({b['pais'] or 'Underground'})</h3>
+                    {f'''<h4 style="font-size: 11px; color: #716d4a !important; margin: 0 0 4px 0; font-style: italic;">"{b["titulo_resena"]}"</h4>''' if b["titulo_resena"] else ""}
+                    <p style="color: #ffffff !important; font-size: 11px; margin: 0; line-height: 1.3;">{(b['texto_resena'] or b['bio_larga'] or '')[:90]}...</p>
                 </td>
             </tr>
         </table>
         """ for b in bandas])
         e_html = "".join([f"""
-        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#0d0d0d" class="darkmode-inner" style="background-color: #0d0d0d !important; border: 1px solid #716d4a; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
             <tr>
-                <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
-                    <img src="{get_full_img_url(e['img_video_path'])}" style="width: 100%; max-height: 200px; object-fit: cover; display: block; border-bottom: 1px solid #716d4a;" />
+                <td width="110" valign="top" bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 0;">
+                    <img src="{get_full_img_url(e['img_video_path'])}" style="width: 110px; height: 100px; object-fit: cover; display: block; border-right: 1px solid #716d4a;" />
                 </td>
-            </tr>
-            <tr>
-                <td bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 14px; color: #ffffff !important;">
-                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; display: inline-block;">Evento Destacado</span>
-                    <h3 style="color: #716d4a !important; margin: 6px 0; font-size: 17px; font-weight: bold;">{e['nombre_evento']}</h3>
-                    <p style="color: #ffffff !important; font-size: 13px; margin: 0;">📍 {e['ciudad']}, {e['pais']} | 📅 {e['fecha_evento']}</p>
+                <td valign="top" bgcolor="#0d0d0d" style="background-color: #0d0d0d !important; padding: 10px 12px; color: #ffffff !important;">
+                    <span style="background-color: #716d4a !important; color: #ffffff !important; font-weight: bold; font-size: 9px; padding: 2px 5px; border-radius: 2px; text-transform: uppercase; display: inline-block;">Evento Destacado</span>
+                    <h3 style="color: #716d4a !important; margin: 4px 0; font-size: 14px; font-weight: bold;">{e['titulo_articulo'] if e['titulo_articulo'] else e['nombre_evento']}</h3>
+                    {f'''<p style="color: #716d4a !important; font-size: 11px; margin: 0 0 4px 0; font-weight: bold;">{e["nombre_evento"]}</p>''' if e["titulo_articulo"] and e["titulo_articulo"] != e["nombre_evento"] else ""}
+                    <p style="color: #ffffff !important; font-size: 11px; margin: 0; line-height: 1.3;">📍 {e['ciudad']}, {e['pais']} <br/> 📅 {e['fecha_evento']}</p>
                 </td>
             </tr>
         </table>
@@ -2894,15 +2907,6 @@ def build_newsletter_html(asunto, mensaje_intro, target_month="2026-07", live=Fa
                             <div style="margin-bottom: 15px;">
                                 {pulse_items}
                             </div>
-                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 15px auto 5px auto;">
-                                <tr>
-                                    <td bgcolor="#1db954" style="background-color: #1db954 !important; border-radius: 20px; padding: 8px 18px;">
-                                        <a href="https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31" target="_blank" style="color: #000000 !important; font-weight: bold; font-size: 12px; text-decoration: none; text-transform: uppercase; display: inline-block;">
-                                            🎧 Escuchar Playlist en Spotify &rarr;
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
                         </td>
                     </tr>
                     ''' if pulse_items else ''}
@@ -3037,7 +3041,6 @@ def admin_newsletter_send():
 
 - Portal Web: https://gothprods.com
 - Agenda Metalera: https://gothprods.com#agenda
-- Playlist Oficial: https://open.spotify.com/playlist/7eXQ7P07vj653yG8mJ2n31
 
 GOTH PRODUCTIONS • MEDIO MEXICANO DE DIVULGACIÓN DEL GÉNERO MÁS FEROZ DEL PLANETA
 """

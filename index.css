@@ -1,6 +1,6 @@
 :root {
     --bg-color: #000000;
-    --bg-secondary: #111111;
+    --bg-secondary: transparent;
     --text-main: #ffffff;
     --text-muted: #aaaaaa;
     --accent-color: #716d4a; /* Ochre homologado */
@@ -34,6 +34,21 @@ body {
     font-family: var(--font-body);
     line-height: 1.6;
     font-size: 1.3rem;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: -3;
+    background: 
+        radial-gradient(circle at 15% 20%, rgba(0, 104, 71, 0.35) 0%, transparent 45%),
+        radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 85% 20%, rgba(206, 17, 38, 0.35) 0%, transparent 45%);
 }
 
 /* Typography */
@@ -138,6 +153,7 @@ main {
     width: 50px;
     height: auto;
     filter: drop-shadow(0 0 5px rgba(113, 109, 74, 0.5));
+    mix-blend-mode: screen;
 }
 
 .dock-menu {
@@ -460,6 +476,8 @@ main {
     margin-top: 0;
     position: relative;
     overflow: hidden;
+    background-color: var(--bg-color);
+    isolation: isolate;
 }
 
 .hero-video {
@@ -479,7 +497,7 @@ main {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.4));
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.1));
     z-index: -1;
 }
 

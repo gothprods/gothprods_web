@@ -135,9 +135,6 @@ def sync_youtube(target_section):
                       (section, title, short_desc, thumbnail, yt_link, pub_date))
     conn.commit()
     
-    if target_section == "La Galería Nocturna":
-    else:
-        
     conn.close()
 
 def sync_youtube_playlist(playlist_id, target_section):
@@ -220,6 +217,9 @@ def sync_ivoox(url, default_section):
                 pub_date_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         else:
             pub_date_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if pub_date_str < "2026-08-06":
+            continue
+
 
         if pub_date_str < "2026-08-06":
             continue

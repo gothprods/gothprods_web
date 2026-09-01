@@ -19,19 +19,19 @@
     {% if share_image.endswith('.mp4') or share_image.endswith('.webm') %}
         {% set share_image = settings.get('header_logo', '/assets/dock_header_icon.png') %}
     {% endif %}
-    <meta property="og:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/{{ share_image }}{% endif %}">
+    <meta property="og:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/{{ share_image }}?v=61{% endif %}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ request.url }}">
     <meta property="twitter:title" content="{% if request.args.get('poster') %}Agenda Metalera | Goth Prods{% else %}Goth Prods | Medio Mexicano de divulgación del género más feroz del planeta{% endif %}">
     <meta property="twitter:description" content="{% if request.args.get('poster') %}¡Revisa los próximos eventos en nuestra Agenda Metalera!{% else %}Goth Prods es la productora de contenidos de Metal más imponente. Encuentra noticias, reseñas exclusivas y el podcast Metal Pulse.{% endif %}">
-    <meta property="twitter:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/{{ share_image }}{% endif %}">
+    <meta property="twitter:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/{{ share_image }}?v=61{% endif %}">
 
     <!-- Favicons -->
     <link rel="icon" href="/assets/viking.webp" type="image/jpeg">
     <link rel="apple-touch-icon" href="/assets/viking.webp">
-    <link rel="stylesheet" href="/index.css?v=55">
+    <link rel="stylesheet" href="/index.css?v=61">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -43,7 +43,7 @@
 <body>
     <nav class="floating-dock">
         <div class="dock-logo">
-            <a href="#home"><img src="/assets/dock_header_icon.png" alt="Goth Prods Logo" class="logo-img"></a>
+            <a href="#home"><img src="/{{ settings.get('icon_home', 'assets/dock_header_icon.png').lstrip('/') }}?v=61" alt="Goth Prods Logo" class="logo-img"></a>
         </div>
         
         <hr class="dock-divider">
@@ -134,14 +134,20 @@
             {% endif %}
             <div class="hero-overlay"></div>
             <div class="hero-content">
-                <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">{{ settings.get('hero_title', 'Goth Productions es una creadora de contenidos enfocados al género más feroz del planeta') }}</h2>
-                <p>{{ settings.get('hero_subtitle', 'Reviews de álbumes, cobertura de festivales y conciertos, colaboraciones con medios, entrevistas y mucho más.') }}</p>
-
+                {% set ht = settings.get('hero_title', 'Goth Productions es una creadora de contenidos enfocados al género más feroz del planeta') %}
+                {% if ht %}
+                <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">{{ ht }}</h2>
+                {% endif %}
+                
+                {% set hs = settings.get('hero_subtitle', 'Reviews de álbumes, cobertura de festivales y conciertos, colaboraciones con medios, entrevistas y mucho más.') %}
+                {% if hs %}
+                <p>{{ hs }}</p>
+                {% endif %}
             </div>
         </section>
 
         {% if settings.get('show_banda_semana', '1') == '1' and (bandas_semana or eventos_semana) %}
-        <section id="radar-del-caos" class="section highlights-section" style="background: linear-gradient(to right, #111, #000); border-bottom: 2px solid var(--accent-color); padding: 2rem 5%;">
+        <section id="radar-del-caos" class="section highlights-section" style="background: transparent; border-bottom: 2px solid var(--accent-color); padding: 2rem 5%;">
             {% if bandas_semana or eventos_semana or (settings.get('show_mexapedia', '0') == '1' and mexapedia_record) %}
             <div class="section-header" style="margin-bottom: 20px;">
                 <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
