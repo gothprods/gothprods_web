@@ -19,19 +19,19 @@
     {% if share_image.endswith('.mp4') or share_image.endswith('.webm') %}
         {% set share_image = settings.get('header_logo', '/assets/dock_header_icon.png') %}
     {% endif %}
-    <meta property="og:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/{{ share_image }}?v=61{% endif %}">
+    <meta property="og:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/{{ share_image }}?v=63{% endif %}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ request.url }}">
     <meta property="twitter:title" content="{% if request.args.get('poster') %}Agenda Metalera | Goth Prods{% else %}Goth Prods | Medio Mexicano de divulgación del género más feroz del planeta{% endif %}">
     <meta property="twitter:description" content="{% if request.args.get('poster') %}¡Revisa los próximos eventos en nuestra Agenda Metalera!{% else %}Goth Prods es la productora de contenidos de Metal más imponente. Encuentra noticias, reseñas exclusivas y el podcast Metal Pulse.{% endif %}">
-    <meta property="twitter:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/{{ share_image }}?v=61{% endif %}">
+    <meta property="twitter:image" content="{% if request.args.get('poster') %}https://gothprods.com/{{ request.args.get('poster') }}{% else %}https://gothprods.com/{{ share_image }}?v=63{% endif %}">
 
     <!-- Favicons -->
     <link rel="icon" href="/assets/viking.webp" type="image/jpeg">
     <link rel="apple-touch-icon" href="/assets/viking.webp">
-    <link rel="stylesheet" href="/index.css?v=61">
+    <link rel="stylesheet" href="/index.css?v=63">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -43,7 +43,7 @@
 <body>
     <nav class="floating-dock">
         <div class="dock-logo">
-            <a href="#home"><img src="/{{ settings.get('icon_home', 'assets/dock_header_icon.png').lstrip('/') }}?v=61" alt="Goth Prods Logo" class="logo-img"></a>
+            <a href="#home"><img src="/{{ settings.get('icon_home', 'assets/dock_header_icon.png').lstrip('/') }}?v=63" alt="Goth Prods Logo" class="logo-img"></a>
         </div>
         
         <hr class="dock-divider">

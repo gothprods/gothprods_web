@@ -89,3 +89,11 @@ Corregí la fecha de creación del episodio problemático directamente en la bas
 **Solución:** 
 - Configuré el área de la cabecera principal (`.hero`) para que actúe como un muro de contención (`isolation: isolate; background-color: var(--bg-color);`). Esto permite que el video o imagen del Hero se siga viendo perfectamente, pero bloquea y "tapa" físicamente la filtración de las luces patrias desde el fondo principal, reservando las luces exclusivamente desde el Radar del Caos hacia abajo.
 - El problema persistente del fondo negro del ícono Home era un estricto caché del navegador a las rutas de las imágenes subidas. Implementé versiones dinámicas forzadas (`?v=61`) directamente en el tag `<img>` de la vista de diseño (`index.html`) para obligar a los navegadores a descargar los nuevos archivos WebP (que ya no tienen los píxeles negros físicamente).
+
+## 19. Ajuste de Luz Blanca (Mes Patrio)
+**Problema:** La luz blanca del fondo se percibía demasiado opaca en comparación con las luces roja y verde.
+**Solución:** Modifiqué el gradiente central en `index.css` incrementando la opacidad del canal blanco al doble (pasó de `0.15` a `0.30`). Ahora el resplandor blanco está balanceado y compite a la par con los colores laterales, logrando una representación más vibrante de la bandera.
+
+## 20. Simetría de Luces Patrias
+**Problema:** Las luces de fondo estaban acomodadas en forma de un ligero triángulo o arco (el blanco estaba más alto que el verde y el rojo). El usuario solicitó simetría.
+**Solución:** Alineé las tres fuentes de luz (los gradientes radiales) en `index.css` de manera horizontal exacta, colocándolas en la misma coordenada Y (`15%`) y distribuyéndolas en el eje X de forma perfectamente simétrica (`20%`, `50%`, `80%`), logrando una iluminación uniforme y balanceada. Forcé el caché a `v=63`.
