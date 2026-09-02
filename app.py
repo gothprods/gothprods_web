@@ -1,4 +1,5 @@
 from flask import Flask, send_from_directory, request, session, redirect, url_for, render_template, flash, jsonify
+from flask_compress import Compress
 import sqlite3
 import os
 import random
@@ -52,6 +53,7 @@ import unicodedata
 load_dotenv('config.env')
 
 app = Flask(__name__, static_folder='.', static_url_path='/static')
+Compress(app)
 app.secret_key = os.getenv('SECRET_KEY', 'super_secret_goth_key')
 app.config['UPLOAD_FOLDER'] = 'updates'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 2592000
