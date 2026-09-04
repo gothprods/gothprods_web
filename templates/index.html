@@ -1101,7 +1101,7 @@
 
         {% if settings.get('show_el_equipo', '0') == '1' %}
         
-        {% if settings.get('show_servicios', '1') == '1' %}
+        {% if settings.get('show_servicios', '1') == '1' and servicios_items %}
         <section id="servicios" class="section servicios-section" style="scroll-margin-top: 100px;">
             <div class="section-header">
                 <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
