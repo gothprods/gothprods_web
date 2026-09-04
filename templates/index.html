@@ -1209,25 +1209,7 @@
         </section>
         {% endif %}
 
-        {% if settings.get('show_contactanos', '1') == '1' %}
-        <section id="contact" class="section contact-section">
-            <div class="section-header">
-                <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">Únete a los <span>Berserkers</span></h2>
-            </div>
-            <form class="contact-form" action="/submit_contact" method="POST" enctype="multipart/form-data">
-                <input type="text" name="name" placeholder="Nombre (Persona, Banda o Artista)" required>
-                <input type="email" name="email" placeholder="Correo de contacto" required>
-                <textarea name="message" placeholder="¿Quieres que reseñemos tu banda o buscas difusión para tu proyecto? Escríbenos tu mensaje aquí..." rows="5" required></textarea>
-                
-                <label style="color: #ccc; font-size: 0.9rem; margin-top: 10px; display: block; text-align: left; margin-bottom: 5px;">
-                    <i class="fa-solid fa-paperclip"></i> Adjunta tu material (Presskit, 1 Track de música, Fotos, Logos PNG transparente en blanco/negro)
-                </label>
-                <input type="file" name="attachments" multiple accept=".pdf,.zip,.rar,.mp3,.wav,.jpg,.jpeg,.png" style="background: #111; padding: 10px; border-radius: 4px; border: 1px solid #444; width: 100%; margin-bottom: 20px; color: #fff; font-size: 0.9rem; cursor: pointer;">
-                
-                <button type="submit" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> ENVIAR MENSAJE</button>
-            </form>
-        </section>
-        {% endif %}
+        
         <!-- UNIFIED CONTACT & BERSERKERS / MEDIOS SECTION -->
         <section id="contacto-medios" class="section newsletter-medios-section" style="padding: 35px 20px; background: #0a0a0a; border-top: 1px solid var(--accent-color); border-bottom: 1px solid var(--accent-color); margin-top: 40px;">
             <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; align-items: center; position: relative;">
