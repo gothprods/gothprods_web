@@ -204,8 +204,9 @@ main {
     height: 100% !important;
     object-fit: contain;
     background: #000;
-    border: 1px solid rgba(113, 109, 74, 0.4);
+    border: 1px solid rgba(113, 109, 74, 0.6);
     border-radius: 50%;
+    filter: brightness(1.2) drop-shadow(0 0 3px rgba(113, 109, 74, 0.3));
 }
 
 .dock-item a i {
@@ -215,8 +216,9 @@ main {
     align-items: center;
     justify-content: center;
     background: #000;
-    border: 1px solid rgba(113, 109, 74, 0.4);
+    border: 1px solid rgba(113, 109, 74, 0.6);
     border-radius: 50%;
+    filter: brightness(1.2) drop-shadow(0 0 3px rgba(113, 109, 74, 0.3));
     filter: drop-shadow(0 0 2px rgba(113, 109, 74, 0.5));
     font-size: 1.1rem;
     transition: all 0.2s ease;
@@ -247,7 +249,7 @@ main {
 
 /* macOS Hover Logic */
 .dock-menu:hover .dock-item {
-    opacity: 0.6;
+    opacity: 0.75;
 }
 
 .dock-item:hover {
@@ -258,6 +260,10 @@ main {
 
 .dock-item:hover a {
     color: var(--accent-color);
+}
+.dock-item:hover a img {
+    filter: brightness(1.5) drop-shadow(0 0 10px rgba(113, 109, 74, 0.8));
+    border-color: var(--accent-color);
 }
 
 .dock-item:hover .dock-text {

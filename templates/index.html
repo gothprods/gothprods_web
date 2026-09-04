@@ -52,7 +52,7 @@
             {% set has_radar = (bandas_semana or eventos_semana) %}
             {% if settings.get('show_banda_semana', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_destacados', 'Radar del Caos') }}">
-                <a href="#radar-del-caos" style="{{ '' if has_radar else 'opacity: 0.3; pointer-events: none; filter: grayscale(100%);' }}">
+                <a href="#radar-del-caos" style="{{ '' if has_radar else 'opacity: 0.65; pointer-events: none; filter: grayscale(100%) brightness(1.5);' }}">
                     <img src="{{ settings.get('icon_destacados', '/assets/destacados_icon.png') }}" alt="{{ settings.get('title_destacados', 'Radar del Caos') }}">
                     <span class="dock-text">{{ settings.get('title_destacados', 'Radar del Caos') }}</span>
                 </a>
@@ -92,7 +92,7 @@
             {% endif %}
             {% if settings.get('show_servicios', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_servicios', 'Servicios') }}">
-                <a href="#servicios" style="opacity: 0.3; pointer-events: none; filter: grayscale(100%);"><img src="{{ settings.get('icon_servicios', 'updates/servicios_icon.jpg') }}" alt="{{ settings.get('title_servicios', 'Servicios') }}" ><span class="dock-text">{{ settings.get('title_servicios', 'Servicios') }}</span></a>
+                <a href="#servicios" style="opacity: 0.65; pointer-events: none; filter: grayscale(100%) brightness(1.5);"><img src="{{ settings.get('icon_servicios', 'updates/servicios_icon.jpg') }}" alt="{{ settings.get('title_servicios', 'Servicios') }}" ><span class="dock-text">{{ settings.get('title_servicios', 'Servicios') }}</span></a>
             </li>
             {% endif %}
             <li class="dock-item" data-title="{{ settings.get('title_contacto', 'Contáctanos') }}">
