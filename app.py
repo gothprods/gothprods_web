@@ -1390,6 +1390,11 @@ def update_settings():
     title_equipo = request.form.get('title_equipo')
     show_equipo_menu = request.form.get('show_equipo_menu', '0')
     
+    show_servicios = request.form.get('show_servicios', '0')
+    title_servicios = request.form.get('title_servicios')
+    title_podcasts = request.form.get('title_podcasts')
+    title_conciertos = request.form.get('title_conciertos')
+    
     conn = get_db_connection()
     queries = [
         ("INSERT OR REPLACE INTO settings (key, value) VALUES ('hero_title', ?)", (hero_title,)),
