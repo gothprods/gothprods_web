@@ -878,38 +878,6 @@
         </section>
         {% endif %}
 
-        {% if settings.get('show_reviews', '1') == '1' %}
-                <section id="reviews" class="section reviews-section">
-            <div class="section-header">
-                <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
-                    {% set icon_path = settings.get('icon_reviews', '/assets/resenas_icon.png') %}
-                    <img loading="lazy" decoding="async" src="{{ icon_path if icon_path.startswith('http') or (icon_path.startswith('assets') or icon_path.startswith('/assets')) else 'updates/' + icon_path }}" class="section-medal" width="65" height="65" style="width: 65px; height: 65px; min-width: 65px; min-height: 65px;">
-                    <div class="header-text-group" style="text-align: left; margin: 0;">
-                        <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">Reseñas de <span>Conciertos</span></h2>
-                    </div>
-                </div>
-            </div>
-            <div class="rail-wrapper">
-                <div class="news-rail">
-                    {% for item in reseñas_items %}
-                <div class="news-card">
-                    <img loading="lazy" decoding="async" src="{{ item.image_filename if item.image_filename.startswith('http') or (item.image_filename.startswith('assets') or item.image_filename.startswith('/assets')) else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
-                    <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
-                    <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc | striptags }}</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
-                        <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="color: var(--accent-color); font-weight: bold; font-size: 0.85rem; display: inline-block;">Leer reseña completa &rarr;</a>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <span style="font-size: 0.75rem; color: #666; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}" data-type="content">{{ item.views if item.views else 0 }}</span></span>
-                            <button class="like-btn" data-id="{{ item.id }}" data-type="content" style="background: none; border: none; color: #666; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 0; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}" data-type="content">{{ item.likes if item.likes else 0 }}</span></button>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-        </section>
-        {% endif %}
-
         {% if settings.get('show_interviews', '1') == '1' %}
         <section id="under-interviews" class="section interviews-section">
             <div class="section-header">
@@ -947,6 +915,39 @@
             </div>
         </section>
         {% endif %}
+
+        {% if settings.get('show_reviews', '1') == '1' %}
+                <section id="reviews" class="section reviews-section">
+            <div class="section-header">
+                <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
+                    {% set icon_path = settings.get('icon_reviews', '/assets/resenas_icon.png') %}
+                    <img loading="lazy" decoding="async" src="{{ icon_path if icon_path.startswith('http') or (icon_path.startswith('assets') or icon_path.startswith('/assets')) else 'updates/' + icon_path }}" class="section-medal" width="65" height="65" style="width: 65px; height: 65px; min-width: 65px; min-height: 65px;">
+                    <div class="header-text-group" style="text-align: left; margin: 0;">
+                        <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">Reseñas de <span>Conciertos</span></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="rail-wrapper">
+                <div class="news-rail">
+                    {% for item in reseñas_items %}
+                <div class="news-card">
+                    <img loading="lazy" decoding="async" src="{{ item.image_filename if item.image_filename.startswith('http') or (item.image_filename.startswith('assets') or item.image_filename.startswith('/assets')) else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center;">
+                    <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
+                    <p style="font-size: 0.85rem; margin-bottom: 10px;">{{ item.short_desc | striptags }}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+                        <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="color: var(--accent-color); font-weight: bold; font-size: 0.85rem; display: inline-block;">Leer reseña completa &rarr;</a>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span style="font-size: 0.75rem; color: #666; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}" data-type="content">{{ item.views if item.views else 0 }}</span></span>
+                            <button class="like-btn" data-id="{{ item.id }}" data-type="content" style="background: none; border: none; color: #666; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 0; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}" data-type="content">{{ item.likes if item.likes else 0 }}</span></button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        </section>
+        {% endif %}
+
 
         {% if settings.get('show_news', '1') == '1' %}
         <section id="news" class="section news-section">
