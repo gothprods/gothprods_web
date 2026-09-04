@@ -49,9 +49,13 @@
         <hr class="dock-divider">
 
         <ul class="dock-menu">
+            {% set has_radar = (bandas_semana or eventos_semana) %}
             {% if settings.get('show_banda_semana', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_destacados', 'Radar del Caos') }}">
-                <a href="#radar-del-caos"><img src="{{ settings.get('icon_destacados', '/assets/destacados_icon.png') }}" alt="{{ settings.get('title_destacados', 'Radar del Caos') }}" ><span class="dock-text">{{ settings.get('title_destacados', 'Radar del Caos') }}</span></a>
+                <a href="#radar-del-caos" style="{{ '' if has_radar else 'opacity: 0.3; pointer-events: none; filter: grayscale(100%);' }}">
+                    <img src="{{ settings.get('icon_destacados', '/assets/destacados_icon.png') }}" alt="{{ settings.get('title_destacados', 'Radar del Caos') }}">
+                    <span class="dock-text">{{ settings.get('title_destacados', 'Radar del Caos') }}</span>
+                </a>
             </li>
             {% endif %}
 
@@ -60,14 +64,12 @@
                 <a href="#highlights"><img src="{{ settings.get('icon_el_pit', '/assets/el_pit_icon.png') }}" alt="{{ settings.get('title_el_pit', 'El Pit') }}" ><span class="dock-text">{{ settings.get('title_el_pit', 'El Pit') }}</span></a>
             </li>
             {% endif %}
-            {% if settings.get('show_galeria_nocturna', '1') == '1' %}
-            <li class="dock-item" data-title="{{ settings.get('title_galeria', 'La Galería Nocturna') }}">
-                <a href="#shows"><img src="{{ settings.get('icon_galeria', '/assets/galeria_nocturna_icon.jpg') }}" alt="{{ settings.get('title_galeria', 'La Galería Nocturna') }}" ><span class="dock-text">{{ settings.get('title_galeria', 'La Galería Nocturna') }}</span></a>
-            </li>
-            {% endif %}
-            {% if settings.get('show_metalpulse', '1') == '1' %}
-            <li class="dock-item" data-title="{{ settings.get('title_metalpulse', 'Metal Pulse') }}">
-                <a href="#metal-pulse"><img src="{{ settings.get('icon_metalpulse', '/assets/metal_pulse_icon.jpg') }}" alt="{{ settings.get('title_metalpulse', 'Metal Pulse') }}" ><span class="dock-text">{{ settings.get('title_metalpulse', 'Metal Pulse') }}</span></a>
+            {% if settings.get('show_galeria_nocturna', '1') == '1' or settings.get('show_metalpulse', '1') == '1' or settings.get('show_entrevistas', '1') == '1' %}
+            <li class="dock-item" data-title="Nuestros Podcasts">
+                <a href="#nuestros-podcasts">
+                    <img src="{{ settings.get('icon_interviews', '/assets/entrevistas_icon.png') }}" alt="Nuestros Podcasts">
+                    <span class="dock-text">Nuestros Podcasts</span>
+                </a>
             </li>
             {% endif %}
             {% if settings.get('show_reviews', '1') == '1' %}
@@ -78,11 +80,6 @@
             {% if settings.get('show_noticiero', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_news', 'El Noticiero Nocturno') }}">
                 <a href="#news"><img src="{{ settings.get('icon_news', '/assets/noticiero_icon.png') }}" alt="{{ settings.get('title_news', 'El Noticiero Nocturno') }}" ><span class="dock-text">{{ settings.get('title_news', 'El Noticiero Nocturno') }}</span></a>
-            </li>
-            {% endif %}
-            {% if settings.get('show_entrevistas', '1') == '1' %}
-            <li class="dock-item" data-title="{{ settings.get('title_interviews', 'Entrevistas Under') }}">
-                <a href="#under-interviews"><img src="{{ settings.get('icon_interviews', '/assets/entrevistas_icon.png') }}" alt="{{ settings.get('title_interviews', 'Entrevistas Under') }}" ><span class="dock-text">{{ settings.get('title_interviews', 'Entrevistas Under') }}</span></a>
             </li>
             {% endif %}
             <li class="dock-item" data-title="{{ settings.get('title_agenda', 'Agenda Metalera') }}">
@@ -781,6 +778,7 @@
         </section>
         {% endif %} <!-- End of show_el_pit -->
 
+        <div id="nuestros-podcasts" style="scroll-margin-top: 100px;"></div>
         {% if settings.get('show_galeria_nocturna', '1') == '1' %}
         <section id="shows" class="section shows-section">
 
@@ -912,39 +910,6 @@
         </section>
         {% endif %}
 
-        {% if settings.get('show_news', '1') == '1' %}
-        <section id="news" class="section news-section">
-            <div class="section-header">
-                <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
-                    {% set icon_path = settings.get('icon_news', '/assets/noticiero_icon.png') %}
-                    <img loading="lazy" decoding="async" src="{{ icon_path if icon_path.startswith('http') or (icon_path.startswith('assets') or icon_path.startswith('/assets')) else 'updates/' + icon_path }}" class="section-medal" width="65" height="65" style="width: 65px; height: 65px; min-width: 65px; min-height: 65px;">
-                    <div class="header-text-group" style="text-align: left; margin: 0;">
-                        <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">El Noticiero <span>Nocturno</span></h2>
-                    </div>
-                </div>
-            </div>
-            <div class="rail-wrapper">
-                <div class="news-rail">
-                    {% for item in noticiero_items %}
-                <div class="news-card">
-                    <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="display: block;">
-                        <img loading="lazy" decoding="async" src="{{ item.image_filename if item.image_filename.startswith('http') or (item.image_filename.startswith('assets') or item.image_filename.startswith('/assets')) else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center; cursor: pointer;">
-                    </a>
-                    <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
-                    <p style="font-size: 0.85rem; margin-bottom: 5px; margin-top: 5px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
-                        <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="color: var(--accent-color); font-weight: bold; font-size: 0.85rem; display: inline-block;">Leer más &rarr;</a>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <span style="font-size: 0.75rem; color: #666; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}" data-type="content">{{ item.views if item.views else 0 }}</span></span>
-                            <button class="like-btn" data-id="{{ item.id }}" data-type="content" style="background: none; border: none; color: #666; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 0; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}" data-type="content">{{ item.likes if item.likes else 0 }}</span></button>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-        {% endif %}
-
         {% if settings.get('show_interviews', '1') == '1' %}
         <section id="under-interviews" class="section interviews-section">
             <div class="section-header">
@@ -982,6 +947,41 @@
             </div>
         </section>
         {% endif %}
+
+        {% if settings.get('show_news', '1') == '1' %}
+        <section id="news" class="section news-section">
+            <div class="section-header">
+                <div class="header-titles" style="display: flex; align-items: center; gap: 15px; justify-content: flex-start;">
+                    {% set icon_path = settings.get('icon_news', '/assets/noticiero_icon.png') %}
+                    <img loading="lazy" decoding="async" src="{{ icon_path if icon_path.startswith('http') or (icon_path.startswith('assets') or icon_path.startswith('/assets')) else 'updates/' + icon_path }}" class="section-medal" width="65" height="65" style="width: 65px; height: 65px; min-width: 65px; min-height: 65px;">
+                    <div class="header-text-group" style="text-align: left; margin: 0;">
+                        <h2 style="font-family: 'Creepster', cursive; font-weight: 400;">El Noticiero <span>Nocturno</span></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="rail-wrapper">
+                <div class="news-rail">
+                    {% for item in noticiero_items %}
+                <div class="news-card">
+                    <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="display: block;">
+                        <img loading="lazy" decoding="async" src="{{ item.image_filename if item.image_filename.startswith('http') or (item.image_filename.startswith('assets') or item.image_filename.startswith('/assets')) else 'updates/' + item.image_filename }}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; height: 140px; object-fit: cover; object-position: center; cursor: pointer;">
+                    </a>
+                    <h3 style="font-size: 1rem; line-height: 1.2;">{{ item.title }}</h3>
+                    <p style="font-size: 0.85rem; margin-bottom: 5px; margin-top: 5px;">{{ item.short_desc[:120] if item.short_desc else '' }}...</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+                        <a href="javascript:void(0);" data-target="dynNewsModal{{ item.id }}" data-id="{{ item.id }}" class="open-review-modal" style="color: var(--accent-color); font-weight: bold; font-size: 0.85rem; display: inline-block;">Leer más &rarr;</a>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span style="font-size: 0.75rem; color: #666; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-eye"></i> <span class="view-count-{{ item.id }}" data-type="content">{{ item.views if item.views else 0 }}</span></span>
+                            <button class="like-btn" data-id="{{ item.id }}" data-type="content" style="background: none; border: none; color: #666; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 0; transition: color 0.3s;"><i class="fa-regular fa-heart"></i> <span class="like-count-{{ item.id }}" data-type="content">{{ item.likes if item.likes else 0 }}</span></button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        
 
         {% if settings.get('show_agenda', '1') == '1' %}
         <section id="agenda" class="section agenda-section">
