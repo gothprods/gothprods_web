@@ -2002,7 +2002,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <div style="position: absolute; right: 15px; top: 15px; font-size: 2rem; color: rgba(255,71,87,0.15);"><i class="fa-solid fa-fire"></i></div>
                 <h4 style="color: #888; font-size: 0.8rem; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 1px;">Interacciones</h4>
                 <div id="kpi-interactions" style="font-size: 2.2rem; font-weight: bold; color: #fff; font-family: 'Oswald', sans-serif;">0</div>
-                <div style="font-size: 0.75rem; color: #666; margin-top: 5px;"><i class="fa-solid fa-heart"></i> Total Vistas, Likes y Comentarios</div>
+                <div style="font-size: 0.75rem; color: #666; margin-top: 5px;"><i class="fa-solid fa-heart"></i> Total Vistas y Likes</div>
             </div>
         </div>
         
@@ -2061,7 +2061,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 15px;">
                 <div>
                     <h4 style="text-align: left; color: #fff; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 10px;">
-                        <i class="fa-solid fa-newspaper" style="color: var(--accent-color);"></i> Catálogo Completo de Contenidos e Interacciones (<span id="total-contents-count">{{ interactions_data|length if interactions_data else 0 }}</span>)
+                        <i class="fa-solid fa-newspaper" style="color: var(--accent-color);"></i> Catálogo Completo de Contenidos e Interacciones <span id="total-contents-count">({{ interactions_data|length if interactions_data else 0 }})</span>
                     </h4>
                     <p style="margin: 4px 0 0 0; color: #777; font-size: 0.85rem;">Seguimiento detallado de lecturas, vistas y likes en todas las noticias, reseñas, bandas y eventos publicados.</p>
                 </div>
@@ -2084,20 +2084,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <button type="button" class="perf-cat-btn" onclick="filterByCategory('reseña', this)" style="padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: 1px solid #333; background: #1c1c1c; color: #ccc; transition: all 0.15s;">
                     🎸 Reseñas
                 </button>
-                <button type="button" class="perf-cat-btn" onclick="filterByCategory('entrevista', this)" style="padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: 1px solid #333; background: #1c1c1c; color: #ccc; transition: all 0.15s;">
-                    🎤 Entrevistas
-                </button>
                 <button type="button" class="perf-cat-btn" onclick="filterByCategory('banda', this)" style="padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: 1px solid #333; background: #1c1c1c; color: #ccc; transition: all 0.15s;">
                     💀 Bandas
                 </button>
                 <button type="button" class="perf-cat-btn" onclick="filterByCategory('agenda', this)" style="padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: 1px solid #333; background: #1c1c1c; color: #ccc; transition: all 0.15s;">
                     📅 Agenda
-                </button>
-                <button type="button" class="perf-cat-btn" onclick="filterByCategory('metal pulse', this)" style="padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: 1px solid #333; background: #1c1c1c; color: #ccc; transition: all 0.15s;">
-                    ⚡ Metal Pulse
-                </button>
-                <button type="button" class="perf-cat-btn" onclick="filterByCategory('caos sonoro', this)" style="padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: 1px solid #333; background: #1c1c1c; color: #ccc; transition: all 0.15s;">
-                    🎙️ Caos Sonoro
                 </button>
             </div>
 
@@ -2110,7 +2101,6 @@ input:checked + .slider:before { transform: translateX(20px); }
                             <th style="padding: 12px 10px; text-align: center;">Fecha</th>
                             <th style="padding: 12px 10px; text-align: center; color: #00d2ff;"><i class="fa-solid fa-eye"></i> Vistas</th>
                             <th style="padding: 12px 10px; text-align: center; color: #ff4757;"><i class="fa-solid fa-heart"></i> Likes</th>
-                            <th style="padding: 12px 10px; text-align: center; color: #2ed573;"><i class="fa-solid fa-comments"></i> Comentarios</th>
                             <th style="padding: 12px 10px; text-align: center;">Acción</th>
                         </tr>
                     </thead>
@@ -2147,9 +2137,6 @@ input:checked + .slider:before { transform: translateX(20px); }
                             </td>
                             <td style="padding: 12px 10px; text-align: center; font-weight: bold; color: #ff4757; font-family: 'Oswald', sans-serif; font-size: 1.1rem;">
                                 {{ item.likes }}
-                            </td>
-                            <td style="padding: 12px 10px; text-align: center; font-weight: bold; color: #2ed573; font-family: 'Oswald', sans-serif; font-size: 1.1rem;">
-                                {{ item.comments_count }}
                             </td>
                             <td style="padding: 12px 10px; text-align: center; white-space: nowrap;">
                                 {% if item.item_type == 'banda' %}
@@ -2197,6 +2184,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             function filterInteractionsTable() {
                 const query = (document.getElementById('search-interactions')?.value || '').toLowerCase().trim();
                 const rows = document.querySelectorAll('.interaction-row');
+                let visibleCount = 0;
                 rows.forEach(row => {
                     const sec = row.getAttribute('data-section') || '';
                     const title = row.getAttribute('data-title') || '';
@@ -2205,8 +2193,15 @@ input:checked + .slider:before { transform: translateX(20px); }
                     if (currentSelectedCat !== 'all') {
                         matchesCat = sec.includes(currentSelectedCat);
                     }
-                    row.style.display = (matchesQuery && matchesCat) ? '' : 'none';
+                    if (matchesQuery && matchesCat) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
                 });
+                const countSpan = document.getElementById('total-contents-count');
+                if(countSpan) countSpan.textContent = '(' + visibleCount + ')';
             }
 
             // Global Chart instances manager
@@ -2341,7 +2336,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 // Total interactions sum
                 let totalInteractions = 0;
                 interactions.forEach(it => {
-                    totalInteractions += (it.views || 0) + (it.likes || 0) + (it.comments_count || 0);
+                    totalInteractions += (it.views || 0) + (it.likes || 0);
                 });
                 const interElem = document.getElementById('kpi-interactions');
                 if (interElem) interElem.innerText = totalInteractions;

@@ -293,7 +293,7 @@
         <!-- EVENTO MODALS -->
         {% for evento in eventos_semana %}
         <div id="evento-modal-{{ evento.id }}" class="modal banda-modal" data-item-id="{{ evento.id }}" data-type="evento">
-            <div class="modal-content split-layout" style="background: #111; border: 1px solid var(--accent-color); border-radius: 8px; position: relative; padding: 0;">
+            <div class="modal-content " style="background: #111; border: 1px solid var(--accent-color); border-radius: 8px; position: relative; padding: 0;">
                 <button class="close-modal" style="position: absolute; right: 20px; top: 20px; background: transparent; border: none; color: #fff; font-size: 2rem; cursor: pointer; z-index: 10;"><i class="fa-solid fa-times"></i></button>
                 
                 <div class="modal-article-pane">
@@ -331,26 +331,7 @@
                     </div>
                 </div>
                 
-                <div class="modal-comments-pane">
-                    <div class="comments-header">
-                        <span>Comentarios</span>
-                    </div>
-                    <div class="comments-list" id="comments-list-{{ evento.id }}">
-                        <div style="text-align: center; color: #888; margin-top: 20px;">Cargando comentarios...</div>
-                    </div>
-                    <div class="comment-input-area">
-                        <form onsubmit="submitComment(event, {{ evento.id }}, 'evento')">
-                            <div class="replying-indicator" id="replying-to-{{ evento.id }}">
-                                <span id="replying-name-{{ evento.id }}">Respondiendo...</span>
-                                <button type="button" onclick="cancelReply({{ evento.id }})" style="background: none; border: none; color: #888; cursor: pointer; padding: 0;"><i class="fa-solid fa-times"></i></button>
-                            </div>
-                            <input type="hidden" id="comment-parent-{{ evento.id }}" value="">
-                            <input type="text" id="comment-name-{{ evento.id }}" placeholder="Tu Nombre o Apodo" required>
-                            <textarea id="comment-text-{{ evento.id }}" placeholder="Escribe tu comentario..." required></textarea>
-                            <button type="submit" class="comment-submit-btn">Publicar</button>
-                        </form>
-                    </div>
-                </div>
+                
                 
             </div>
         </div>
@@ -359,7 +340,7 @@
         <!-- BANDA MODALS (One for each band) -->
         {% for banda_semana in bandas_semana %}
         <div id="banda-modal-{{ banda_semana.id }}" class="modal banda-modal" data-item-id="{{ banda_semana.id }}" data-type="banda">
-            <div class="modal-content split-layout" style="background: #111; border: 1px solid var(--accent-color); border-radius: 8px; position: relative; padding: 0;">
+            <div class="modal-content " style="background: #111; border: 1px solid var(--accent-color); border-radius: 8px; position: relative; padding: 0;">
                 <button class="close-modal" style="position: absolute; right: 20px; top: 20px; background: transparent; border: none; color: #fff; font-size: 2rem; cursor: pointer; z-index: 10;"><i class="fa-solid fa-times"></i></button>
                 
                 <div class="modal-article-pane">
@@ -416,26 +397,7 @@
                     </div>
                 </div>
                 
-                <div class="modal-comments-pane">
-                    <div class="comments-header">
-                        <span>Comentarios</span>
-                    </div>
-                    <div class="comments-list" id="comments-list-{{ banda_semana.id }}">
-                        <div style="text-align: center; color: #888; margin-top: 20px;">Cargando comentarios...</div>
-                    </div>
-                    <div class="comment-input-area">
-                        <form onsubmit="submitComment(event, {{ banda_semana.id }}, 'banda')">
-                            <div class="replying-indicator" id="replying-to-{{ banda_semana.id }}">
-                                <span id="replying-name-{{ banda_semana.id }}">Respondiendo...</span>
-                                <button type="button" onclick="cancelReply({{ banda_semana.id }})" style="background: none; border: none; color: #888; cursor: pointer; padding: 0;"><i class="fa-solid fa-times"></i></button>
-                            </div>
-                            <input type="hidden" id="comment-parent-{{ banda_semana.id }}" value="">
-                            <input type="text" id="comment-name-{{ banda_semana.id }}" placeholder="Tu Nombre o Apodo" required>
-                            <textarea id="comment-text-{{ banda_semana.id }}" placeholder="Escribe tu comentario..." required></textarea>
-                            <button type="submit" class="comment-submit-btn">Publicar</button>
-                        </form>
-                    </div>
-                </div>
+                
                 
             </div>
         </div>
@@ -1380,7 +1342,7 @@
     {% for items_list in [noticiero_items, reseñas_items, entrevistas_items, agenda_items] %}
     {% for item in items_list %}
     <div id="dynNewsModal{{ item.id }}" class="modal" data-item-id="{{ item.id }}">
-        <div class="modal-content split-layout" style="background: #111; border: 1px solid var(--accent-color); border-radius: 8px; position: relative; padding: 0;">
+        <div class="modal-content " style="background: #111; border: 1px solid var(--accent-color); border-radius: 8px; position: relative; padding: 0;">
             <button class="close-modal" style="position: absolute; right: 20px; top: 20px; background: transparent; border: none; color: #fff; font-size: 2rem; cursor: pointer; z-index: 10;"><i class="fa-solid fa-times"></i></button>
             
             <div class="modal-article-pane">
@@ -1443,26 +1405,7 @@
                 </div>
             </div>
 
-            <div class="modal-comments-pane">
-                <div class="comments-header">
-                    <span>Comentarios</span>
-                </div>
-                <div class="comments-list" id="comments-list-{{ item.id }}">
-                    <div style="text-align: center; color: #888; margin-top: 20px;">Cargando comentarios...</div>
-                </div>
-                <div class="comment-input-area">
-                    <form onsubmit="submitComment(event, {{ item.id }})">
-                        <div class="replying-indicator" id="replying-to-{{ item.id }}">
-                            <span id="replying-name-{{ item.id }}">Respondiendo...</span>
-                            <button type="button" onclick="cancelReply({{ item.id }})" style="background: none; border: none; color: #888; cursor: pointer; padding: 0;"><i class="fa-solid fa-times"></i></button>
-                        </div>
-                        <input type="hidden" id="comment-parent-{{ item.id }}" value="">
-                        <input type="text" id="comment-name-{{ item.id }}" placeholder="Tu Nombre o Apodo" required>
-                        <textarea id="comment-text-{{ item.id }}" placeholder="Escribe tu comentario..." required></textarea>
-                        <button type="submit" class="comment-submit-btn">Publicar</button>
-                    </form>
-                </div>
-            </div>
+            
 
         </div>
     </div>

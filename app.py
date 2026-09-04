@@ -1306,30 +1306,21 @@ def admin_dashboard():
     
     interactions_query = '''
     SELECT id, section, title, COALESCE(views, 0) as views, COALESCE(likes, 0) as likes, 
-           (SELECT COUNT(*) FROM comments WHERE item_id = content_items.id AND item_type = 'content') as comments_count,
            created_at, 'content' as item_type
     FROM content_items 
+    WHERE section IN ('El Noticiero Nocturno', 'Reseñas de Conciertos')
     
     UNION ALL
     
     SELECT id, 'Banda de la Semana' as section, nombre as title, COALESCE(views, 0) as views, COALESCE(likes, 0) as likes,
-           (SELECT COUNT(*) FROM comments WHERE item_id = banda_semana.id AND item_type = 'banda') as comments_count,
            created_at, 'banda' as item_type
     FROM banda_semana
     
     UNION ALL
     
     SELECT id, 'Agenda Metalera' as section, titulo_articulo as title, COALESCE(views, 0) as views, COALESCE(likes, 0) as likes,
-           (SELECT COUNT(*) FROM comments WHERE item_id = eventos_semana.id AND item_type = 'evento') as comments_count,
            created_at, 'evento' as item_type
     FROM eventos_semana
-    
-    UNION ALL
-    
-    SELECT id, 'Colectivo Mexapedia' as section, titulo as title, 0 as views, 0 as likes,
-           0 as comments_count,
-           created_at, 'mexapedia' as item_type
-    FROM colectivo_mexapedia
     
     ORDER BY id DESC, created_at DESC
     '''
