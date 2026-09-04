@@ -2085,19 +2085,19 @@ input:checked + .slider:before { transform: translateX(20px); }
             <!-- Filtros Rápidos por Categoría -->
             <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 1px solid #242424; padding-bottom: 12px;" id="category-filter-chips">
                 <button type="button" class="perf-cat-btn active" onclick="filterByCategory('all', this)" style="padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid var(--accent-color); background: var(--accent-color); color: #000; transition: all 0.15s;">
-                    Todos (<span id="cat-count-all">{{ interactions_data|length if interactions_data else 0 }}</span>)
+                    Todos (<span id="cat-count-all">0</span>) | <i class="fa-solid fa-bolt"></i> <span id="cat-int-all">0</span>
                 </button>
                 <button type="button" class="perf-cat-btn" onclick="filterByCategory('noticia', this)" style="padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: 1px solid #333; background: #1c1c1c; color: #ccc; transition: all 0.15s;">
-                    📰 Noticias
+                    📰 Noticias (<span id="cat-count-noticia">0</span>) | <i class="fa-solid fa-bolt"></i> <span id="cat-int-noticia">0</span>
                 </button>
                 <button type="button" class="perf-cat-btn" onclick="filterByCategory('reseña', this)" style="padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: 1px solid #333; background: #1c1c1c; color: #ccc; transition: all 0.15s;">
-                    🎸 Reseñas
+                    🎸 Reseñas (<span id="cat-count-reseña">0</span>) | <i class="fa-solid fa-bolt"></i> <span id="cat-int-reseña">0</span>
                 </button>
                 <button type="button" class="perf-cat-btn" onclick="filterByCategory('banda', this)" style="padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: 1px solid #333; background: #1c1c1c; color: #ccc; transition: all 0.15s;">
-                    💀 Bandas
+                    💀 Bandas (<span id="cat-count-banda">0</span>) | <i class="fa-solid fa-bolt"></i> <span id="cat-int-banda">0</span>
                 </button>
                 <button type="button" class="perf-cat-btn" onclick="filterByCategory('agenda', this)" style="padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: 1px solid #333; background: #1c1c1c; color: #ccc; transition: all 0.15s;">
-                    📅 Agenda
+                    📅 Agenda (<span id="cat-count-agenda">0</span>) | <i class="fa-solid fa-bolt"></i> <span id="cat-int-agenda">0</span>
                 </button>
             </div>
 
@@ -2115,7 +2115,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                     </thead>
                     <tbody>
                         {% for item in interactions_data %}
-                        <tr class="interaction-row" data-section="{{ (item.section or '')|lower }}" data-title="{{ (item.title or '')|lower }}" style="border-bottom: 1px solid #222; transition: background 0.15s;" onmouseover="this.style.background='#1a1a1a';" onmouseout="this.style.background='transparent';">
+                        <tr class="interaction-row" data-section="{{ (item.section or '')|lower }}" data-title="{{ (item.title or '')|lower }}" data-views="{{ item.views or 0 }}" data-likes="{{ item.likes or 0 }}" style="border-bottom: 1px solid #222; transition: background 0.15s;" onmouseover="this.style.background='#1a1a1a';" onmouseout="this.style.background='transparent';">
                             <td style="padding: 12px 10px;">
                                 {% if item.section == 'El Noticiero Nocturno' %}
                                     <span style="background: rgba(204,168,91,0.15); color: var(--accent-color); border: 1px solid rgba(204,168,91,0.4); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;"><i class="fa-solid fa-newspaper"></i> Noticiero</span>
@@ -2189,6 +2189,51 @@ input:checked + .slider:before { transform: translateX(20px); }
                 }
                 filterInteractionsTable();
             }
+
+
+            function updateCategoryStats() {
+                const rows = document.querySelectorAll('.interaction-row');
+                let stats = {
+                    all: { count: 0, int: 0 },
+                    noticia: { count: 0, int: 0 },
+                    reseña: { count: 0, int: 0 },
+                    banda: { count: 0, int: 0 },
+                    agenda: { count: 0, int: 0 }
+                };
+                
+                rows.forEach(row => {
+                    const sec = row.getAttribute('data-section') || '';
+                    const views = parseInt(row.getAttribute('data-views')) || 0;
+                    const likes = parseInt(row.getAttribute('data-likes')) || 0;
+                    const totalInt = views + likes;
+                    
+                    stats.all.count++;
+                    stats.all.int += totalInt;
+                    
+                    if(sec.includes('notici')) {
+                        stats.noticia.count++;
+                        stats.noticia.int += totalInt;
+                    } else if(sec.includes('reseña')) {
+                        stats.reseña.count++;
+                        stats.reseña.int += totalInt;
+                    } else if(sec.includes('banda')) {
+                        stats.banda.count++;
+                        stats.banda.int += totalInt;
+                    } else if(sec.includes('agenda')) {
+                        stats.agenda.count++;
+                        stats.agenda.int += totalInt;
+                    }
+                });
+                
+                Object.keys(stats).forEach(cat => {
+                    const countEl = document.getElementById('cat-count-' + cat);
+                    const intEl = document.getElementById('cat-int-' + cat);
+                    if(countEl) countEl.innerText = stats[cat].count;
+                    if(intEl) intEl.innerText = stats[cat].int;
+                });
+            }
+
+            document.addEventListener("DOMContentLoaded", updateCategoryStats);
 
             function filterInteractionsTable() {
                 const query = (document.getElementById('search-interactions')?.value || '').toLowerCase().trim();
