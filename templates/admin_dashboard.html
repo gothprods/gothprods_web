@@ -2250,7 +2250,8 @@ input:checked + .slider:before { transform: translateX(20px); }
                     const matchesQuery = !query || title.includes(query) || sec.includes(query);
                     let matchesCat = true;
                     if (currentSelectedCat !== 'all') {
-                        matchesCat = sec.includes(currentSelectedCat);
+                        const searchCat = (currentSelectedCat === 'noticia') ? 'notici' : currentSelectedCat;
+                        matchesCat = sec.includes(searchCat);
                     }
                     if (matchesQuery && matchesCat) {
                         row.style.display = '';
