@@ -1430,7 +1430,7 @@ def update_settings():
         if v is not None:
             queries.append(("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (k, v)))
     
-    file_keys = ['hero_bg', 'header_logo', 'icon_home', 'galeria_bg', 'metalpulse_bg', 
+    file_keys = ['hero_bg', 'header_logo', 'icon_home', 'footer_logo', 'galeria_bg', 'metalpulse_bg', 
                  'icon_destacados', 'icon_el_pit', 'icon_galeria', 'icon_metalpulse',
                  'icon_reviews', 'icon_news', 'icon_interviews', 'icon_agenda', 'icon_contacto', 'icon_equipo',
                  'logo_aliado_1', 'logo_aliado_2', 'logo_aliado_3', 'logo_aliado_4', 'logo_aliado_5',

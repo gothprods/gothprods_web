@@ -1338,7 +1338,8 @@
     <footer>
         <div class="footer-content">
             <a href="#top" style="text-decoration: none; display: inline-block;">
-                <img loading="lazy" decoding="async" src="/assets/logo.webp?v=2" alt="Goth Prods Logo" class="footer-logo">
+                {% set footer_logo = settings.get('footer_logo', '/assets/logo.webp') %}
+                <img loading="lazy" decoding="async" src="{{ footer_logo if footer_logo.startswith('http') or footer_logo.startswith('/assets') or footer_logo.startswith('assets') else '/' + footer_logo }}" alt="Goth Prods Logo" class="footer-logo">
             </a>
             <p>Goth Productions es una productora y creadora de contenidos enfocados al género más feroz del planeta.</p>
         </div>
