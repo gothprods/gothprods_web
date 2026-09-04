@@ -150,7 +150,7 @@ main {
 }
 
 .dock-logo img {
-    width: 50px;
+    width: 65px;
     height: auto;
     filter: drop-shadow(0 0 5px rgba(113, 109, 74, 0.5));
     mix-blend-mode: screen;
@@ -333,7 +333,7 @@ main {
     .dock-controls { gap: 0.4rem; padding-bottom: 0.3rem; }
     .dock-socials { gap: 0.2rem; }
     .dock-socials a, .dock-auth a { font-size: 1rem; }
-    .dock-logo img { width: 40px; }
+    .dock-logo img { width: 52px; }
     .floating-dock { padding: 0.5rem 0; }
     .dock-divider { margin: 0.3rem 0; }
     .dock-text { font-size: 0.75rem; padding: 2px 8px; left: 45px; }
@@ -371,7 +371,7 @@ main {
     }
     
     .dock-logo img {
-        width: 40px;
+        width: 55px;
     }
 
     .dock-menu {
