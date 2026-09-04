@@ -20,6 +20,8 @@
 .tab-content.active { display: block; animation: fadeIn 0.3s; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+.perf-cat-btn { width: auto !important; margin-top: 0 !important; text-transform: none !important; }
+
 /* Toggle Switch CSS */
 .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
 .switch input { opacity: 0; width: 0; height: 0; }
@@ -2096,12 +2098,12 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <table id="interactions-table" style="width: 100%; border-collapse: collapse; color: #ccc; font-size: 0.9rem; text-align: left;">
                     <thead style="position: sticky; top: 0; background: #1d1d1d; z-index: 2;">
                         <tr style="border-bottom: 2px solid #333; color: #fff;">
-                            <th style="padding: 12px 10px;">Sección / Tipo</th>
-                            <th style="padding: 12px 10px;">Título del Contenido</th>
-                            <th style="padding: 12px 10px; text-align: center;">Fecha</th>
-                            <th style="padding: 12px 10px; text-align: center; color: #00d2ff;"><i class="fa-solid fa-eye"></i> Vistas</th>
-                            <th style="padding: 12px 10px; text-align: center; color: #ff4757;"><i class="fa-solid fa-heart"></i> Likes</th>
-                            <th style="padding: 12px 10px; text-align: center;">Acción</th>
+                            <th style="padding: 12px 10px; white-space: nowrap; width: 120px;">Sección / Tipo</th>
+                            <th style="padding: 12px 10px; min-width: 250px;">Título del Contenido</th>
+                            <th style="padding: 12px 10px; text-align: center; white-space: nowrap; width: 100px;">Fecha</th>
+                            <th style="padding: 12px 10px; text-align: center; color: #00d2ff; white-space: nowrap; width: 80px;"><i class="fa-solid fa-eye"></i> Vistas</th>
+                            <th style="padding: 12px 10px; text-align: center; color: #ff4757; white-space: nowrap; width: 80px;"><i class="fa-solid fa-heart"></i> Likes</th>
+                            <th style="padding: 12px 10px; text-align: center; white-space: nowrap; width: 80px;">Acción</th>
                         </tr>
                     </thead>
                     <tbody>
