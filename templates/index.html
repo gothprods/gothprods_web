@@ -92,7 +92,7 @@
             {% endif %}
             {% if settings.get('show_servicios', '1') == '1' %}
             <li class="dock-item" data-title="{{ settings.get('title_servicios', 'Servicios') }}">
-                <a href="#servicios"><img src="{{ settings.get('icon_servicios', 'updates/servicios_icon.jpg') }}" alt="{{ settings.get('title_servicios', 'Servicios') }}" ><span class="dock-text">{{ settings.get('title_servicios', 'Servicios') }}</span></a>
+                <a href="#servicios" style="opacity: 0.3; pointer-events: none; filter: grayscale(100%);"><img src="{{ settings.get('icon_servicios', 'updates/servicios_icon.jpg') }}" alt="{{ settings.get('title_servicios', 'Servicios') }}" ><span class="dock-text">{{ settings.get('title_servicios', 'Servicios') }}</span></a>
             </li>
             {% endif %}
             <li class="dock-item" data-title="{{ settings.get('title_contacto', 'Contáctanos') }}">
