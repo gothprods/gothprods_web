@@ -1021,7 +1021,7 @@
                 {% for month_name, items in agenda_grouped_2026.items() %}
                 <div id="tab-2026-{{ month_name|replace(' ', '-') }}" class="agenda-month-panel news-rail">
                     {% for item in items %}
-                    {% set is_cancelled = ('cancelado' in item.title|lower) or (item.sp_link and 'cancelado' in item.sp_link|lower) %}
+                    {% set is_cancelled = ('cancelado' in item.title|lower) or (item.sp_link and 'cancelado' in item.sp_link|lower) or (item.full_desc and 'cancelado' in item.full_desc|lower) %}
                     <div class="agenda-card {% if item.author < current_date and not is_cancelled %}past-event{% endif %} {% if is_cancelled %}cancelled-event{% endif %}" {% if is_cancelled %}style="opacity: 0.7; filter: grayscale(80%); position: relative;"{% endif %}>
                         {% if is_cancelled %}
                         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); background: rgba(200,0,0,0.9); color: white; border: 3px solid white; padding: 10px 20px; font-size: 1.5rem; font-weight: 900; letter-spacing: 4px; border-radius: 10px; z-index: 10; text-shadow: 2px 2px 0 #000; box-shadow: 0 0 15px rgba(255,0,0,0.5); text-transform: uppercase; pointer-events: none; width: 85%; text-align: center;">CANCELADO</div>
@@ -1069,7 +1069,7 @@
                 {% for month_name, items in agenda_grouped_2027.items() %}
                 <div id="tab-2027-{{ month_name|replace(' ', '-') }}" class="agenda-month-panel news-rail">
                     {% for item in items %}
-                    {% set is_cancelled = ('cancelado' in item.title|lower) or (item.sp_link and 'cancelado' in item.sp_link|lower) %}
+                    {% set is_cancelled = ('cancelado' in item.title|lower) or (item.sp_link and 'cancelado' in item.sp_link|lower) or (item.full_desc and 'cancelado' in item.full_desc|lower) %}
                     <div class="agenda-card {% if item.author < current_date and not is_cancelled %}past-event{% endif %} {% if is_cancelled %}cancelled-event{% endif %}" {% if is_cancelled %}style="opacity: 0.7; filter: grayscale(80%); position: relative;"{% endif %}>
                         {% if is_cancelled %}
                         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); background: rgba(200,0,0,0.9); color: white; border: 3px solid white; padding: 10px 20px; font-size: 1.5rem; font-weight: 900; letter-spacing: 4px; border-radius: 10px; z-index: 10; text-shadow: 2px 2px 0 #000; box-shadow: 0 0 15px rgba(255,0,0,0.5); text-transform: uppercase; pointer-events: none; width: 85%; text-align: center;">CANCELADO</div>
